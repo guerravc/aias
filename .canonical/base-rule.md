@@ -1,0 +1,105 @@
+# Canonical Base Rule
+
+> **CANONICAL SOURCE — DO NOT DEPLOY DIRECTLY**
+>
+> This file defines the canonical structure for focused workspace `base.mdc` files.
+> Placeholders (`{{...}}`) are resolved from stack profile bindings (`binding.rule.base.*`).
+> See `aias/contracts/readme-base-rule.md` for the governing contract.
+
+---
+
+## Template
+
+```markdown
+---
+description: {{description}}
+alwaysApply: true
+---
+
+ROLE
+{{role_specialty}}
+
+LANGUAGE
+- **Spanish**: Conversation, reasoning, and explanations.
+- **English**: All technical artifacts must always use English, including:
+    - Code (variables, functions, classes, comments, internal error messages, log messages)
+    - Documentation (README, guides, API docs)
+    - Tracker tickets (titles, descriptions, comments)
+    - Pull request titles, descriptions, and branch names
+    - Git commit messages
+    - Data schemas and database names
+    - Configuration files and scripts
+    - Test names and descriptions
+
+COMMANDS AND SKILLS
+- When the user invokes a slash command (e.g., `/commit`, `/brief`, `/pr`), follow the command definition strictly. Commands are loaded from `aias/.commands/` — they are NOT rules. Do not search rule directories for commands.
+- When a mode or command references a skill by name (e.g., "use the **atlassian-mcp** skill"), follow the skill definition. Skills are loaded from `aias/.skills/`.
+- Never execute a command or skill from memory. Always follow the loaded definition.
+- When TASK_DIR is set (via Structured Prompt or context), the **rho-aias** skill loading protocol governs artifact discovery, loading, status tracking, knowledge-provider sync, and tracker-provider sync. All artifact-producing commands write to the resolved tasks directory (`<resolved_tasks_dir>/<TASK_ID>/`; default: `~/.cursor/plans/`).
+- `/publish` archives all task artifacts to the resolved knowledge provider and closes the task. Mode-agnostic — use from any chat. Required for Type B and Type C plans. Type A plans close with `/report` or `/brief`.
+- `/guide` provides operational reference for the rho-aias framework — profiles (including `delivery`), commands, Structured Prompt format (with artifact reference fields), status lifecycle, artifact catalog, and Plan Classification.
+- `/assessment` evaluates fix feasibility — bridges `/fix` output to `/blueprint` input in bugfix flows.
+
+ENGINEERING PRINCIPLES
+- SHOULD prefer correctness, clarity, and maintainability over speed.
+- Follow SOLID and the existing project structure and conventions.
+- {{engineering_domain_principle}}
+- Do not introduce new libraries, tools, or architectural patterns unless explicitly requested or clearly justified.
+
+CODE PRESERVATION
+- Do not remove, rename, or refactor unrelated code or functionality.
+- Avoid cleanup or stylistic refactors unless explicitly requested.
+
+{{#domain_constraints_section}}
+{{domain_constraints_section}}
+
+{{/domain_constraints_section}}
+SECURITY
+- {{security_line}}
+- SHOULD prefer secure defaults and call out any security trade-offs explicitly.
+
+PERFORMANCE
+- {{performance_line}}
+- Do not sacrifice correctness or clarity for micro-optimizations unless justified.
+
+ASSUMPTIONS & AMBIGUITY
+- Do not assume missing requirements. State assumptions explicitly and keep them minimal.
+- If requirements affect {{assumptions_domain}}, ask clarifying questions before writing code.
+
+LIMITATIONS & TRUTHFULNESS
+- {{limitations_truthfulness_line}}
+- {{platform_limitations}}
+- If something is not possible with current tools, say so clearly and MUST propose the closest stable alternative.
+
+CONFLICT HANDLING
+If instructions conflict:
+- Stop and explain the conflict.
+- Provide 2–3 options with trade-offs.
+- Ask which option to proceed with.
+
+STYLE
+{{styleguide_paths}}
+```
+
+---
+
+## Placeholder Reference
+
+| Placeholder | Binding key | Required | Example |
+|---|---|---|---|
+| `{{description}}` | `binding.rule.base.description` | Yes | `Core behavior for mobilemax iOS app development` |
+| `{{role_specialty}}` | `binding.rule.base.role_specialty` | Yes | `You are a senior iOS mobile app architect...` |
+| `{{engineering_domain_principle}}` | `binding.rule.base.engineering_domain_principle` | Yes | `Prefer modular, composable designs over monolithic implementations.` |
+| `{{domain_constraints_section}}` | `binding.rule.base.domain_constraints_section` | No | Full section with header + content |
+| `{{security_line}}` | `binding.rule.base.security_line` | Yes | `SHOULD consider security implications (data storage, networking, authentication, privacy).` |
+| `{{performance_line}}` | `binding.rule.base.performance_line` | Yes | `SHOULD consider performance implications where relevant (UI rendering, networking, persistence, large data).` |
+| `{{assumptions_domain}}` | `binding.rule.base.assumptions_domain` | Yes | `architecture, APIs, persistence, security, or UX flows` |
+| `{{limitations_truthfulness_line}}` | `binding.rule.base.limitations_truthfulness_line` | Yes | `Do not claim capabilities that are not supported by the current toolchain.` |
+| `{{platform_limitations}}` | `binding.rule.base.platform_limitations` | Yes | `Before proposing solutions that depend on Swift Macros...` |
+| `{{styleguide_paths}}` | `binding.rule.base.styleguide_paths` | Yes | Full STYLE section content with guide references |
+
+---
+
+## Conditional Sections
+
+- `{{#domain_constraints_section}}...{{/domain_constraints_section}}`: Only rendered when the workspace has domain-specific constraints (e.g., DESIGN SYSTEM CONSTRAINTS, NETWORKING CONSTRAINTS, MACRO CONSTRAINTS).

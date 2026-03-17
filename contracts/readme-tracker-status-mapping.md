@@ -1,0 +1,150 @@
+# Tracker Status Mapping Contract — Cursor Configuration System (v1.0)
+
+This document defines the canonical contract for tracker status mapping artifacts used by provider-specific tracker integrations.
+
+It exists to:
+- Standardize mapping from framework canonical states to provider states.
+- Decouple tracker transitions from provider-specific labels.
+- Enforce fail-fast behavior when mapping is missing or invalid.
+- Keep transition logic auditable across providers.
+
+---
+
+## Purpose
+
+A tracker status mapping file defines how canonical framework states map to a concrete provider workflow (Jira, Trello, Monday, etc.).
+
+Canonical states are the source of truth:
+
+- `pending_dor`
+- `ready`
+- `in_progress`
+- `in_review`
+- `completed`
+- `cancelled`
+
+Provider labels are adapter-specific outputs.
+
+---
+
+## File Location
+
+Mapping artifacts can live in one of these locations:
+
+- `aias/.skills/<provider-skill>/<provider>-status-mapping.md`
+- `aias-providers/mappings/<provider>-status-mapping.md`
+
+The active file must be referenced by `status_mapping_source` in `aias-providers/tracker-config.md`.
+
+---
+
+## Mandatory Sections (Order)
+
+Each mapping file must contain these sections in this exact order:
+
+1. `Purpose`
+2. `Provider`
+3. `Canonical Status Catalog`
+4. `Canonical -> Provider Mapping`
+5. `Command Triggers`
+6. `Boundary Rules`
+7. `Resolution Rules`
+
+---
+
+## Normative Schema
+
+Each mapping must define, at minimum:
+
+- `provider` (string, provider identifier)
+- `canonical_to_provider` (map of canonical state -> provider target)
+- `command_triggers` (map of command -> canonical transition)
+
+### Required `canonical_to_provider` keys
+
+All canonical states are mandatory keys:
+
+- `pending_dor`
+- `ready`
+- `in_progress`
+- `in_review`
+- `completed`
+- `cancelled`
+
+### Provider target shape
+
+Each `canonical_to_provider.<state>` target must include:
+
+- `state_name` (string)
+
+Optional target metadata:
+
+- `state_id` (string)
+- `container_type` (string; e.g. `status`, `list`, `group`)
+- `container_id` (string)
+- `notes` (string)
+
+---
+
+## Command Trigger Contract
+
+The following command transitions are mandatory:
+
+- `/validate-plan`: `pending_dor -> ready`
+- `/implement`: `ready -> in_progress`
+- `/pr`: `in_progress -> in_review`
+- `/commit`: verify `in_review` (no state change if already there)
+
+Canonical key format is mandatory:
+
+- `slash + kebab-case` only (regex: `^/[a-z][a-z0-9-]*$`)
+- `snake_case` is forbidden for canonical trigger keys
+- Legacy aliases are forbidden
+- Runtime normalizers/adapters from legacy keys are forbidden
+
+Mappings may add provider-specific metadata, but cannot alter these canonical transitions or key format.
+
+---
+
+## Boundary Rules (Mandatory)
+
+1. Framework never auto-transitions to `completed`.
+2. Framework never auto-transitions to `cancelled`.
+3. If provider status already matches target, transition is idempotent (no-op).
+
+---
+
+## Resolution Rules (Fail-Fast)
+
+When resolving tracker transitions:
+
+- If mapping file is missing: abort dependent tracker transition.
+- If mapping schema is invalid: abort dependent tracker transition.
+- If target canonical state has no provider mapping: abort dependent tracker transition.
+- If provider workflow has no reachable transition to mapped target: abort dependent tracker transition.
+
+Error response must include:
+
+- provider
+- command
+- canonical transition
+- reason code
+
+---
+
+## Conformance Checklist
+
+| Check | Pass/Fail |
+|---|---|
+| Mandatory section order present | ☐ |
+| `provider` declared | ☐ |
+| All canonical states mapped | ☐ |
+| Required command triggers declared | ☐ |
+| Trigger keys use only `slash + kebab-case` | ☐ |
+| No legacy trigger aliases (`snake_case`) | ☐ |
+| Boundary rules declared | ☐ |
+| Resolution rules are fail-fast | ☐ |
+
+---
+
+This document is the source of truth for tracker status mapping structure and validation.

@@ -1,0 +1,24 @@
+---
+description: Continuous improvement — learn from user feedback and propose rule refinements through an explicit approval process
+alwaysApply: true
+---
+
+CONTINUOUS IMPROVEMENT
+
+When the user provides feedback, corrections, suggestions, or expresses preferences during an interaction, evaluate whether existing rules, modes, or commands should be refined.
+
+PROCESS
+1. Identify the feedback or learning opportunity from the interaction.
+2. Connect it to a specific rule, mode, command, or convention.
+3. Propose a precise modification, identifying the exact file and section.
+4. Wait for explicit user approval before making any change.
+5. After applying, confirm what was changed and where.
+
+ANTI-PATTERNS (FORBIDDEN)
+- Applying rule modifications without explicit user approval.
+- Proposing changes not clearly connected to specific user feedback.
+- Suggesting vague modifications without identifying the exact file and section.
+- Ignoring relevant feedback that could improve the rules.
+- Updating multiple unrelated rules simultaneously or exceeding the scope of the feedback received.
+- Modifying rules proactively without a direct connection to user feedback.
+- Failing to confirm after a rule modification is applied.
