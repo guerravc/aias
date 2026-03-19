@@ -6,7 +6,7 @@
 
 You are executing an implementation plan increment by increment, reading plan artifacts from the task directory. This command orchestrates a mandatory protocol: **read → analyze → understand → execute → feedback gate → next**. It ensures the developer has full visibility and control at every step. On the first increment, it triggers the canonical tracker transition `ready` -> `in_progress` through the resolved tracker provider mapping.
 
-**Skills referenced:** `rho-aias`, `incremental-decomposition`.
+**Skills referenced:** `rho-aias`, `incremental-decomposition`, `xcode-mcp` (conditional — iOS projects).
 
 ---
 
@@ -226,7 +226,21 @@ For each increment:
 
 4. **Update** the plan's frontmatter todo status from `pending` to `completed` for this increment (if the plan file is writable).
 
-5. **Governance gate** — Resolve and fire the appropriate gate before proceeding to the next increment.
+5. **Verify** (conditional — requires `xcode-mcp`):
+   - Resolve `tabIdentifier` via `XcodeListWindows` (once per execution session; reuse for subsequent increments).
+   - Run `BuildProject(tabIdentifier)`.
+   - If build succeeds, run `RunAllTests(tabIdentifier)`.
+   - Report result:
+     ```
+     ✓ Verification passed:
+       Build: SUCCESS (<elapsed>)
+       Tests: <passed> passed, 0 failed (<elapsed>)
+     ```
+   - If build or tests fail, fire the Verification Failure gate (see below).
+   - If `xcode-mcp` is not available (non-iOS project), skip silently.
+   - If `XcodeListWindows` fails (Xcode not open), warn and skip verification for this increment.
+
+6. **Governance gate** — Resolve and fire the appropriate gate before proceeding to the next increment.
 
 #### Gate: Inter-Increment Feedback
 
@@ -256,6 +270,35 @@ Report increment completion (changes, files, verification).
 - `continue` → Proceed to next increment
 - `adjust` → User provides corrections; apply them before continuing (see Feedback Handling below)
 - `stop` → Report current state (completed increments, remaining increments, any in-progress work)
+
+**Anti-bypass:** Inherits Gate Invocation Protocol. No additional rules.
+
+#### Gate: Verification Failure (conditional)
+
+**Type:** Verification
+**Fires:** After step 5 (Verify), only when build or tests fail.
+**Skippable:** No (when fired).
+
+**Context output:**
+Report verification result:
+- Build status (success/failure + error count)
+- Test status (passed/failed counts)
+- Error details (file, line, message — from build log or test results)
+
+**AskQuestion:**
+- **Prompt:** "Verification failed after Increment <N>. <error summary>."
+- **Options:**
+  - `fix`: "Fix the issues" (agent applies corrections, then re-runs verification)
+  - `retry`: "Re-run verification" (after manual user fixes outside the agent)
+  - `skip`: "Skip verification and proceed to feedback"
+  - `stop`: "Stop execution"
+- **allow_multiple:** false
+
+**On response:**
+- `fix` → Agent attempts to fix reported errors, then re-runs build + tests. If still failing, re-fires this gate.
+- `retry` → Re-runs build + tests without changes. If still failing, re-fires this gate.
+- `skip` → Proceed to Inter-Increment Feedback gate (user accepts risk).
+- `stop` → Report current state and halt.
 
 **Anti-bypass:** Inherits Gate Invocation Protocol. No additional rules.
 
