@@ -29,6 +29,8 @@ Two files carry this responsibility:
 - **`AGENTS.md`** — The IDE-native context file (Cursor, Claude Code, Windsurf). Declares project structure, conventions, key technologies, and related documentation. Read automatically by the agent at session start.
 - **`RHOAIAS.md`** — The framework-specific project context file. Declares stack, repositories, plans base directory, service bindings, and team conventions. Consumed by the `rho-aias` system skill during the loading protocol.
 
+Release metadata is intentionally kept outside this layer: `aias/CHANGELOG.md` is the versioned source of truth for framework version and release history, while `AGENTS.md` remains focused on operational context for the agent.
+
 Both files are maintained manually by the team. They change when the project changes, not when the framework changes.
 
 Contract: `aias/contracts/readme-project-context.md`.

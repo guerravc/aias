@@ -28,6 +28,17 @@ Before creating or modifying any artifact, read the governing contract first.
 
 ---
 
+## Version Management
+
+Release metadata is versioned documentation, not runtime agent context.
+
+- `aias/CHANGELOG.md` is the source of truth for the current framework version, versioning scheme, and release history.
+- `AGENTS.md` must not keep the detailed release history; it should only point to `aias/CHANGELOG.md`.
+- When bumping the framework version, update `aias/CHANGELOG.md` first.
+- If a release changes architecture, workflows, or maintainer expectations, review references in `aias/README.md` and `aias/docs/ARCHITECTURE.md` as part of the same change.
+
+---
+
 ## Creating a New Mode
 
 1. Read the contract: `aias/contracts/readme-mode-rule.md`.

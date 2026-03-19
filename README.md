@@ -92,6 +92,7 @@ Less suitable for teams seeking pure prompt experimentation without process cons
 ## Documentation
 
 - [Quick Start](docs/QUICKSTART.md) — From clone to first `/blueprint` in under 10 minutes
+- [Changelog](CHANGELOG.md) — Current version, versioning policy, and release history
 - [Architecture](docs/ARCHITECTURE.md) — The seven layers, data flow, and generation pipeline
 - [Configuration](docs/CONFIGURATION.md) — Project context, stack profiles, services, and editor setup
 - [Workflows](docs/WORKFLOWS.md) — End-to-end flows for features, bugs, enrichment, CI/CD
