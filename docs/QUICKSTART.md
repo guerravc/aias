@@ -108,8 +108,8 @@ The most efficient way to interact with the system. One message with structured 
 ```
 MODE: <mode>                 (required)
 REPO: <repo>                 (when working in a specific repo)
-TICKET: <ticket-id>          (enables tracker-provider enrichment via service config)
-TASK_DIR: <task-id>          (artifact dir: <resolved_tasks_dir>/<task-id>/ — default: ~/.cursor/plans/)
+TASK ID: <task-id>            (enables tracker-provider enrichment via service config)
+TASK DIR: <task-id>           (artifact dir: <resolved_tasks_dir>/<task-id>/ — default: ~/.cursor/plans/)
 PROFILE: <profile>           (feature|bugfix|refactor|enrichment|delivery — sets workflow profile)
 PLAN: <plan-name>            (when continuing from an existing plan)
 ISSUE: <filename>            (loads report.issue.md for context or update)
@@ -121,7 +121,7 @@ CONTEXT: <background>        (problem description, current state, what was reque
 TASK: <instruction>          (what to do + optional command chaining)
 ```
 
-All fields except MODE and TASK are optional — use only what the task needs. When TICKET is provided and TASK_DIR is not, TASK_DIR defaults to the ticket ID.
+All fields except MODE and TASK are optional — use only what the task needs. When `TASK ID` is provided and `TASK DIR` is not, the task directory defaults to the task identifier. `TICKET` remains a legacy alias for compatibility.
 
 ### Fail-Fast Guardrails (Service-Dependent Steps)
 
@@ -138,8 +138,8 @@ For commands that depend on tracker/knowledge/design/VCS providers:
 ```
 MODE: @planning
 REPO: mobilemax-dev
-TICKET: MAX-12761
-TASK_DIR: MAX-12761
+TASK ID: MAX-12761
+TASK DIR: MAX-12761
 PROFILE: feature
 FIGMA: https://figma.com/design/abc123/...
 CONTEXT: Product requested a new candidate search feature with filters
@@ -151,8 +151,8 @@ TASK: Analyze the requirement. When done, execute /blueprint.
 ```
 MODE: @debug
 REPO: mobilemax-dev
-TICKET: MAX-12850
-TASK_DIR: MAX-12850
+TASK ID: MAX-12850
+TASK DIR: MAX-12850
 PROFILE: bugfix
 CONTEXT: The candidate list crashes when filtering by "Remote only".
          The API returns null for the candidates array instead of an
@@ -164,15 +164,15 @@ TASK: Analyze the root cause. When done, execute /fix.
 ```
 MODE: @dev
 REPO: mobilemax-dev
-TASK_DIR: MAX-12761
+TASK DIR: MAX-12761
 TASK: Execute /implement for this plan.
 ```
 
 **Enriching a vague ticket:**
 ```
 MODE: @product
-TICKET: MAX-13001
-TASK_DIR: MAX-13001
+TASK ID: MAX-13001
+TASK DIR: MAX-13001
 PROFILE: enrichment
 CONTEXT: Ticket only says "Add export button to reports".
          No acceptance criteria, no design, no scope definition.
@@ -183,7 +183,8 @@ TASK: Analyze with product frameworks. When done, execute /enrich.
 ```
 MODE: @review
 REPO: mobilemax-dev
-TASK: Review the changes on the current branch.
+TASK DIR: MAX-12850
+TASK: Review the changes on the current branch. When done, /self-review.
 ```
 
 ---
@@ -215,8 +216,10 @@ TASK: Review the changes on the current branch.
 | `/fix` | Structure fix analysis | `@debug` data | Task directory |
 | `/brief` | Feature brief | Planning context | Markdown brief |
 | `/report` | Bug fix report | Debug context | Markdown report |
+| `/self-review` | Review your own local work | `@review` + local code / TASK_DIR | Findings in chat |
+| `/peer-review` | Review a PR or third-party change | `@review` + PR URL/number | Findings in chat |
 | `/pr` | PR description | Implementation context | PR template |
-| `/enrich` | Enrich tracker ticket | Ticket ID + `@product` context | Task directory |
+| `/enrich` | Enrich tracker-backed task | Task ID + `@product` context | Task directory |
 | `/explain` | Concept learning | Topic or question | Structured explanation (chat) |
 | `/trace` | Log instrumentation plan | `@qa` or `@debug` context | Task directory |
 | `/assessment` | Evaluate fix feasibility | `@dev` + fix + issue | Task directory |
@@ -271,8 +274,8 @@ To create or regenerate workspace artifacts, use `aias init` or individual `aias
 ```
 MODE: @planning
 REPO: mobilemax-dev
-TICKET: MAX-14000
-TASK_DIR: MAX-14000
+TASK ID: MAX-14000
+TASK DIR: MAX-14000
 PROFILE: feature
 FIGMA: https://figma.com/design/abc123/user-profile
 CONTEXT: Product wants a user profile screen where users can view and
@@ -283,7 +286,7 @@ TASK: Analyze the requirement. When done, /blueprint.
 **Step 2: Delivery Assessment** (optional, new chat)
 ```
 MODE: @delivery
-TASK_DIR: MAX-14000
+TASK DIR: MAX-14000
 TASK: Assess readiness. When done, /charter.
 ```
 
@@ -291,7 +294,7 @@ TASK: Assess readiness. When done, /charter.
 ```
 MODE: @dev
 REPO: mobilemax-dev
-TASK_DIR: MAX-14000
+TASK DIR: MAX-14000
 TASK: /implement
 ```
 
