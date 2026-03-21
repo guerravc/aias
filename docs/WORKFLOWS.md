@@ -16,9 +16,9 @@ This document describes the complete workflows for common development tasks usin
 
 See [QUICKSTART.md § Structured Prompt](QUICKSTART.md#structured-prompt-primary-workflow) for the canonical format definition, field descriptions, and examples. Commands can be chained in TASK: "When done, /blueprint." or "When done, /blueprint. When blueprint is done, /validate-plan."
 
-### Interactive Gates (AskQuestion UX)
+### Interactive Gates (Structured UX)
 
-Commands use **AskQuestion** as the sole mechanism for interactive gates — structured prompts with explicit options that the user selects before the command proceeds. This replaces all text-based `(yes / adjust)` pseudo-gates.
+Commands use a **structured interactive mechanism** for gates. `AskQuestion` is canonical when the runtime exposes it; otherwise the same gate must be projected through the **Text Gate Protocol** defined in `readme-commands.md`. This replaces ad-hoc text prompts such as `(yes / adjust)` pseudo-gates.
 
 **Gate types:** Confirmation, Decision, Feedback, Approval, Precondition. Each gate follows the Gate Invocation Protocol: Context → Gate → Action.
 
@@ -53,7 +53,7 @@ Complete workflow from planning to implementation to PR and closure.
 ```
 MODE: @product
 REPO: mobilemax-dev
-TICKET: PROJ-123
+TASK ID: PROJ-123
 CONTEXT: Ticket is vague — only says "Add export button to reports".
          No acceptance criteria, no design, no scope.
 TASK: Analyze with product frameworks (JTBD, 5 Whys, User Journey, MoSCoW).
@@ -72,8 +72,8 @@ TASK: Analyze with product frameworks (JTBD, 5 Whys, User Journey, MoSCoW).
 ```
 MODE: @planning
 REPO: mobilemax-dev
-TICKET: PROJ-123
-TASK_DIR: PROJ-123
+TASK ID: PROJ-123
+TASK DIR: PROJ-123
 FIGMA: <url if available>
 CONTEXT: <what was requested and any relevant background>
 TASK: Analyze the requirement. When done, /blueprint.
@@ -106,7 +106,7 @@ Use `/blueprint --fast` for trivial or well-understood tasks.
 ```
 MODE: @dev
 REPO: mobilemax-dev
-TASK_DIR: PROJ-123
+TASK DIR: PROJ-123
 TASK: /implement
 ```
 
@@ -167,7 +167,7 @@ For complex features, assess readiness before implementation:
 
 ```
 MODE: @delivery
-TASK_DIR: PROJ-123
+TASK DIR: PROJ-123
 TASK: Assess readiness. When done, /charter.
 ```
 
@@ -186,8 +186,8 @@ Complete workflow from bug discovery to fix implementation. Steps marked with * 
 ```
 MODE: @qa
 REPO: mobilemax-dev
-TICKET: MAX-12850
-TASK_DIR: MAX-12850
+TASK ID: MAX-12850
+TASK DIR: MAX-12850
 CONTEXT: <describe the bug, environment, reproduction steps, evidence>
 TASK: Analyze the bug. When done, /issue.
 ```
@@ -217,7 +217,7 @@ New chat:
 ```
 MODE: @dev
 REPO: mobilemax-dev
-TASK_DIR: MAX-12850
+TASK DIR: MAX-12850
 TRACE: instrumentation.trace.md
 TASK: Implement the trace plan.
 ```
@@ -248,7 +248,7 @@ New chat:
 ```
 MODE: @debug
 REPO: mobilemax-dev
-TASK_DIR: MAX-12850
+TASK DIR: MAX-12850
 CONTEXT: See issue at <resolved_tasks_dir>/MAX-12850/report.issue.md
 TASK: Analyze root cause. When done, /fix.
 ```
@@ -265,7 +265,7 @@ New chat:
 ```
 MODE: @dev
 REPO: mobilemax-dev
-TASK_DIR: MAX-12850
+TASK DIR: MAX-12850
 FIX: analysis.fix.md
 ISSUE: report.issue.md
 TASK: /assessment
@@ -283,7 +283,7 @@ New chat:
 ```
 MODE: @planning
 REPO: mobilemax-dev
-TASK_DIR: MAX-12850
+TASK DIR: MAX-12850
 ASSESSMENT: feasibility.assessment.md
 ISSUE: report.issue.md
 FIX: analysis.fix.md
@@ -416,7 +416,7 @@ Coordinating changes across multiple repositories (MobileMax, RDSUI, RDSNetworki
 
 ```
 MODE: @planning
-TASK_DIR: integration-rdsnetworking-upgrade
+TASK DIR: integration-rdsnetworking-upgrade
 CONTEXT: RDSNetworking has breaking API changes that affect MobileMax
          and RDSMacros. Need to coordinate the upgrade.
 TASK: Plan the integration. When done, /blueprint.
@@ -432,7 +432,7 @@ TASK: Plan the integration. When done, /blueprint.
 New chat:
 ```
 MODE: @integration
-TASK_DIR: integration-rdsnetworking-upgrade
+TASK DIR: integration-rdsnetworking-upgrade
 TASK: Coordinate the changes across repositories according to the plan.
 ```
 
@@ -463,7 +463,7 @@ Generating a structured log instrumentation plan for tracing execution flows.
 ```
 MODE: @qa
 REPO: mobilemax-dev
-TASK_DIR: <task-id>
+TASK DIR: <task-id>
 CONTEXT: Need to trace the login flow to understand what's happening.
 TASK: Analyze the flow in LoginViewModel.swift and LoginView.swift.
       When done, /trace LoginViewModel.swift LoginView.swift.
@@ -495,8 +495,8 @@ Analyzing and enriching vague tracker tickets with product and technical detail.
 
 ```
 MODE: @product
-TICKET: MAX-12761
-TASK_DIR: MAX-12761
+TASK ID: MAX-12761
+TASK DIR: MAX-12761
 CONTEXT: Ticket is vague — only says "Add export button to reports".
          No acceptance criteria, no design, no scope.
 TASK: Analyze with product frameworks (JTBD, 5 Whys, User Journey, MoSCoW).
@@ -675,7 +675,7 @@ Four commands trigger canonical tracker operations. Transitions only fire when `
 **Examples:**
 ```
 MODE: @planning
-TICKET: MAX-12761
+TASK ID: MAX-12761
 FIGMA: https://figma.com/design/...
 CONTEXT: Product requested candidate search with filters.
 TASK: Analyze. When done, /blueprint.
@@ -684,14 +684,14 @@ TASK: Analyze. When done, /blueprint.
 ```
 MODE: @debug
 REPO: mobilemax-dev
-TICKET: MAX-12850
+TASK ID: MAX-12850
 CONTEXT: Candidate list crashes on "Remote only" filter.
 TASK: Analyze root cause. When done, /fix.
 ```
 
 ```
 MODE: @dev
-TASK_DIR: MAX-12761
+TASK DIR: MAX-12761
 TASK: /implement
 ```
 
@@ -712,7 +712,7 @@ TASK: /implement
 ```
 Message 1:
   MODE: @planning
-  TICKET: MAX-12761
+  TASK ID: MAX-12761
   TASK: Analyze this requirement.
 
   → Review output, correct if needed
@@ -771,7 +771,7 @@ For the complete artifact catalog (suffixes, producers, and descriptions), see `
 → `@product`
 
 **Reviewing code?**
-→ `@review`
+→ `@review` + `/self-review` for local work, or `@review` + `/peer-review` for PR / third-party review
 
 **Building and running the app?**
 → `/run` (with optional flags: `-s`, `-l`, `--log-level`)
@@ -833,7 +833,7 @@ Commits use conventional type tags. AI-assisted commits prepend `AI` for traceab
 4. **Provide CONTEXT and TASK separately** — CONTEXT is the "what's happening", TASK is the "what to do"
 5. **Chain commands in TASK** when the flow is predictable ("When done, /blueprint.")
 6. **Follow workspace-specific output contracts** (one file per response, commit messages, etc.)
-7. **Set TASK_DIR** (or TICKET, which defaults TASK_DIR) so artifacts load correctly across chats
+7. **Set TASK DIR** (or `TASK ID`, which defaults the task directory) so artifacts load correctly across chats
 8. **Run `/publish`** after PR creation and review to archive all artifacts and close the task formally
 
 ---
