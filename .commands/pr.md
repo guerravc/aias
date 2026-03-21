@@ -68,6 +68,7 @@ Present PR summary in chat:
 - Action: create vs update
 
 **AskQuestion:**
+- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
 - **Prompt:** "Create PR against <base-branch> with the description above?"
 - **Options:**
   - `create`: "Create the pull request"
@@ -142,7 +143,7 @@ Select one:
 
 ## Associated Tickets
 <!-- Link tracker tickets -->
-[<TICKET-ID>](<TRACKER-TICKET-URL>)
+[<TASK_ID>](<TRACKER-TICKET-URL>)
 
 ## Summary
 <!-- High-level summary of what changed (2–4 bullets max) -->
