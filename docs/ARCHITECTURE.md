@@ -90,7 +90,7 @@ Two command types:
 
 Commands are invoked within a mode context. The mode provides the reasoning; the command provides the structure. A command without a mode is syntax without semantics.
 
-The full command catalog lives in `aias/.commands/`. Current commands: `/aias`, `/assessment`, `/blueprint`, `/brief`, `/charter`, `/commit`, `/consolidate-plan`, `/copyedit`, `/enrich`, `/explain`, `/fix`, `/guide`, `/implement`, `/issue`, `/pr`, `/publish`, `/report`, `/run`, `/spm`, `/test`, `/trace`, `/validate-plan`.
+The full command catalog lives in `aias/.commands/`. Current commands: `/aias`, `/assessment`, `/blueprint`, `/brief`, `/charter`, `/commit`, `/consolidate-plan`, `/copyedit`, `/enrich`, `/explain`, `/fix`, `/guide`, `/implement`, `/issue`, `/peer-review`, `/pr`, `/publish`, `/report`, `/run`, `/self-review`, `/spm`, `/test`, `/trace`, `/validate-plan`.
 
 Contract: `aias/contracts/readme-commands.md`.
 
@@ -155,8 +155,8 @@ The Structured Prompt is the primary input format. It declares the operating con
 ```
 MODE: @planning
 REPO: my-project
-TICKET: PROJ-123
-TASK_DIR: PROJ-123
+TASK ID: PROJ-123
+TASK DIR: PROJ-123
 TASK: Analyze the requirement. When done, /blueprint.
 ```
 
@@ -200,7 +200,7 @@ Since each mode operates in its own chat session, handoffs between modes happen 
 1. `@planning` produces `technical.plan.md` via `/blueprint`
 2. A new chat in `@dev` loads the plan artifact during the loading protocol
 3. `@dev` executes `/implement` against the loaded plan
-4. A new chat in `@review` loads the implementation artifacts for `/pr`
+4. A new chat in `@review` loads the implementation artifacts for `/self-review` or PR context for `/peer-review`
 
 The task directory is the shared state. `status.md` tracks which phase the task is in.
 
