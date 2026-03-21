@@ -211,8 +211,8 @@ Open your AI coding tool (Cursor, Claude Code, Windsurf, GitHub Copilot, Codex, 
 ```
 MODE: @planning
 REPO: my-project
-TICKET: PROJ-100
-TASK_DIR: PROJ-100
+TASK ID: PROJ-100
+TASK DIR: PROJ-100
 PROFILE: feature
 CONTEXT: <describe the problem or requirement>
 TASK: <what to do>
