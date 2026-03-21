@@ -84,6 +84,7 @@ Present target summary in chat:
 - Confirmation that the file exists and is writable
 
 **AskQuestion:**
+- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
 - **Prompt:** "Copyedit and overwrite <file-path>?"
 - **Options:**
   - `proceed`: "Apply copyedits to the file"
