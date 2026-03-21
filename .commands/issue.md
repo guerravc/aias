@@ -52,6 +52,7 @@ Present artifact summary in chat:
 - Steps to reproduce count
 
 **AskQuestion:**
+- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
 - **Prompt:** "Write bug report to <TASK_DIR>?"
 - **Options:**
   - `write`: "Write artifact to TASK_DIR"
@@ -66,7 +67,7 @@ Present artifact summary in chat:
 
 FILE OUTPUT CONTRACT (must follow)
 - Follow the **rho-aias** skill loading protocol Phase 0 to resolve TASK_DIR.
-- If TASK_DIR is set (via Structured Prompt, ticket ID, or context): write `report.issue.md` to TASK_DIR.
+- If TASK_DIR is set (via Structured Prompt, task id, or context): write `report.issue.md` to TASK_DIR.
 - If TASK_DIR is not set: create a new directory `<resolved_tasks_dir>/<Name>/` (default: ~/.cursor/plans/) using a kebab-case name derived from the bug title, and write `report.issue.md` there.
 - Create `status.md` if it does not exist (profile: `bugfix`).
 - The bug report content must be the ONLY content in the file. The template has **no "Possible Fix"** section.
