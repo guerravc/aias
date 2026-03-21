@@ -55,6 +55,7 @@ Present artifact summary in chat:
 - Solution count (viable)
 
 **AskQuestion:**
+- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
 - **Prompt:** "Write fix analysis to <TASK_DIR>?"
 - **Options:**
   - `write`: "Write artifact to TASK_DIR"
