@@ -50,11 +50,12 @@ Rules:
 **Context output:**
 Present publish preview in chat:
 - Report content summary (bug title, root cause, fix applied)
-- Target ticket ID
+- Target task ID / tracker reference
 - Tracker provider action (post as comment)
 
 **AskQuestion:**
-- **Prompt:** "Publish bug fix report to <TICKET_ID> via tracker provider?"
+- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
+- **Prompt:** "Publish bug fix report to <TASK_ID> via tracker provider?"
 - **Options:**
   - `publish`: "Publish to tracker"
   - `adjust`: "Adjust content before publishing"
