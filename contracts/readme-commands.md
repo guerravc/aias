@@ -302,22 +302,49 @@ All gates in commands MUST comply with this section. Individual command definiti
 
 ### Gate Taxonomy
 
-Five gate types. The first four use `AskQuestion`; Precondition is a hard STOP.
+Five gate types. The first four use a **structured interactive mechanism**; Precondition is a hard STOP.
 
 | Gate Type | Mechanism | Blocking | Use Case | Options Pattern |
 |---|---|---|---|---|
-| **Confirmation** | `AskQuestion` (single-select) | Yes | Validate understanding or approve a write action | 2 options: affirmative action + adjustment |
-| **Decision** | `AskQuestion` (single-select or multi-select) | Yes | Choose between mutually exclusive paths | 2–5 options describing distinct actions |
-| **Feedback** | `AskQuestion` (single-select) | Yes | Post-execution quality check | 3 options: continue / adjust / stop |
-| **Approval** | `AskQuestion` (single-select) | Yes | Authorize a high-impact or irreversible action | 2 options: approve / reject with reason |
+| **Confirmation** | `AskQuestion` when available; otherwise `Text Gate Protocol` | Yes | Validate understanding or approve a write action | 2 options: affirmative action + adjustment |
+| **Decision** | `AskQuestion` when available; otherwise `Text Gate Protocol` | Yes | Choose between mutually exclusive paths | 2–5 options describing distinct actions |
+| **Feedback** | `AskQuestion` when available; otherwise `Text Gate Protocol` | Yes | Post-execution quality check | 3 options: continue / adjust / stop |
+| **Approval** | `AskQuestion` when available; otherwise `Text Gate Protocol` | Yes | Authorize a high-impact or irreversible action | 2 options: approve / reject with reason |
 | **Precondition** | Hard STOP (halt + report) | Yes | Missing required input or invalid state | No `AskQuestion` — halt execution and report |
 
 **Binding rules:**
-- Confirmation, Decision, Feedback, and Approval MUST use the `AskQuestion` tool.
+- Confirmation, Decision, Feedback, and Approval MUST use `AskQuestion` when the runtime exposes it.
+- If the runtime does not expose `AskQuestion`, Confirmation, Decision, Feedback, and Approval MUST use the `Text Gate Protocol`.
 - Precondition MUST NOT use `AskQuestion`. It halts and reports.
-- No other interactive mechanism is permitted.
+- No ad-hoc interactive mechanism is permitted outside these two channels.
 
 ---
+
+### Runtime Compatibility for Gates
+
+Rho AIAS supports two runtime-compatible channels for the same interactive gate model:
+
+1. `AskQuestion` — canonical and preferred when available
+2. `Text Gate Protocol` — mandatory compatibility path when `AskQuestion` is unavailable in the runtime
+
+This does **not** create a new gate type. It preserves the same gate taxonomy, blocking semantics, option ids, and anti-bypass rules across runtimes.
+
+The absence of `AskQuestion` in the runtime activates `Text Gate Protocol`. Commands MUST NOT invent their own fallback wording or degrade to informal free-form chat choices.
+
+### Text Gate Protocol
+
+When `AskQuestion` is unavailable, the runtime MUST project the same gate through chat text using this exact sequence:
+
+1. Present the normal gate context output.
+2. Present the gate prompt and the same option ids and labels that would have been used in `AskQuestion`.
+3. Instruct the user to reply with exactly one option id unless the gate explicitly allows multiple selections.
+4. Map the user's reply to the same action table defined under `On response`.
+
+Rules:
+
+- The gate remains blocking until a valid mapped response is received.
+- If the user reply does not map cleanly to exactly one valid option (or the allowed multi-select set), the gate MUST re-fire.
+- Commands MUST NOT continue execution while awaiting a valid textual gate response.
 
 ### Gate Invocation Protocol
 
@@ -332,10 +359,14 @@ The context MUST include:
 - Any assumptions, risks, or notable findings
 
 **Step 2 — Gate**
-Invoke `AskQuestion` with:
+Invoke the structured interactive mechanism with:
 - A clear, specific prompt that restates the decision
 - Descriptive, action-oriented options (see Option Design Principles)
 - The appropriate `allow_multiple` setting for the gate type
+
+Mechanism resolution:
+- If `AskQuestion` is available in the runtime, MUST use `AskQuestion`.
+- Otherwise, MUST use `Text Gate Protocol` with the same prompt, option ids, labels, and `allow_multiple` semantics.
 
 The gate MUST block execution until the user responds.
 
@@ -353,10 +384,10 @@ These rules apply to **all gates in all commands**. They are defined here and re
 |---|---|---|
 | AB-01 | MUST NOT skip a gate without an explicit contract exemption (e.g., `--fast`) | Gates exist to protect decision points. |
 | AB-02 | MUST NOT infer `--fast` from context, urgency, or task simplicity | `--fast` is an explicit user flag on `/blueprint` only. |
-| AB-03 | MUST NOT batch multiple gates into a single `AskQuestion` call | Each gate represents a distinct decision point. |
-| AB-04 | MUST NOT print gate options in chat text as a substitute for `AskQuestion` | Chat text is informational. Only `AskQuestion` provides structured interaction. |
+| AB-03 | MUST NOT batch multiple gates into a single structured interaction | Each gate represents a distinct decision point. |
+| AB-04 | MUST NOT print unstructured gate options in chat text as a substitute for the canonical mechanism | Chat text is informational unless it follows the exact Text Gate Protocol. |
 | AB-05 | MUST NOT self-answer a gate based on prior context or assumptions | Gates require explicit user input. |
-| AB-06 | MUST NOT proceed past a gate while `AskQuestion` is pending | The gate is blocking. No execution until response. |
+| AB-06 | MUST NOT proceed past a gate while a gate response is pending | The gate is blocking. No execution until response. |
 | AB-07 | MUST NOT convert a Precondition STOP into an `AskQuestion` gate | Preconditions are not negotiable. |
 
 ---
@@ -368,7 +399,7 @@ These rules apply to **all gates in all commands**. They are defined here and re
 3. **Action-oriented verbs.** Each option MUST start with a verb or verb phrase.
 4. **Exhaustive coverage.** The option set MUST cover all valid responses. If the user might want to stop, include a stop option.
 5. **No duplicative options.** Each option MUST represent a distinct action path.
-6. **Prompt context.** The `AskQuestion` prompt MUST include a 1–2 line summary that frames the decision without requiring the user to re-read the full context output.
+6. **Prompt context.** The gate prompt MUST include a 1–2 line summary that frames the decision without requiring the user to re-read the full context output.
 
 ---
 
@@ -393,6 +424,9 @@ Every gate defined in a command MUST use this template structure:
   - `<option-id-2>`: "<Descriptive action label>"
   [- `<option-id-3>`: "<Descriptive action label>"]
 - **allow_multiple:** <true | false>
+
+**Runtime compatibility:**
+- If `AskQuestion` is unavailable, use the Text Gate Protocol with the same prompt, option ids, labels, and `allow_multiple` semantics.
 
 **On response:**
 - `<option-id-1>` → <action>
@@ -630,7 +664,7 @@ Commands that produce artifacts MUST write to the task directory (`<resolved_tas
 
 ### TASK_DIR Field
 
-The Structured Prompt convention includes a `TASK_DIR` field that resolves the task directory. When `TICKET` is provided and `TASK_DIR` is not, `TASK_DIR` defaults to the ticket ID. Commands MUST respect this field for directory resolution.
+The Structured Prompt convention includes a `TASK_DIR` field that resolves the task directory. In user-facing prompts, `TASK DIR` is preferred and `DIR` is an allowed ergonomic alias. When `TASK_ID` / `TASK ID` is provided and `TASK_DIR` / `TASK DIR` is not, the task directory defaults to the task identifier. `TICKET` may remain as a legacy input alias, but it is not the canonical framework term. Commands MUST respect this field for directory resolution.
 
 ### Plan Delta Section
 
@@ -664,7 +698,7 @@ Commands that reference skills MUST declare them in the Identity section (Sectio
 
 ### Structured Prompt — Artifact Reference Fields
 
-In addition to the standard fields (`MODE`, `REPO`, `TICKET`, `TASK_DIR`, `PROFILE`, `PLAN`, `FIGMA`, `CONTEXT`, `TASK`), the Structured Prompt supports artifact reference fields: `ISSUE:`, `FIX:`, `ASSESSMENT:`, `TRACE:`. These resolve relative to TASK_DIR and instruct the agent to load the referenced artifact as primary context.
+In addition to the standard fields (`MODE`, `REPO`, `TASK ID`, `TASK DIR`, `PROFILE`, `PLAN`, `FIGMA`, `CONTEXT`, `TASK`), the Structured Prompt supports artifact reference fields: `ISSUE:`, `FIX:`, `ASSESSMENT:`, `TRACE:`. `DIR:` is an allowed alias for `TASK DIR`. `TICKET:` may be accepted as a legacy alias for `TASK ID`, but new documentation MUST prefer `TASK ID`. Artifact reference fields resolve relative to TASK_DIR and instruct the agent to load the referenced artifact as primary context.
 
 ### One Mode Per Chat
 
