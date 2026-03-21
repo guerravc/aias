@@ -51,11 +51,12 @@ Rules:
 **Context output:**
 Present publish preview in chat:
 - Brief content summary (title and key sections)
-- Target ticket ID
+- Target task ID / tracker reference
 - Tracker provider action (post as comment)
 
 **AskQuestion:**
-- **Prompt:** "Publish feature brief to <TICKET_ID> via tracker provider?"
+- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
+- **Prompt:** "Publish feature brief to <TASK_ID> via tracker provider?"
 - **Options:**
   - `publish`: "Publish to tracker"
   - `adjust`: "Adjust content before publishing"
