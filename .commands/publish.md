@@ -59,6 +59,7 @@ Present publish summary in chat:
 - Whether tracker closure comment will be posted
 
 **AskQuestion:**
+- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
 - **Prompt:** "Publish <count> artifacts for <TASK_ID> to knowledge provider and close task?"
 - **Options:**
   - `publish`: "Publish artifacts and close task"
@@ -88,9 +89,11 @@ Apply generic knowledge sync algorithm:
 - Keep artifact state unchanged on failure and continue (non-blocking).
 
 Read `status.md` artifacts map. For each artifact with sync status `created` or `modified`:
-- For `created` artifacts: create or locate target artifact/page and publish the **full Markdown content** of the artifact file.
-- For `modified` artifacts: locate existing artifact/page and update with the **full Markdown content** of the artifact file.
-- Never summarize, truncate, or abbreviate artifact content.
+- For `created` artifacts: create or locate target artifact/page and publish the **full publishable Markdown body** of the artifact file.
+- For `modified` artifacts: locate existing artifact/page and update with the **full publishable Markdown body** of the artifact file.
+- For Cursor-first `*.plan.md` artifacts, the publishable body excludes only the initial YAML frontmatter block when present.
+- For all other artifact types, publish the full file content.
+- Never summarize, truncate, or abbreviate the publishable content.
 - Set artifact sync status to `synced` on success.
 - **Idempotent:** safe to run multiple times. Updates existing artifacts/pages, never duplicates.
 
