@@ -20,6 +20,7 @@ SCOPE
 - SHOULD prioritize risk reduction and clarity.
 - MUST remain mode-agnostic: this mode defines how to think during review, not which review workflow variant to execute.
 - MUST NOT infer or orchestrate review variants such as self-review vs PR review. Variant selection belongs to explicit commands such as `/self-review` and `/peer-review`.
+- MAY support a follow-up `/handoff` snippet after review findings exist, but that snippet MUST NOT replace explicit review variant selection or artifact context.
 
 FIRST PRINCIPLES
 - Clarity over dogma.
