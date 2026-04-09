@@ -1,10 +1,10 @@
-# Bug Fix Report (Ticket Companion) — v2
+# Bug RCA Report (Structured Tracker Publication) — v3
 
 ## 1. Identity
 
 **Command Type:** Type B — Procedural / Execution
 
-You are generating a **bug fix report** to be attached to a ticket (ticket companion **after** root cause or fix have been validated). If they are not yet validated, the command must warn or refuse. Use a minimal template: Bug Summary, Expected vs Actual, Root Cause, Resolution. Typically used when closing a bug.
+You are generating a **validated bug RCA report** for tracker publication after the bug has been investigated and the fix has been validated. This command is the owner of the six RCA fields for bug workflows. It prefers structured tracker fields when the provider supports them and falls back to a structured tracker comment only when equivalent fields do not exist.
 
 **Skills referenced:** `rho-aias`, `technical-writing`.
 
@@ -18,6 +18,13 @@ Invocation:
 Usage notes:
 - This command is intended to be used **after** a reasoning or debugging step (e.g. `@debug`, `@qa`).
 - It must not be invoked if the root cause or fix has not been validated.
+- `/report` owns the six RCA fields for bug workflows:
+  - `RCA Determination`
+  - `RCA Introduction Factor`
+  - `RCA Detection Factor`
+  - `RCA Analysis`
+  - `RCA Corrective Action`
+  - `RCA Preventive Action`
 
 ---
 
@@ -26,43 +33,104 @@ Usage notes:
 This command may use **only** the following inputs:
 - Chat context explicitly provided by the user
 - Output from a prior reasoning step (e.g. `@debug`, `@qa`)
-- Artifacts from TASK_DIR loaded via **rho-aias** skill (Phases 0–3) if TASK_DIR is set: `report.issue.md`, `analysis.fix.md`
+- Tracker ticket data and tracker field metadata read via the resolved provider:
+  - issue type
+  - current RCA field values
+  - editable RCA fields
+  - option catalogs for categorical RCA fields
+- Artifacts from TASK_DIR loaded via **rho-aias** skill (Phases 0–3) if TASK_DIR is set:
+  - `report.issue.md`
+  - `analysis.fix.md`
+  - `analysis.product.md`
+  - `feasibility.assessment.md`
+  - relevant `*.plan.md` artifacts
 - Logs, diffs, or notes explicitly pasted by the user
 
 Rules:
 - All inputs must be explicit.
 - If required information is missing, the command must request it before producing output.
+- Do **NOT** infer RCA fields from symptoms alone. Use only validated evidence from the available inputs.
 
 ---
 
 ## 4. Output Contract (Format)
 
 - **Default:** The response **MUST** be returned as **a single Markdown code block** using ```markdown (output only in chat).
-- If the user **explicitly** asks to publish to the ticket (e.g. "publish to the ticket", "post as comment"), fire the Artifact Preview gate first, then resolve the tracker provider and publish.
+- If the user **explicitly** asks to publish to the ticket (e.g. "publish to the ticket", "post as comment"), resolve the tracker provider, evaluate RCA field support and evidence sufficiency, then fire the required gates before publishing.
 - If tracker config is missing, invalid, or points to an unresolvable provider, abort publish and request provider configuration. Otherwise output only in chat.
 
-### Gate: Artifact Preview
+### Tracker Output (when user requests publish)
+
+Publish bug RCA using this order of precedence:
+- **Field-first:** write to structured RCA fields when the resolved tracker provider exposes equivalent fields.
+- **Comment-last:** if equivalent structured fields do not exist, publish one structured fallback comment with the RCA sections.
+
+For trackers that support the six RCA fields:
+- **RCA Determination**: categorical field, write only a valid option id from the tracker catalog.
+- **RCA Introduction Factor**: categorical field, write only a valid option id from the tracker catalog.
+- **RCA Detection Factor**: categorical field, write only a valid option id from the tracker catalog.
+- **RCA Analysis**: textarea field, prefer Markdown when supported; fall back to ADF when required.
+- **RCA Corrective Action**: textarea field, prefer Markdown when supported; fall back to ADF when required.
+- **RCA Preventive Action**: textarea field, prefer Markdown when supported; fall back to ADF when required.
+
+Field sufficiency rules:
+- Open-text RCA fields may be written only when evidence is sufficient or the user provides explicit text through the Evidence Sufficiency gate flow.
+- Categorical RCA fields may be written only when the selected option is backed by sufficient evidence or explicitly chosen by the user from the tracker-supported catalog.
+- If a field does not meet the sufficiency rule, `/report` MUST omit it when empty or leave it untouched when already populated.
+
+### Gate: Evidence Sufficiency
 
 **Type:** Confirmation
-**Fires:** Before publishing the report to the resolved tracker provider (only when the user explicitly requests tracker publish).
+**Fires:** Before tracker publish, only when `/report` cannot complete one or more RCA fields with sufficient evidence.
+**Skippable:** No.
+
+**Context output:**
+Present the RCA evidence summary in chat:
+- Fields with sufficient evidence
+- Fields that remain incomplete or ambiguous
+- Why evidence is insufficient per missing field
+- Allowed options for any categorical fields that still need explicit user choice
+
+**AskQuestion:**
+- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
+- **Prompt:** "Some RCA fields for <TASK_ID> still need user input. How should `/report` proceed?"
+- **Options:**
+  - `provide`: "I will provide the missing RCA values now"
+  - `omit`: "Publish only the RCA fields with sufficient evidence"
+  - `cancel`: "Cancel tracker publish"
+- **allow_multiple:** false
+
+**On response:**
+- `provide` → Request only the missing values:
+  - open-text fields as explicit text
+  - categorical fields as one of the displayed tracker-supported options
+- `omit` → Continue with only the fields that satisfy sufficiency
+- `cancel` → Abort publish and keep chat output only
+
+### Gate: Tracker Publish
+
+**Type:** Confirmation
+**Fires:** Before publishing the RCA report to the resolved tracker provider (only when the user explicitly requests tracker publish).
 **Skippable:** No.
 
 **Context output:**
 Present publish preview in chat:
-- Report content summary (bug title, root cause, fix applied)
+- RCA report summary (problem, RCA analysis, corrective action, preventive action)
 - Target task ID / tracker reference
-- Tracker provider action (post as comment)
+- Issue type and RCA field support status
+- Structured fields to update
+- Comment fallback: yes / no
 
 **AskQuestion:**
 - **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
-- **Prompt:** "Publish bug fix report to <TASK_ID> via tracker provider?"
+- **Prompt:** "Publish RCA report to <TASK_ID> via tracker provider?"
 - **Options:**
-  - `publish`: "Publish to tracker"
+  - `publish`: "Publish RCA to tracker"
   - `adjust`: "Adjust content before publishing"
 - **allow_multiple:** false
 
 **On response:**
-- `publish` → Publish via resolved tracker provider
+- `publish` → Publish via resolved tracker provider using field-first, comment-last behavior
 - `adjust` → Apply corrections, return to context output and re-present gate
 
 **Anti-bypass:** Inherits Gate Invocation Protocol. No additional rules.
@@ -89,14 +157,16 @@ resolveTrackerProvider():
 - If information is missing, leave the section empty or include a short placeholder comment.
 - Focus on **causality and resolution**, not on implementation details.
 - Do **NOT** include large code blocks unless explicitly provided in the input.
+- Treat tracker field metadata as authoritative for what can be written remotely.
+- If tracker runtime metadata and the documented project mapping diverge, use runtime metadata for the remote write and surface the mapping drift as a maintenance issue.
 
 ---
 
 ## 6. Output Structure (Template)
 
 ```markdown
-## Bug Summary
-<!-- Short description of the observed problem -->
+## Problem Summary
+<!-- Short description of the validated problem -->
 
 ## Expected vs Actual Behavior
 **Expected:**
@@ -105,21 +175,24 @@ resolveTrackerProvider():
 **Actual:**
 <!-- What actually happened -->
 
-## Root Cause
-<!-- The underlying cause of the bug (not just the symptom) -->
+## RCA Classification
+**Determination:** <!-- Avoidable / Unavoidable or [Needs input] -->
 
-## Before (Problem State)
-<!-- Brief description of the problematic behavior -->
-<!-- Do not paste large code blocks -->
+**Introduction Factor:** <!-- Tracker-supported option or [Needs input] -->
 
-## Fix Applied
+**Detection Factor:** <!-- Tracker-supported option or [Needs input] -->
+
+## RCA Analysis
+<!-- The validated root cause analysis -->
+
+## Corrective Action
 <!-- What was changed to resolve the issue -->
 
-## After (Result)
-<!-- How the system behaves after the fix -->
+## Preventive Action
+<!-- What should prevent this class of issue in the future -->
 
-## Regression Prevention
-<!-- Tests, guards, or invariants added (if any) -->
+## Supporting Evidence
+<!-- Key evidence backing the RCA decisions -->
 ```
 
 ---
@@ -127,10 +200,12 @@ resolveTrackerProvider():
 ## 7. Non-Goals / Forbidden Actions
 
 This command must **NOT**:
-- Infer root cause or resolution from symptoms alone; only structure what comes from context (e.g. @debug or validated /fix)
+- Infer RCA values from symptoms alone; only structure what comes from validated context (e.g. `@debug`, `@qa`, `analysis.fix.md`)
 - Publish to the ticket unless the user explicitly asks
 - Perform analysis or debugging
 - Infer missing context
+- Treat categorical RCA fields as free text
+- Publish tracker comments by default when structured RCA fields exist
 - Write or modify code
 - Touch files or repositories
 - Suggest alternative fixes
