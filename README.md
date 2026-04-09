@@ -51,7 +51,7 @@ flowchart LR
     Contract -.govern behavior.-> Art
 ```
 
-The framework keeps the reasoning layer, execution layer, and provider integrations separate. Modes define how to think, commands define how to execute, skills mediate provider-specific operations, and artifacts preserve state across chats.
+The framework keeps the reasoning layer, execution layer, and provider integrations separate. Modes define how to think, commands define how to execute, skills mediate provider-specific operations, and artifacts preserve durable state across chats. When needed, `/handoff` can add an operational snippet to help open the next chat, but the source of truth remains the task directory.
 
 ## Quick Start
 
@@ -101,7 +101,7 @@ Rho AIAS aims to become a distributable framework that any technical team can ad
 ## Value Proposition
 
 - Convert ad hoc AI interactions into deterministic workflows with explicit roles, contracts, and outputs.
-- Preserve context and decisions through artifact-driven handoffs instead of fragile chat memory.
+- Preserve context and decisions through artifact-driven handoffs instead of fragile chat memory, with optional operational handoff snippets for chat startup.
 - Keep humans in governance loops while benefiting from accelerated execution.
 - Enable long-running, multi-step work where planning, implementation, review, and closure remain connected.
 
