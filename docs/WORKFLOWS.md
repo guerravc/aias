@@ -11,6 +11,7 @@ This document describes the complete workflows for common development tasks usin
 - **Each chat is treated as a single specialized agent:** one mode per chat, plus the base rules that always apply. Modes are not mixed in the same chat, to avoid confusing the model.
 - **Commands that generate artifacts** (e.g. `/blueprint`, `/issue`, `/fix`) do two things: (1) **Expose** output so a human knows what to do or what's happening; (2) **Provide context** to another chat/agent/mode. For example, plan artifacts from `@planning` + `/blueprint` are used as context in a different chat with `@dev`; `report.issue.md` from `@qa` + `/issue` is used as context in a different chat with `@debug`.
 - Handoffs between modes happen **across chats**: one chat produces an artifact (via a command); that file is then used as input/context in another chat where a different mode runs.
+- `/handoff` is an optional **operational** handoff aid: it can generate a reusable Markdown snippet for the next chat, but it never replaces TASK_DIR artifacts as the durable handoff layer.
 
 ### Structured Prompt (primary workflow)
 
@@ -28,7 +29,8 @@ Key gates across the workflow:
 - `/pr` — PR Confirmation (before creating/updating a PR)
 - `/publish` — Publish Confirmation (before publishing)
 - `/commit` — Branch Safeguard (when on main/master/develop)
-- `/enrich` — Tracker Write Preview (before writing to tracker)
+- `/enrich` — Classification Comprehension (when classification is ambiguous or conflicts with user intent), Tracker Write Preview (before writing to tracker)
+- `/report` — Evidence Sufficiency (when RCA fields lack supportable values), Tracker Publish (before publishing RCA)
 - Artifact-producing commands — Artifact Preview (before writing files to TASK_DIR)
 
 See `readme-commands.md` § Governance for the full gate taxonomy and invocation protocol.
@@ -338,11 +340,12 @@ If `/validate-plan` finds gaps, use `/consolidate-plan` to resolve them one by o
 TASK: /implement
 ```
 
-After implementation: `/commit` → `/pr` → `/report`
+After implementation: `/commit` → `/pr` → optional `@review` + `/peer-review` → `/report`
 
 **Expected Output:**
 - Production-ready fix implementation
 - Canonical transitions: `/implement` → `in_progress`, `/pr` → `in_review` (provider-mapped)
+- Optional peer review findings plus VCS-ready review comment snippets
 - Bug fix report summary posted to resolved tracker provider
 
 ---
@@ -540,12 +543,12 @@ TASK: Analyze with product frameworks (JTBD, 5 Whys, User Journey, MoSCoW).
 **Expected Output:**
 - Product analysis (JTBD, 5 Whys, User Journey, MoSCoW) → Gap Summary → Enhanced content
 - `analysis.product.md` written to `<resolved_tasks_dir>/<TASK_ID>/`
-- Confirmation prompt before writing structured fields to the resolved tracker provider (AC, test steps, priority, components)
-- Reference comment posted on the resolved tracker provider linking to local artifact
-- Full prose content stays local; syncs through progressive knowledge-provider publishing
+- Confirmation prompt before writing enriched fields to the resolved tracker provider (`Description`, Acceptance Criteria, Test Steps, priority, components)
+- `Enhanced by` headers are applied only to the remote tracker payload, not to the local artifact
+- Full local analysis stays in `analysis.product.md`; the tracker receives a curated field-by-field representation
 
 **Result:**
-- Tracker ticket enriched with missing product and technical detail (structured fields only)
+- Tracker ticket enriched with missing product and technical detail through field updates, without local-path comments
 - Enriched artifact can feed into `@planning` + `/blueprint`
 
 ---
@@ -574,6 +577,52 @@ TASK: Explore <topic or question>.
 
 **Expected Output:**
 - Concept Summary, Alternatives, Mental Model, optional Quiz
+
+---
+
+## Review and Handoff Flow
+
+Use `@review` when the goal is correctness, risk detection, and readiness assessment rather than implementation.
+
+### Local review before PR
+
+```
+MODE: @review
+REPO: mobilemax-dev
+TASK DIR: MAX-12850
+TASK: Review the current branch changes. When done, /self-review.
+```
+
+**Expected Output:**
+- Severity-ordered findings in chat
+- Explicit readiness verdict for peer review / PR
+- No VCS-ready snippets, because there is no remote diff anchor
+
+### PR / third-party review
+
+```
+MODE: @review
+TASK ID: MAX-12850
+TASK: Review PR 482. When done, /peer-review 482.
+```
+
+**Expected Output:**
+- Severity-ordered findings in chat
+- VCS-ready snippets with `File`, `Applies to diff`, and copy-paste review comments
+- One PR-level general review comment
+
+### Operational handoff between chats
+
+Use `/handoff` when the next chat needs a compact startup payload in addition to TASK_DIR artifacts.
+
+```
+/handoff -m @planning -c /blueprint
+```
+
+**Expected Output:**
+- One reusable Markdown snippet with mode, command, context, goal, constraints, and expected output
+- Explicit assumptions when destination resolution is partial or inferred
+- No file writes and no replacement of artifact loading
 
 ---
 
@@ -806,6 +855,9 @@ For the complete artifact catalog (suffixes, producers, and descriptions), see `
 
 **Reviewing code?**
 → `@review` + `/self-review` for local work, or `@review` + `/peer-review` for PR / third-party review
+
+**Need to transfer context into the next chat?**
+→ use `/handoff` after the current step when TASK_DIR artifacts alone would benefit from an operational startup snippet
 
 **Building and running the app?**
 → `/run` (with optional flags: `-s`, `-l`, `--log-level`)
