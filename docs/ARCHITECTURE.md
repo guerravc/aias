@@ -75,7 +75,7 @@ Nine modes, organized in two categories:
 
 Canonical sources live in `aias/.canonical/`. Generated output goes to `aias/.modes/`.
 
-Governance rule: **one mode per chat, never mixed**. Handoffs between modes happen across chats via artifact files in the task directory.
+Governance rule: **one mode per chat, never mixed**. Handoffs between modes happen across chats via artifact files in the task directory. `/handoff` may add an operational snippet for the next chat, but does not replace those artifacts.
 
 Contract: `aias/contracts/readme-mode-rule.md`.
 
@@ -85,12 +85,12 @@ Commands define *how to execute*. Where modes shape reasoning, commands structur
 
 Two command types:
 
-- **Type A (chat-only)** — Produces structured output within the chat. No side effects, no file writes, no service calls. Examples: `/explain`, `/guide`, `/copyedit`.
+- **Type A (chat-only)** — Produces structured output within the chat. No side effects, no file writes, and no external mutation. Read-only provider calls are allowed when the command contract says so. Examples: `/explain`, `/guide`, `/peer-review`, `/handoff`.
 - **Type B (procedural)** — May write artifacts to the task directory, call external services, or trigger multi-step workflows. Examples: `/blueprint`, `/implement`, `/publish`, `/commit`.
 
 Commands are invoked within a mode context. The mode provides the reasoning; the command provides the structure. A command without a mode is syntax without semantics.
 
-The full command catalog lives in `aias/.commands/`. Current commands: `/aias`, `/assessment`, `/blueprint`, `/brief`, `/charter`, `/commit`, `/consolidate-plan`, `/copyedit`, `/enrich`, `/explain`, `/fix`, `/guide`, `/implement`, `/issue`, `/peer-review`, `/pr`, `/publish`, `/report`, `/run`, `/self-review`, `/spm`, `/test`, `/trace`, `/validate-plan`.
+The full command catalog lives in `aias/.commands/`. Current commands: `/aias`, `/assessment`, `/blueprint`, `/brief`, `/charter`, `/commit`, `/consolidate-plan`, `/copyedit`, `/enrich`, `/explain`, `/fix`, `/guide`, `/handoff`, `/implement`, `/issue`, `/peer-review`, `/pr`, `/publish`, `/report`, `/run`, `/self-review`, `/spm`, `/test`, `/trace`, `/validate-plan`.
 
 Contract: `aias/contracts/readme-commands.md`.
 
@@ -138,7 +138,7 @@ The artifact catalog is closed — only types defined in the `rho-aias` system s
 
 Naming convention: `<name>.<suffix>.md` (e.g., `technical.plan.md`, `feasibility.assessment.md`). Artifacts are discovered by globbing their suffix, not by hardcoding names.
 
-Artifacts serve as the handoff mechanism between modes. Since each mode runs in its own chat, artifacts in the task directory are the shared state that connects planning to implementation to review to closure.
+Artifacts serve as the durable handoff mechanism between modes. Since each mode runs in its own chat, artifacts in the task directory are the shared state that connects planning to implementation to review to closure. The `/handoff` command adds an operational handoff snippet for chat-to-chat continuity, but it is transient and subordinate to TASK_DIR state.
 
 Contract: `aias/contracts/readme-artifact.md`. Runtime details: `aias/.skills/rho-aias/SKILL.md`.
 
@@ -261,8 +261,9 @@ Since each mode operates in its own chat session, handoffs between modes happen 
 2. A new chat in `@dev` loads the plan artifact during the loading protocol
 3. `@dev` executes `/implement` against the loaded plan
 4. A new chat in `@review` loads the implementation artifacts for `/self-review` or PR context for `/peer-review`
+5. If needed, `/handoff` can generate an operational snippet to open the next chat with explicit mode / command / constraints
 
-The task directory is the shared state. `status.md` tracks which phase the task is in.
+The task directory is the shared state. `status.md` tracks which phase the task is in. `/handoff` is optional scaffolding for chat startup, not a replacement for artifact loading.
 
 ### Provider-Mediated Execution Sequence
 
@@ -288,7 +289,7 @@ sequenceDiagram
     TaskDir-->>Mode: Make artifacts available for next chat
 ```
 
-This sequence captures the core invariant of Rho AIAS: provider-specific operations are mediated by skills, while commands remain structured and artifacts remain the durable handoff layer between chats.
+This sequence captures the core invariant of Rho AIAS: provider-specific operations are mediated by skills, while commands remain structured and artifacts remain the durable handoff layer between chats. Any operational handoff snippet produced by `/handoff` is secondary to those artifacts.
 
 ---
 
