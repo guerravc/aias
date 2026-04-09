@@ -74,7 +74,7 @@ Commands define **how to execute** and format output. They structure data from m
 - `/issue` — Structure QA data into bug report (writes to task directory)
 - `/fix` — Structure debug data into fix analysis (writes to task directory)
 - `/brief` — Generate feature brief
-- `/report` — Generate bug fix report
+- `/report` — Generate validated bug RCA report and publish RCA fields when requested
 - `/pr` — Generate PR description
 - `/enrich` — Analyze and enrich a tracker ticket; writes to task directory (use with `@product` or standalone)
 - `/explain` — Concept-focused learning response (use in any mode, natural in `@product`)
@@ -84,6 +84,7 @@ Commands define **how to execute** and format output. They structure data from m
 - `/consolidate-plan` — Work through plan gaps one by one
 - `/publish` — Archive all task artifacts to the resolved knowledge provider and close the task
 - `/guide` — Operational reference for the rho-aias framework (profiles, commands, prompt format, status lifecycle, artifacts)
+- `/handoff` — Generate an operational Markdown handoff snippet for the next chat or agent
 - `/run` — Build and launch app on Simulator (use with `@tooling` or directly)
 - `/test` — Run project tests (use with `@tooling` or directly)
 - `/commit` — Stage and commit files
@@ -187,6 +188,11 @@ TASK DIR: MAX-12850
 TASK: Review the changes on the current branch. When done, /self-review.
 ```
 
+**Operational handoff to the next chat:**
+```
+/handoff -m @planning -c /blueprint
+```
+
 ---
 
 ## Quick Reference
@@ -215,9 +221,10 @@ TASK: Review the changes on the current branch. When done, /self-review.
 | `/issue` | Structure bug report | `@qa` data | Task directory |
 | `/fix` | Structure fix analysis | `@debug` data | Task directory |
 | `/brief` | Feature brief | Planning context | Markdown brief |
-| `/report` | Bug fix report | Debug context | Markdown report |
-| `/self-review` | Review your own local work | `@review` + local code / TASK_DIR | Findings in chat |
-| `/peer-review` | Review a PR or third-party change | `@review` + PR URL/number | Findings in chat |
+| `/report` | Bug RCA report | Debug context | Markdown RCA summary |
+| `/self-review` | Review your own local work | `@review` + local code / TASK_DIR | Findings + readiness verdict in chat |
+| `/peer-review` | Review a PR or third-party change | `@review` + PR URL/number | Findings + VCS-ready snippets + general review comment |
+| `/handoff` | Prepare the next chat with explicit context | Current chat context + optional TASK_DIR | Single Markdown handoff snippet |
 | `/pr` | PR description | Implementation context | PR template |
 | `/enrich` | Enrich tracker-backed task | Task ID + `@product` context | Task directory |
 | `/explain` | Concept learning | Topic or question | Structured explanation (chat) |
