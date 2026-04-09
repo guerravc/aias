@@ -30,6 +30,18 @@ Commands **do not**:
 
 When reasoning is required, it happens **before** the command, using a mode (`@planning`, `@qa`, etc.).
 
+### Controlled Resolution Exception
+
+The only allowed exception to "do not infer missing intent" is **controlled resolution** inside `/handoff`.
+
+Controlled resolution is allowed only when all conditions hold:
+- The user explicitly invoked `/handoff`
+- The destination is resolved from explicit workflow evidence already available in chat or TASK_DIR
+- Any inferred mode / command / next step is declared explicitly in the output
+- The command preserves uncertainty instead of inventing continuity when evidence is insufficient
+
+This exception does **not** authorize open-ended command autonomy. It exists only to format an operational handoff when the user explicitly asks for one.
+
 ---
 
 ## Command Categories
@@ -42,15 +54,19 @@ Characteristics:
 - Output is presented exclusively in the chat response
 - No file writes
 - No status mutation
-- No external system calls (tracker, knowledge provider, VCS provider, etc.)
+- External system calls are allowed only in **read-only** mode
+- External mutation remains forbidden (no tracker writes, no knowledge publishes, no VCS comments/approvals/merges)
 
 Typical usage:
 - User asks a question or requests information
-- Command reads from skill files or chat context and responds in chat
+- Command reads from skill files, chat context, TASK_DIR context, or read-only provider context and responds in chat
 
 Examples:
 - guide
 - explain
+- self-review
+- peer-review
+- handoff
 
 ---
 
@@ -134,6 +150,7 @@ The separation enables a reliable **two-message workflow**:
 **Separation:**
 - **Mode:** Provides reasoning stance and domain context
 - **Command (`/guide`, `/explain`):** Reads reference material and presents information in chat — no files written, no state changed
+- **Command (`/peer-review`):** Reads PR context through the configured VCS provider, then returns findings/snippets in chat — no files written, no remote mutation
 
 #### Type B Commands (Procedural / Execution)
 
@@ -283,7 +300,7 @@ Examples:
 - Do not write code
 - Do not modify files
 - Do not suggest alternatives
-- Do not write files or call external systems (for Type A)
+- Do not write files or mutate external systems (for Type A)
 
 Purpose:
 - Reduce overreach
@@ -455,7 +472,7 @@ Every gate defined in a command MUST use this template structure:
 | **MAY** | Optional, at implementer's discretion | Permitted but not required behavior | Expected behavior (use SHOULD) |
 
 **Application scope:**
-- All 21 commands MUST use RFC-2119 keywords for enforcement language.
+- All 25 commands MUST use RFC-2119 keywords for enforcement language.
 - All 9 canonical modes MUST use RFC-2119 keywords to replace suggestive language ("prefer", "consider", "propose", "optionally"). Each replacement requires per-instance judgment — not mechanical substitution.
 
 #### Mode Enforcement Mapping
@@ -473,7 +490,7 @@ Suggestive language in canonical modes MUST be replaced with RFC-2119 keywords:
 
 ### Command Gate Requirements
 
-All 21 commands are categorized by implementation priority for gate standardization.
+All 25 commands are categorized by implementation priority for gate standardization.
 
 #### P0 — Core (deep redesign)
 
@@ -494,7 +511,7 @@ All 21 commands are categorized by implementation priority for gate standardizat
 | Command | Required Gates | Notes |
 |---|---|---|
 | `/commit` | Branch Safeguard (Confirmation) — migrate existing text-based warning on main/master/develop. Commit Plan Confirmation (Confirmation) — show files and messages before execution. | Existing text-based gate. |
-| `/enrich` | Tracker Write (Confirmation) — migrate existing text-based tracker write preview. | Existing text-based gate. |
+| `/enrich` | Classification Comprehension (Confirmation) when tracker signals conflict with user declaration or classification is ambiguous. Tracker Write (Confirmation) before remote enrichment write. | Existing text-based tracker write gate plus new classification gate. |
 | `/consolidate-plan` | Artifact Update (Confirmation) — migrate existing text-based update instruction. | Existing text-based gate. |
 | `/copyedit` | Target Confirmation (Confirmation) — migrate existing implicit path confirmation. | Implicit gate. |
 
@@ -504,7 +521,7 @@ All 21 commands are categorized by implementation priority for gate standardizat
 |---|---|---|
 | `/assessment` | Artifact Preview (Confirmation) before writing `feasibility.assessment.md`. | Coexists with END-OF-RESPONSE CONFIRMATION. |
 | `/brief` | Tracker Publish (Confirmation) when user requests publish to tracker. Chat-only output needs no gate. | Gate only on external write. |
-| `/report` | Tracker Publish (Confirmation) when user requests publish to tracker. Chat-only output needs no gate. | Gate only on external write. |
+| `/report` | Evidence Sufficiency (Confirmation) when RCA fields lack enough evidence for publish. Tracker Publish (Confirmation) when user requests publish to tracker. Chat-only output needs no gate. | External write with evidence gate before publish when needed. |
 | `/charter` | Artifact Preview (Confirmation) before writing `delivery.charter.md`. | Coexists with END-OF-RESPONSE CONFIRMATION. |
 | `/issue` | Artifact Preview (Confirmation) before writing `report.issue.md`. | Coexists with END-OF-RESPONSE CONFIRMATION. |
 | `/fix` | Artifact Preview (Confirmation) before writing `analysis.fix.md`. | Coexists with END-OF-RESPONSE CONFIRMATION. |
@@ -520,6 +537,9 @@ All 21 commands are categorized by implementation priority for gate standardizat
 | `/spm` | Enforcement language sweep only. | Has `--dry-run` safety. |
 | `/guide` | Enforcement language sweep only. | Type A, chat-only. |
 | `/explain` | Enforcement language sweep only. | Type A, chat-only. |
+| `/self-review` | Enforcement language sweep only. | Type A, chat-only local review. |
+| `/peer-review` | Enforcement language sweep only. | Type A, read-only VCS review. |
+| `/handoff` | Enforcement language sweep only. | Type A, operational handoff formatting. |
 
 ---
 
@@ -696,6 +716,14 @@ Commands that reference skills MUST declare them in the Identity section (Sectio
 - **Type A:** `/report` or `/brief` to the resolved tracker provider (no mandatory knowledge publish)
 - **Type B/C:** `/publish` to the resolved knowledge provider
 
+### Type A Terminology
+
+`Type A` is overloaded in the framework and MUST be interpreted by scope:
+- **Command Type A** = chat-only command behavior under **Command Categories**
+- **Plan Classification Type A** = local / low-risk lifecycle classification under **Plan Classification**
+
+Documentation SHOULD name the surrounding concept explicitly when ambiguity is possible.
+
 ### Structured Prompt — Artifact Reference Fields
 
 In addition to the standard fields (`MODE`, `REPO`, `TASK ID`, `TASK DIR`, `PROFILE`, `PLAN`, `FIGMA`, `CONTEXT`, `TASK`), the Structured Prompt supports artifact reference fields: `ISSUE:`, `FIX:`, `ASSESSMENT:`, `TRACE:`. `DIR:` is an allowed alias for `TASK DIR`. `TICKET:` may be accepted as a legacy alias for `TASK ID`, but new documentation MUST prefer `TASK ID`. Artifact reference fields resolve relative to TASK_DIR and instruct the agent to load the referenced artifact as primary context.
@@ -703,6 +731,8 @@ In addition to the standard fields (`MODE`, `REPO`, `TASK ID`, `TASK DIR`, `PROF
 ### One Mode Per Chat
 
 Commands do not enforce mode boundaries, but all documentation and workflow profiles assume the **one mode per chat** rule: each chat session uses exactly one mode, and handoffs between modes happen via artifact files across chats.
+
+Artifacts remain the **durable handoff layer** between chats. The `/handoff` command MAY produce an **operational handoff snippet** in chat, but that snippet is advisory and transient. It MUST NOT replace TASK_DIR artifacts as the source of truth.
 
 ---
 
