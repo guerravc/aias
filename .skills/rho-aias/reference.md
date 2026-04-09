@@ -12,6 +12,20 @@ All commands and skills that reference artifact directories must use the **resol
 
 ---
 
+## Handoff Model
+
+Rho AIAS uses two complementary handoff layers:
+
+- **Durable handoff** — TASK_DIR artifacts plus `status.md`. This is the source of truth across chats and modes.
+- **Operational handoff** — `/handoff` emits a chat snippet that helps open the next chat with the right mode, command, and constraints.
+
+Rules:
+- Operational handoff MUST NOT replace artifact loading.
+- When both exist, artifacts win over the snippet if there is any conflict.
+- `/handoff` is optional workflow scaffolding, not a new artifact type.
+
+---
+
 ## Per-Mode Artifact Requirements
 
 Each mode declares which artifacts it **requires** (must be present) and which are **optional** (loaded if present, not an error if absent).
@@ -97,7 +111,7 @@ Each task follows one of five profiles. The profile determines which steps are e
 | implement | Chat Dev | `@dev` | `/implement` | — (code changes) | `ready` → `in_progress` |
 | commit | Chat Dev | `@dev` | `/commit` | — | — |
 | pr | Chat Dev | `@dev` | `/pr` | — (PR created) | `in_progress` → `in_review` |
-| report | Chat Dev | `@dev` | `/report` | — (summary to tracker) | — |
+| report | Chat Dev | `@dev` | `/report` | — (RCA fields or fallback comment to tracker) | — |
 | closure | (any) | (any) | `/publish` | `delta.publish.md` | — |
 
 *Steps marked with * are conditional — only when more evidence is needed.
