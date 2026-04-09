@@ -1,4 +1,4 @@
-# Self Review (Own-Work Review) — v1
+# Self Review (Own-Work Review) — v2
 
 ## 1. Identity
 
@@ -39,22 +39,15 @@ Rules:
 
 ## 4. Output Contract (Format)
 
-Return findings directly in chat, prioritized by severity:
-
-1. Blocking issues
-2. Major risks
-3. Minor improvements
-4. Open questions / assumptions
-5. Overall readiness
-
-Each finding SHOULD tie observed code back to one or more of:
-
-- `dod.plan.md`
-- `increments.plan.md`
-- `technical.plan.md`
-- local coding standards and architecture
-
-If no findings exist, say so explicitly and state any residual testing or context gaps.
+- Return rendered Markdown in chat.
+- Output MUST follow the same severity-first review structure as `/peer-review`, but this command MUST remain local-work oriented.
+- This command MUST NOT emit VCS-ready review snippets because there is no PR diff anchor.
+- Each finding SHOULD tie observed code back to one or more of:
+  - `dod.plan.md`
+  - `increments.plan.md`
+  - `technical.plan.md`
+  - local coding standards and architecture
+- If no findings exist, say so explicitly and state any residual testing or context gaps.
 
 ---
 
@@ -66,20 +59,39 @@ If no findings exist, say so explicitly and state any residual testing or contex
 - MUST distinguish blocking issues from optional improvements.
 - SHOULD evaluate alignment between actual code, `dod.plan.md`, and increment goals.
 - If local artifacts and code conflict, report the drift explicitly.
+- MUST conclude whether the work is ready for peer review or what should be addressed first.
+- MUST keep recommendations scoped to local review readiness, not PR publication wording.
 
 ---
 
-## 6. Review Procedure
+## 6. Output Structure (Template)
 
-1. Resolve TASK_DIR when available via `rho-aias`.
-2. Load local review context in this priority order:
-   - `dod.plan.md`
-   - `increments.plan.md`
-   - `technical.plan.md`
-   - other relevant local artifacts
-3. Inspect modified code and compare it against local plan intent.
-4. Report findings with evidence and impact.
-5. Conclude whether the work looks ready for PR / peer review, or what should be addressed first.
+```markdown
+# Self Review
+
+## Source Mix
+- Modified local code: used
+- Local TASK_DIR artifacts: <used | not used>
+
+## Findings
+### Blocking issues
+- <finding or "None">
+
+### Major risks
+- <finding or "None">
+
+### Minor improvements
+- <finding or "None">
+
+### Open questions / assumptions
+- <question or "None">
+
+## Readiness
+- <ready for peer review | address blockers first | address major risks before PR>
+
+## Recommended Next Step
+- <run `/peer-review` on PR once ready | fix local issues first | validate missing tests/context>
+```
 
 ---
 
@@ -91,3 +103,4 @@ This command must **NOT**:
 - Post to tracker or VCS provider
 - Replace `@review` with implementation behavior
 - Pretend a PR review happened when only local work was reviewed
+- Emit VCS-ready review comments as if a remote diff existed
