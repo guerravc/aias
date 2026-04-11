@@ -1,6 +1,6 @@
 # Cursor Workflows — End-to-End Guide
 
-This document describes the complete workflows for common development tasks using Cursor modes and commands. It reflects the **v6.1** architecture with unified task directories, Plan Classification, tracker sync, and progressive knowledge-provider publishing.
+This document describes the complete workflows for common development tasks using Cursor modes and commands. It reflects the **v8.0** architecture with unified task directories, Plan Classification, tracker sync, unconditional knowledge-provider publishing, and separated refinement/planning phases.
 
 ---
 
@@ -24,12 +24,14 @@ Commands use a **structured interactive mechanism** for gates. `AskQuestion` is 
 **Gate types:** Confirmation, Decision, Feedback, Approval, Precondition. Each gate follows the Gate Invocation Protocol: Context → Gate → Action.
 
 Key gates across the workflow:
-- `/blueprint` — Comprehension (skippable with `--fast`), Checkpoint (skippable with `--fast`), Preview (always fires)
+- `/enrich` — Classification Comprehension (when classification is ambiguous), Tracker Write Preview (before writing to tracker), DoR Readiness Check (before writing DoR/DoD)
+- `/blueprint` — Comprehension (skippable with `--fast`), Preview (always fires)
+- `/validate-plan` — Amendment Approval (when DoR/DoD amendments proposed), Validation Result
+- `/consolidate-plan` — Update Approval (technical artifacts), Amendment Approval (DoR/DoD artifacts)
 - `/implement` — Ready, Pre-Implementation Approval (Type C), Inter-Increment Feedback
 - `/pr` — PR Confirmation (before creating/updating a PR)
 - `/publish` — Publish Confirmation (before publishing)
 - `/commit` — Branch Safeguard (when on main/master/develop)
-- `/enrich` — Classification Comprehension (when classification is ambiguous or conflicts with user intent), Tracker Write Preview (before writing to tracker)
 - `/report` — Evidence Sufficiency (when RCA fields lack supportable values), Tracker Publish (before publishing RCA)
 - Artifact-producing commands — Artifact Preview (before writing files to TASK_DIR)
 
@@ -54,13 +56,19 @@ flowchart TD
 
     Start --> Entry{"Feature or Bugfix?"}
 
-    Entry -->|Feature| Product["@product<br/>optional /enrich"]
-    Product --> Planning["@planning<br/>/blueprint"]
-    Planning --> Validate["/validate-plan/"]
-    Validate --> Dev["@dev<br/>/implement"]
-    Dev --> Commit["/commit/"]
-    Commit --> PR["/pr/"]
-    PR --> Publish["/publish/"]
+    Entry -->|Feature| Product["@product<br/>analysis"]
+    Product --> Enrich["/enrich<br/>DoR + DoD + publish<br/>pending_dor → ready"]
+    Enrich --> Planning["@planning<br/>/blueprint<br/>ready → in_progress"]
+    Planning --> Validate["/validate-plan"]
+    Validate --> Amendments{"DoR/DoD<br/>amendments?"}
+    Amendments -->|Yes| AmendGate["Amendment gate:<br/>apply_local / pause / reject"]
+    AmendGate --> Validate
+    Amendments -->|No| Gaps{"Planning gaps?"}
+    Gaps -->|Yes| Consolidate["/consolidate-plan"] --> Validate
+    Gaps -->|No| Dev["@dev<br/>/implement"]
+    Dev --> Commit["/commit"]
+    Commit --> PR["/pr<br/>in_progress → in_review"]
+    PR --> Publish["/publish<br/>reconcile + close"]
     Publish --> Done["Task archived"]
 
     Entry -->|Bugfix| QA["@qa<br/>/issue"]
@@ -71,7 +79,7 @@ flowchart TD
     Trace -->|No| Debug["@debug<br/>/fix"]
     QA --> Debug
     Debug --> Assessment{"Need feasibility gate?"}
-    Assessment -->|Yes| Feasibility["/assessment/"]
+    Assessment -->|Yes| Feasibility["/assessment"]
     Feasibility --> Planning
     Assessment -->|No| Planning
 ```
@@ -84,7 +92,7 @@ This map is intentionally high level. The detailed sections below define exact m
 
 Complete workflow from planning to implementation to PR and closure.
 
-### Step 1: Product Analysis (Optional for vague tickets)
+### Step 1: Product Analysis + Refinement
 
 ```
 MODE: @product
@@ -98,8 +106,11 @@ TASK: Analyze with product frameworks (JTBD, 5 Whys, User Journey, MoSCoW).
 
 **Expected Output:**
 - Product analysis (JTBD, 5 Whys, User Journey, MoSCoW) → Gap Summary → Enhanced content
-- `analysis.product.md` written to `<resolved_tasks_dir>/<TASK_ID>/`
-- Structured fields (AC, test steps, priority, components) optionally written to the resolved tracker provider after user confirmation
+- `analysis.product.md`, `dor.plan.md`, `dod.plan.md` written to `<resolved_tasks_dir>/<TASK_ID>/`
+- DoR Readiness Check gate with blocking/non-blocking classification
+- Structured fields optionally written to the resolved tracker provider after user confirmation
+- All artifacts published to knowledge provider (Phase 5c unconditional)
+- Canonical transition **pending_dor → ready** (after successful publish)
 
 ---
 
@@ -117,14 +128,19 @@ TASK: Analyze the requirement. When done, /blueprint.
 
 Use `/blueprint --fast` for trivial or well-understood tasks.
 
+**Precondition:** `dor.plan.md` and `dod.plan.md` must exist in TASK_DIR (from `/enrich`), except for bug flow with assessment artifacts.
+
 **Expected Output:**
 - Plan artifacts written to `<resolved_tasks_dir>/<TASK_ID>/`:
-  - `technical.plan.md`, `increments.plan.md`, `dor.plan.md`, `dod.plan.md`
+  - `technical.plan.md`, `increments.plan.md`
   - `specs.design.md` (when Figma context exists)
+- Proposed DoR/DoD amendments in `technical.plan.md` (if gaps detected)
+- Canonical transition **ready → in_progress** (provider-mapped)
+- `status.md` updated: `status: in_progress`
 
 ---
 
-### Step 3: Plan Validation + Tracker Transition
+### Step 3: Plan Validation
 
 ```
 /validate-plan
@@ -132,8 +148,8 @@ Use `/blueprint --fast` for trivial or well-understood tasks.
 
 **Expected Output:**
 - Validation verdict: "Plan ready for implementation" or list of gaps
-- When verdict is ready AND ticket in context: canonical transition **pending_dor → ready** (provider-mapped)
-- `status.md` updated: `status: ready`, `current_step: implement`
+- Amendment gate (if amendments proposed): `apply_local` / `pause` / `reject`
+- `status.md` updated: `current_step: implement` (status remains `in_progress`)
 
 ---
 
@@ -150,8 +166,7 @@ TASK: /implement
 - Code implemented increment by increment with governance-driven AskQuestion gates
 - Governance resolved from classification (status.md) and custom gates (increments.plan.md)
 - Each increment verified via Inter-Increment Feedback gate before proceeding
-- On first increment start: canonical transition **ready → in_progress** (provider-mapped)
-- `status.md` updated: `status: in_progress`
+- `status.md` updated: `current_step: implement`
 
 ---
 
@@ -326,11 +341,11 @@ FIX: analysis.fix.md
 TASK: Create implementation plan. When done, /blueprint. When blueprint is done, /validate-plan.
 ```
 
-If `/validate-plan` finds gaps, use `/consolidate-plan` to resolve them one by one.
+If `/validate-plan` finds gaps, use `/consolidate-plan` to resolve them one by one. In the bug flow, `/blueprint` generates DoR/DoD via the bug exception (derived from assessment artifacts).
 
 **Expected Output:**
 - Plan artifacts in TASK_DIR (with classification assigned)
-- Canonical transition: `/validate-plan` → `ready` (provider-mapped)
+- Canonical transition: `/blueprint` → `in_progress` (provider-mapped)
 
 ---
 
@@ -344,7 +359,7 @@ After implementation: `/commit` → `/pr` → optional `@review` + `/peer-review
 
 **Expected Output:**
 - Production-ready fix implementation
-- Canonical transitions: `/implement` → `in_progress`, `/pr` → `in_review` (provider-mapped)
+- Canonical transition: `/pr` → `in_review` (provider-mapped)
 - Optional peer review findings plus VCS-ready review comment snippets
 - Bug fix report summary posted to resolved tracker provider
 
@@ -352,9 +367,7 @@ After implementation: `/commit` → `/pr` → optional `@review` + `/peer-review
 
 ### Step 9: Closure
 
-Closure depends on Plan Classification:
-- **Type A:** `/report` or `/brief` already posted to tracker provider — done
-- **Type B/C:** `/publish` to archive all artifacts to resolved knowledge provider
+`/publish` to reconcile any remaining artifacts, generate delta, and formally close the task. Since Phase 5c is unconditional, most artifacts will already be published progressively.
 
 ---
 
@@ -542,13 +555,17 @@ TASK: Analyze with product frameworks (JTBD, 5 Whys, User Journey, MoSCoW).
 
 **Expected Output:**
 - Product analysis (JTBD, 5 Whys, User Journey, MoSCoW) → Gap Summary → Enhanced content
-- `analysis.product.md` written to `<resolved_tasks_dir>/<TASK_ID>/`
+- `analysis.product.md`, `dor.plan.md`, `dod.plan.md` written to `<resolved_tasks_dir>/<TASK_ID>/`
+- DoR Readiness Check gate with blocking/non-blocking classification
 - Confirmation prompt before writing enriched fields to the resolved tracker provider (`Description`, Acceptance Criteria, Test Steps, priority, components)
 - `Enhanced by` headers are applied only to the remote tracker payload, not to the local artifact
 - Full local analysis stays in `analysis.product.md`; the tracker receives a curated field-by-field representation
+- All artifacts published to knowledge provider (Phase 5c unconditional)
+- Canonical transition `pending_dor → ready` (after successful publish)
 
 **Result:**
 - Tracker ticket enriched with missing product and technical detail through field updates, without local-path comments
+- DoR/DoD artifacts ready for `@planning` + `/blueprint`
 - Enriched artifact can feed into `@planning` + `/blueprint`
 
 ---
@@ -663,11 +680,12 @@ Every task directory contains a `status.md` system file that tracks progress, tr
 profile: feature
 task_id: MAX-XXXXX
 classification: null
+refinement_validated: false
 started: 2026-01-25
 status: pending_dor
 tracker_status: <provider:pending_dor_label>
 completed_steps: []
-current_step: product-analysis
+current_step: refinement
 published: null
 completed: null
 artifacts:
@@ -679,8 +697,8 @@ artifacts:
 | Status | Meaning | Entered when |
 |--------|---------|-------------|
 | `pending_dor` | Artifacts being created, not ready for implementation | Task directory created |
-| `ready` | All required artifacts validated | `/validate-plan` passes |
-| `in_progress` | Implementation underway | `/implement` starts first increment |
+| `ready` | Refinement complete, DoR/DoD published | `/enrich` publishes successfully |
+| `in_progress` | Planning or implementation underway | `/blueprint` starts (Phase 0) |
 | `in_review` | PR created, awaiting feedback or approval | `/pr` creates PR |
 | `completed` | All artifacts published, task archived | `/publish` completes |
 | `cancelled` | Task abandoned | Manual action only |
@@ -695,31 +713,24 @@ artifacts:
 
 ---
 
-## Progressive Knowledge Sync (Classification-Gated)
+## Progressive Knowledge Sync (Unconditional)
 
-Artifacts are synced to the resolved knowledge provider progressively, **gated by Plan Classification** in `status.md`. This is Phase 5c of the rho-aias loading protocol.
-
-**Classification gate:** Before attempting knowledge sync, every command reads `classification` from `status.md`:
-
-| Classification | Phase 5c behavior |
-|---|---|
-| `null` (not yet assigned) | **Skip** — artifacts remain `created`/`modified` locally |
-| `A` (low-risk) | **Skip** — Type A closure is via `/report` or `/brief` to tracker |
-| `B` (medium) | **Sync** — progressive publishing to knowledge provider |
-| `C` (critical) | **Sync** — progressive publishing to knowledge provider |
-
-**Practical effect:** All diagnostic commands (`/issue`, `/fix`, `/assessment`, `/trace`) run before `/blueprint` assigns classification — so they never trigger knowledge sync. Once `/blueprint` classifies the task as B or C, subsequent commands sync progressively. Type A tasks never sync to the knowledge provider automatically.
+Artifacts are synced to the resolved knowledge provider progressively via Phase 5c of the rho-aias loading protocol. **Phase 5c is unconditional** — it always publishes regardless of Plan Classification.
 
 **Publishing hierarchy:** provider-defined hierarchy under `<TASK_ID>`, resolved from `aias-config/providers/knowledge-config.md` and the active provider binding.
 
-When Phase 5c is **not skipped** (classification B or C):
+Phase 5c behavior:
 - The command resolves the knowledge provider from `aias-config/providers/knowledge-config.md`.
 - Validates config, active provider, skill binding, and capability compatibility.
 - Publishes non-synced artifacts through the resolved provider algorithm.
 - After successful sync, the artifact is marked `synced` in `status.md`.
 - On failure (missing/invalid config, unresolved mapping/binding, or runtime provider unavailability): abort dependent sync operation and request correction.
 
-**`/publish` bypasses the classification gate** — it always executes full knowledge sync regardless of classification. This makes it the explicit override for Type A tasks that the user wants to archive. `/publish` exists as the **final step** to ensure everything is archived (safety net), generate Plan Delta, and mark the task as completed.
+**Exception:** DoR/DoD artifacts that were locally amended via the Amendment gate (in `/validate-plan` or `/consolidate-plan`) are excluded from Phase 5c until reconciled via `/publish`.
+
+**Classification role:** Plan Classification (A/B/C) is used **only for governance** (gates in `/implement`), not for publishing decisions.
+
+**`/publish`** reconciles any remaining unpublished artifacts (including locally-amended DoR/DoD), generates Plan Delta, and marks the task as completed.
 
 For the complete resilience model (local-first guarantees, failure scenarios, retry mechanisms), see `aias/.skills/rho-aias/reference.md` § Resilience Model.
 
@@ -731,10 +742,12 @@ Four commands trigger canonical tracker operations. Transitions only fire when `
 
 | Command | Condition | Canonical transition |
 |---------|-----------|----------------------|
-| `/validate-plan` | Verdict = "Plan ready for implementation" | `pending_dor` → `ready` |
-| `/implement` | First increment starting | `ready` → `in_progress` |
+| `/enrich` | Publish to Confluence + Jira successful | `pending_dor` → `ready` |
+| `/blueprint` | Phase 0 starts with DoR/DoD valid | `ready` → `in_progress` |
 | `/pr` | PR created successfully | `in_progress` → `in_review` |
 | `/commit` | Open PR detected for current branch | verify `in_review` (no-op if already there) |
+
+Note: `/validate-plan`, `/implement`, and `/consolidate-plan` do not trigger tracker transitions.
 
 **Boundary rules:**
 - The framework **never** transitions to DONE — that is Product's responsibility.
@@ -836,16 +849,16 @@ For the complete artifact catalog (suffixes, producers, and descriptions), see `
 ## Workflow Decision Tree
 
 **Starting a new feature?**
-→ `@product` (optional) + `/enrich` → `@planning` + `/blueprint` → `/validate-plan` → `@dev` + `/implement` → `/commit` → `/pr --create` → `/publish`
+→ `@product` + `/enrich` (DoR/DoD + publish) → `@planning` + `/blueprint` → `/validate-plan` → `@dev` + `/implement` → `/commit` → `/pr` → `/publish`
 
 **Found a bug?**
-→ `@qa` + `/issue` → `@debug` + `/fix` → `@planning` + `/blueprint` → `/validate-plan` → `@dev` + `/implement` → `/report` → `/commit` → `/pr --create` → `/publish`
+→ `@qa` + `/issue` → `@debug` + `/fix` → `/assessment` → `@planning` + `/blueprint` (bug exception: derives DoR/DoD) → `/validate-plan` → `@dev` + `/implement` → `/report` → `/commit` → `/pr` → `/publish`
 
 **Need to trace a flow with logs?**
 → `@qa` or `@debug` + `/trace` → copy snippet → `@dev` (implement logs)
 
 **Received a vague or poorly defined ticket?**
-→ `@product` (product analysis) → `/enrich`
+→ `@product` (product analysis) → `/enrich` (produces DoR/DoD + publishes)
 
 **Need to understand a concept or pattern?**
 → `/explain <topic>` (in any mode, or `@product` + `/explain` for deep exploration)
