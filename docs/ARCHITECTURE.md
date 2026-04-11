@@ -259,11 +259,12 @@ Artifact (traceable output)
 
 Since each mode operates in its own chat session, handoffs between modes happen through the task directory:
 
-1. `@planning` produces `technical.plan.md` via `/blueprint`
-2. A new chat in `@dev` loads the plan artifact during the loading protocol
-3. `@dev` executes `/implement` against the loaded plan
-4. A new chat in `@review` loads the implementation artifacts for `/self-review` or PR context for `/peer-review`
-5. If needed, `/handoff` can generate an operational snippet to open the next chat with explicit mode / command / constraints
+1. `@product` produces `analysis.product.md`, `dor.plan.md`, `dod.plan.md` via `/enrich`
+2. `@planning` produces `technical.plan.md`, `increments.plan.md` via `/blueprint` (consuming DoR/DoD from step 1)
+3. A new chat in `@dev` loads the plan artifact during the loading protocol
+4. `@dev` executes `/implement` against the loaded plan
+5. A new chat in `@review` loads the implementation artifacts for `/self-review` or PR context for `/peer-review`
+6. If needed, `/handoff` can generate an operational snippet to open the next chat with explicit mode / command / constraints
 
 The task directory is the shared state. `status.md` tracks which phase the task is in. `/handoff` is optional scaffolding for chat startup, not a replacement for artifact loading.
 
@@ -403,8 +404,8 @@ Task artifacts go through a lifecycle tracked by `status.md` in the task directo
 | Status | Meaning | Entered when |
 |---|---|---|
 | `pending_dor` | Artifacts being created | Task directory created |
-| `ready` | All required artifacts validated | `/validate-plan` passes |
-| `in_progress` | Implementation underway | `/implement` starts first increment |
+| `ready` | Refinement complete, DoR/DoD published | `/enrich` publishes successfully |
+| `in_progress` | Planning or implementation underway | `/blueprint` starts (Phase 0) |
 | `in_review` | PR created | `/pr` creates pull request |
 | `completed` | All artifacts published | `/publish` completes |
 | `cancelled` | Task abandoned | Manual action only |
@@ -421,9 +422,9 @@ Each artifact tracks its own sync state relative to the configured knowledge pro
 | `synced` | Published to knowledge provider, content matches |
 | `modified` | Local content changed after last sync |
 
-### Progressive Knowledge Sync
+### Progressive Knowledge Sync (Unconditional)
 
-Artifacts are published progressively — after every command that writes to the task directory, not only at the end. This means the knowledge provider stays current throughout the task lifecycle. `/publish` serves as the safety net for final archival, ensuring all artifacts reach `synced` state before the task is marked `completed`.
+Artifacts are published progressively and unconditionally — after every command that writes to the task directory, regardless of plan classification. This means the knowledge provider stays current throughout the task lifecycle. `/publish` serves as the reconciliation and closure step, ensuring any remaining unpublished artifacts (e.g., locally-amended DoR/DoD) reach `synced` state, generating a Plan Delta, and marking the task as `completed`.
 
 ### Plan Classification
 
@@ -435,7 +436,7 @@ Plans are classified at creation time by `/blueprint` based on complexity:
 | B | Medium, multi-increment | Plan + design |
 | C | Large, cross-system | Plan + design + charter |
 
-Classification can be escalated by `/charter` but never downgraded. It determines the minimum artifact set required before `/validate-plan` can pass.
+Classification can be escalated by `/charter` but never downgraded. It is used only for governance (gates in `/implement`), not for publishing decisions. When `refinement_validated: true` in `status.md` (set by `/enrich` after team refinement), classification-derived governance gates are relaxed.
 
 ---
 
