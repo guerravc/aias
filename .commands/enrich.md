@@ -190,8 +190,9 @@ After writing `analysis.product.md`:
 
 1. Follow **rho-aias** skill loading protocol (Phases 0–3) to resolve TASK_DIR and load existing artifacts.
 2. Resolve tracker provider from `aias-providers/tracker-config.md`; if missing/invalid/unresolvable, abort and request provider configuration.
-3. Use the resolved provider to read the ticket: description, acceptance criteria, comments, linked issues, status.
-4. If `@product` analysis is present in the chat context, collect it as supplementary input.
+3. Load `field_mapping_source` from the resolved tracker config (MANDATORY for write commands). If field mapping is missing or unresolvable, STOP with `MISSING_FIELD_MAPPING` and request configuration via `/aias configure-providers`.
+4. Use the resolved provider to read the ticket: description, acceptance criteria, comments, linked issues, status.
+5. If `@product` analysis is present in the chat context, collect it as supplementary input.
 
 ### Phase 2 — Analyze
 
@@ -234,6 +235,23 @@ If tracker signals and user-declared classification conflict, or if confidence i
    - `Acceptance Criteria` = field-specific criteria only
    - `Test Steps` = field-specific test steps only
    - tracker-owned fields (`Priority`, `Components`) only when supported and justified
+
+### Phase 3b — Field Write Plan
+
+Before presenting the write preview, resolve the format for each target field:
+
+For each field that `/enrich` intends to write:
+
+1. `field_key` — from the loaded field mapping.
+2. `ownership` — which command/role owns writes to this field (verify `/enrich` is allowed).
+3. `merge_strategy` — `create_or_replace_managed_block` | `set_if_default` | `append` | `skip`.
+4. `content_format` — resolve with precedence:
+   1. Runtime field metadata (from the ticket read response) — highest priority.
+   2. Mapping document (`Format` column in `jira-field-mapping.md`) — second priority.
+   3. Default (ADF for custom textarea fields, Markdown for description) — lowest priority.
+5. `decision_source` — `runtime` | `mapping` | `default`.
+
+Include the resolved write plan in the **Gate: Tracker Write Preview** context output.
 
 ### Phase 4 — Present + Write
 
