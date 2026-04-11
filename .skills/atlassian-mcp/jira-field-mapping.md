@@ -1,4 +1,4 @@
-> **DEPRECATED (v7.5)** — This file has moved to `aias-providers/atlassian/jira-field-mapping.md`.
+> **DEPRECATED (v7.5)** — This file has moved to `aias-config/providers/atlassian/jira-field-mapping.md`.
 > This copy is kept for backward compatibility during migration.
 > Run `/aias health` to detect and migrate automatically.
 > This file will be removed in a future version.
