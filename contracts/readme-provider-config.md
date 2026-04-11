@@ -46,14 +46,14 @@ A service config is not a mode, command, skill, or runtime artifact.
 
 Service config files must live under:
 
-- `aias-providers/knowledge-config.md`
-- `aias-providers/tracker-config.md`
-- `aias-providers/design-config.md`
-- `aias-providers/vcs-config.md`
+- `aias-config/providers/knowledge-config.md`
+- `aias-config/providers/tracker-config.md`
+- `aias-config/providers/design-config.md`
+- `aias-config/providers/vcs-config.md`
 
 Future categories must follow:
 
-- `aias-providers/<category>-config.md`
+- `aias-config/providers/<category>-config.md`
 
 ---
 
@@ -61,7 +61,7 @@ Future categories must follow:
 
 Provider configs reference external documents (field mappings, status mappings, publishing configs) that contain project-specific configuration. These documents live in a provider-specific subdirectory:
 
-- `aias-providers/<provider_id>/` — where `provider_id` matches the `active_provider` value (e.g., `atlassian`, `figma`, `github`)
+- `aias-config/providers/<provider_id>/` — where `provider_id` matches the `active_provider` value (e.g., `atlassian`, `figma`, `github`)
 
 Documents are referenced via path keys in the provider parameters (`field_mapping_source`, `status_mapping_source`, `config_source`) and declared as dependencies in `skill_binding.resource_files`.
 
@@ -180,12 +180,12 @@ skill_binding:
   skill: atlassian-mcp
   capability: knowledge-publish
   resource_files:
-    - aias-providers/atlassian/confluence-config.md
+    - aias-config/providers/atlassian/confluence-config.md
 providers:
   confluence:
     enabled: true
     mcp_server: user-Atlassian
-    config_source: aias-providers/atlassian/confluence-config.md
+    config_source: aias-config/providers/atlassian/confluence-config.md
 ```
 
 ### `tracker` minimum template
@@ -198,14 +198,14 @@ skill_binding:
   skill: atlassian-mcp
   capability: tracker-sync
   resource_files:
-    - aias-providers/atlassian/jira-field-mapping.md
-    - aias-providers/atlassian/tracker-status-mapping.md
+    - aias-config/providers/atlassian/jira-field-mapping.md
+    - aias-config/providers/atlassian/tracker-status-mapping.md
 providers:
   jira:
     enabled: true
     mcp_server: user-Atlassian
-    field_mapping_source: aias-providers/atlassian/jira-field-mapping.md
-    status_mapping_source: aias-providers/atlassian/tracker-status-mapping.md
+    field_mapping_source: aias-config/providers/atlassian/jira-field-mapping.md
+    status_mapping_source: aias-config/providers/atlassian/tracker-status-mapping.md
 ```
 
 ### `design` minimum template
@@ -259,7 +259,8 @@ A service config is valid only if all rules below pass:
 
 `skill_binding.skill` is resolvable when at least one location exists:
 
-- `aias/.skills/<skill>/`
+- `aias/.skills/<skill>/` (framework)
+- `aias-config/skills/<skill>/` (project)
 - `.cursor/skills/<skill>/`
 - `~/.cursor/skills/<skill>/`
 
@@ -332,7 +333,7 @@ When resolution fails, consumers must use these normalized outcomes:
 
 | Error code | Trigger condition | Mandatory behavior |
 |---|---|---|
-| `MISSING_CONFIG` | `aias-providers/<category>-config.md` not found | Abort dependent operation and request config |
+| `MISSING_CONFIG` | `aias-config/providers/<category>-config.md` not found | Abort dependent operation and request config |
 | `INVALID_SCHEMA` | Required keys/types/constraints fail | Abort dependent operation and request config fix |
 | `UNRESOLVABLE_SKILL` | `skill_binding.skill` cannot be resolved | Abort dependent operation and request config fix |
 | `UNSUPPORTED_CAPABILITY` | capability not compatible with category intent | Abort dependent operation and request capability mapping fix |
@@ -350,7 +351,7 @@ Consumers must use this canonical algorithm:
 
 ```text
 resolveServiceOrAbort(category):
-  load aias-providers/<category>-config.md
+  load aias-config/providers/<category>-config.md
   validate config (schema + category rules + resolvability)
   if valid:
     return explicit config selection
@@ -411,7 +412,7 @@ Use this checklist to approve a service config implementation:
 
 | Check | Pass/Fail |
 |---|---|
-| 1. File path follows `aias-providers/<category>-config.md` | ☐ |
+| 1. File path follows `aias-config/providers/<category>-config.md` | ☐ |
 | 2. Mandatory section order is respected | ☐ |
 | 3. `service_category` enum is valid | ☐ |
 | 4. `active_provider` exists in `providers` map | ☐ |
