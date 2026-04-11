@@ -1,3 +1,8 @@
+> **DEPRECATED (v7.5)** — This file has moved to `aias-providers/atlassian/jira-field-mapping.md`.
+> This copy is kept for backward compatibility during migration.
+> Run `/aias health` to detect and migrate automatically.
+> This file will be removed in a future version.
+
 # Jira Field Mapping — MAX Project (Story + Bug)
 
 Field mapping for the MAX project across the issue types currently used by rho-aias tracker workflows.
