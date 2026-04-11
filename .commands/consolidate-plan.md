@@ -1,11 +1,11 @@
-# Consolidate Plan (Gap-by-Gap Plan Strengthening) — v3
+# Consolidate Plan (Gap-by-Gap Plan Strengthening) — v4
 
 ## 1. Identity
 
 **Command Type:** Type B — Procedural / Execution
 
 You are **consolidating** an implementation plan by working through gaps identified by `/validate-plan`, one at a time, using the plan artifacts in the task directory.
-This command is responsible for guiding a strict workflow: one persisted validation todo → one proposal → refinement until the user agrees → update the relevant artifact(s) in TASK_DIR only when explicitly instructed.
+This command is responsible for guiding a strict workflow: one persisted validation todo → one proposal → refinement until the user agrees → update the relevant artifact(s) in TASK_DIR only when explicitly instructed. For gaps touching DoR/DoD artifacts, the Amendment gate is used instead of the Update Approval gate.
 
 **Skills referenced:** `rho-aias`.
 
@@ -47,7 +47,7 @@ Rules:
 - **Proposals** must be presented in the chat as plain Markdown. Structure: a clear heading for the gap, then the concrete changes (what to add, change, or remove in which artifact), then a short summary.
 - **Refinement:** Replies in chat; no fixed template. The command adjusts the proposal based on user feedback until the user explicitly approves.
 - **After artifact update:** Confirm in chat: which validation todo was resolved, which artifact(s) were updated, and list remaining pending validation todos.
-- **File output:** The command may write **only** to plan artifacts in TASK_DIR, and **only** when the user has explicitly instructed to update. After updating, run Phase 5 to mark artifacts as `modified` and sync to resolved knowledge provider.
+- **File output:** The command may write **only** to plan artifacts in TASK_DIR, and **only** when the user has explicitly instructed to update. After updating, run Phase 5 to mark artifacts as `modified` and sync to resolved knowledge provider (Phase 5c always publishes — it is NOT conditioned by plan classification). Exception: DoR/DoD artifacts modified via the Amendment gate remain local and are excluded from Phase 5c until reconciled via `/publish`.
 
 ---
 
@@ -77,18 +77,21 @@ The command follows this **procedure**. Do not skip steps or update artifacts be
 
 - Produce a **proposal**: concrete changes to the relevant artifact(s) that address this gap.
 - Present the proposal in chat. Do **not** modify artifacts yet.
+- Identify the **artifact type** the gap touches:
+  - **Technical artifacts** (`technical.plan.md`, `increments.plan.md`, `specs.design.md`) → Update Approval gate.
+  - **Refinement artifacts** (`dor.plan.md`, `dod.plan.md`) → Amendment gate.
 
 ### Step 3 — Refinement cycle
 
 - MUST wait for the user's response before proceeding.
 - If the user requests changes: revise the proposal. Repeat until the user indicates agreement.
 - If the user cancels or switches gap: acknowledge and select another gap.
-- When the user indicates agreement with the proposal, fire the Update Approval gate.
+- When the user indicates agreement with the proposal, fire the appropriate gate based on artifact type.
 
-#### Gate: Update Approval
+#### Gate: Update Approval (for technical artifacts)
 
 **Type:** Confirmation
-**Fires:** Step 3, when the user agrees with a proposal and the command is about to write to artifact files.
+**Fires:** Step 3, when the user agrees with a proposal that touches technical artifacts (`technical.plan.md`, `increments.plan.md`, `specs.design.md`).
 **Skippable:** No.
 
 **Context output:**
@@ -111,11 +114,37 @@ Present the approved proposal summary:
 
 **Anti-bypass:** Inherits Gate Invocation Protocol. No additional rules.
 
+#### Gate: Amendment Approval (for DoR/DoD artifacts)
+
+**Type:** Decision
+**Fires:** Step 3, when the user agrees with a proposal that touches refinement artifacts (`dor.plan.md`, `dod.plan.md`).
+**Skippable:** No.
+
+**Context output:**
+Present the approved proposal summary:
+- Gap being resolved
+- Which DoR/DoD dimension is affected
+- Proposed change
+
+**AskQuestion:**
+- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
+- **Prompt:** "This gap touches DoR/DoD. How to proceed?"
+- **Options:**
+  - `apply_local`: "Apply amendment locally (do not publish to team)"
+  - `pause`: "Pause — consult the team before proceeding"
+  - `reject`: "Reject amendment — adjust plan to existing DoR/DoD"
+- **allow_multiple:** false
+
+**On response:**
+- `apply_local` → Apply changes to `dor.plan.md`/`dod.plan.md` locally. Mark as `modified` in `status.md`. Do NOT publish via Phase 5c — remains local until reconciliation via `/publish` or team re-runs `/enrich`.
+- `pause` → Halt consolidation for this gap. Inform user to consult the team and return when resolved.
+- `reject` → Discard proposed changes. Mark validation todo as `completed` (no action taken). The plan must work with existing DoR/DoD.
+
 ### Step 4 — Update artifacts
 
 - Apply the **approved** proposal to the relevant artifact file(s) in TASK_DIR.
 - Mark the corresponding validation todo in `technical.plan.md` as `completed`.
-- Run Phase 5: mark updated artifacts as `modified` in `status.md`, sync to resolved knowledge provider.
+- Run Phase 5: mark updated artifacts as `modified` in `status.md`, sync to resolved knowledge provider (Phase 5c always publishes, except for locally-amended DoR/DoD).
 - Confirm in chat: "Artifact updated. Validation todo resolved." and list remaining pending validation todos.
 
 ### Step 5 — Next gap (optional)
