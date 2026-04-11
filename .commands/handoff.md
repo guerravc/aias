@@ -39,6 +39,7 @@ This command may use **only** the following inputs:
 - Current workflow context already present in the conversation
 - Local TASK_DIR artifacts when available through `rho-aias`
 - `status.md` when available through TASK_DIR
+- `stack-profile.md` (`binding.generation.tools`) for shortcut path resolution
 
 Rules:
 - The command MAY resolve a destination only after the user explicitly invokes `/handoff`.
@@ -65,6 +66,13 @@ Rules:
 - Any assumption or inferred destination MUST be declared inside the snippet.
 - This command MUST distinguish operational handoff from durable artifact handoff: it summarizes the next-step context, but does not replace TASK_DIR artifacts as the source of truth.
 - Extra sections beyond the required base MUST come only from the closed contextual mappings defined in Section 6.
+- **Path resolution:** Before emitting the snippet, resolve the shortcut path for MODE and COMMAND based on the primary tool (first entry) in `binding.generation.tools` from `stack-profile.md`. Use the tool adapter mapping:
+  - `cursor`: `.cursor/rules/<mode>.mdc`, `.cursor/commands/<command>.md`
+  - `claude`: `.claude/rules/<mode>.md`, command not supported (emit canonical: `aias/.commands/<command>.md`)
+  - `copilot`: `.github/instructions/<mode>.instructions.md`, `.github/agents/<command>.md`
+  - `codex`: mode not supported (emit canonical: `aias-config/modes/<mode>.mdc`), `.codex/commands/<command>.md`
+  - If tool is unknown or `binding.generation.tools` is missing, emit the canonical path as fallback (`aias-config/modes/<mode>.mdc`, `aias/.commands/<command>.md`).
+  - Always verify the resolved path exists before emitting. If missing, fall back to canonical.
 
 ---
 
@@ -72,8 +80,8 @@ Rules:
 
 ````markdown
 ```markdown
-MODE: <target mode or "Unspecified">
-COMMAND: <target command or "Open">
+MODE: <resolved mode shortcut path or "Unspecified">
+COMMAND: <resolved command shortcut path or "Open">
 REPO: <repo or "Unspecified">
 TASK ID: <task id or "Unspecified">
 DIR: <task dir or "Unspecified">
