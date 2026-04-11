@@ -11,8 +11,8 @@ Inputs:
 - <repo_root>/stack-profile.md (one per repo)
 
 Outputs (canonical — always produced):
-- aias/.modes/*.mdc (generated platform modes)
-- aias/.rules/base.mdc, output-contract.mdc (flat, from last workspace processed)
+- aias-config/modes/*.mdc (generated platform modes)
+- aias-config/rules/base.mdc, output-contract.mdc (flat, from last workspace processed)
 
 Outputs (shortcuts — only with --shortcuts flag):
 - .cursor/rules/*.mdc (rules + modes)
@@ -33,7 +33,7 @@ Pre-flight validation:
   G2 — Mode Binding Completeness: all required mode bindings present per profile
   G3 — Rule Binding Completeness: all required base + output_contract bindings present per workspace
   G4 — Fragment Validation: stack-fragment.md exists at repo root, non-empty, has UPPERCASE header
-  G5 — Output Directory: aias/.rules/ and aias/.modes/ exist or can be created
+  G5 — Output Directory: aias-config/rules/ and aias-config/modes/ exist or can be created
   G6 — Shortcut Consistency: every canonical file has corresponding shortcuts for all supported tools (only with --shortcuts)
   G7 — No Content Duplication: no shortcut file exceeds threshold length (only with --shortcuts)
 """
@@ -51,10 +51,12 @@ from typing import Dict, List, Optional, Tuple
 ROOT = pathlib.Path(__file__).resolve().parents[3]
 CANONICAL_DIR = ROOT / "aias" / ".canonical"
 STACK_FRAGMENT_PATH = ROOT / "stack-fragment.md"
-RULES_OUTPUT_DIR = ROOT / "aias" / ".rules"
-MODES_OUTPUT_DIR = ROOT / "aias" / ".modes"
-COMMANDS_DIR = ROOT / "aias" / ".commands"
-SKILLS_DIR = ROOT / "aias" / ".skills"
+RULES_OUTPUT_DIR = ROOT / "aias-config" / "rules"
+MODES_OUTPUT_DIR = ROOT / "aias-config" / "modes"
+FW_COMMANDS_DIR = ROOT / "aias" / ".commands"
+FW_SKILLS_DIR = ROOT / "aias" / ".skills"
+PROJECT_COMMANDS_DIR = ROOT / "aias-config" / "commands"
+PROJECT_SKILLS_DIR = ROOT / "aias-config" / "skills"
 TRANSVERSAL_MODES_DIR = ROOT / "aias" / ".canonical"
 
 MODE_NAMES = ("planning", "dev", "qa", "debug", "review", "product", "integration")
@@ -226,10 +228,10 @@ def _gate_1_profile_discovery(
                 f"[G1] Missing binding.generation.mode_output_dir in {profile.relative_to(ROOT)}\n"
                 f"      → Add: - `binding.generation.mode_output_dir`: `<path>`"
             )
-        elif bindings["generation.mode_output_dir"].strip() != "aias/.modes":
+        elif bindings["generation.mode_output_dir"].strip() not in ("aias-config/modes", "aias/.modes"):
             errors.append(
                 f"[G1] Invalid binding.generation.mode_output_dir in {profile.relative_to(ROOT)}\n"
-                f"      → Must be: - `binding.generation.mode_output_dir`: `aias/.modes`"
+                f"      → Must be: - `binding.generation.mode_output_dir`: `aias-config/modes`"
             )
         if "generation.tools" not in bindings:
             errors.append(
@@ -463,8 +465,10 @@ def _gate_6_shortcut_consistency(generated_modes: List[str], tools: List[str]) -
             copilot_mode = ROOT / ".github" / "instructions" / f"{mode_name}.instructions.md"
             _check_shortcut_exists(copilot_mode, f"GitHub Copilot mode: {mode_name}", errors)
 
-    if COMMANDS_DIR.is_dir():
-        for cmd_file in sorted(COMMANDS_DIR.glob("*.md")):
+    for cmd_dir in (FW_COMMANDS_DIR, PROJECT_COMMANDS_DIR):
+        if not cmd_dir.is_dir():
+            continue
+        for cmd_file in sorted(cmd_dir.glob("*.md")):
             name = cmd_file.name
             if "cursor" in tools:
                 _check_shortcut_exists(ROOT / ".cursor" / "commands" / name, f"Cursor command: {name}", errors)
@@ -473,8 +477,10 @@ def _gate_6_shortcut_consistency(generated_modes: List[str], tools: List[str]) -
             if "codex" in tools:
                 _check_shortcut_exists(ROOT / ".codex" / "commands" / name, f"Codex command: {name}", errors)
 
-    if SKILLS_DIR.is_dir():
-        for skill_dir in sorted(SKILLS_DIR.iterdir()):
+    for skills_dir in (FW_SKILLS_DIR, PROJECT_SKILLS_DIR):
+        if not skills_dir.is_dir():
+            continue
+        for skill_dir in sorted(skills_dir.iterdir()):
             if skill_dir.is_dir() and (skill_dir / "SKILL.md").is_file():
                 sname = skill_dir.name
                 if "cursor" in tools:
@@ -1001,8 +1007,10 @@ def _generate_cursor_shortcuts(generated_modes: List[str]) -> int:
 
     cmds_dir = ROOT / ".cursor" / "commands"
     cmds_dir.mkdir(parents=True, exist_ok=True)
-    if COMMANDS_DIR.is_dir():
-        for cmd_file in sorted(COMMANDS_DIR.glob("*.md")):
+    for cmd_dir in (FW_COMMANDS_DIR, PROJECT_COMMANDS_DIR):
+        if not cmd_dir.is_dir():
+            continue
+        for cmd_file in sorted(cmd_dir.glob("*.md")):
             _create_symlink(cmds_dir / cmd_file.name, cmd_file)
             count += 1
 
@@ -1023,7 +1031,7 @@ def _generate_claude_shortcuts(
         canonical_path = RULES_OUTPUT_DIR / f"{rule_name}.mdc"
         desc = _extract_description(canonical_path)
         prefix = f"[{rule_name}] {desc}\n" if desc else ""
-        content = f"{prefix}Read and follow the canonical rule at: aias/.rules/{rule_name}.mdc\n"
+        content = f"{prefix}Read and follow the canonical rule at: aias-config/rules/{rule_name}.mdc\n"
         shortcut_path.write_text(content, encoding="utf-8")
         count += 1
 
@@ -1032,14 +1040,14 @@ def _generate_claude_shortcuts(
         shortcut_path = rules_dir / "continuous-improvement.md"
         desc = _extract_description(ci_source)
         prefix = f"[continuous-improvement] {desc}\n" if desc else ""
-        content = f"{prefix}Read and follow the canonical rule at: aias/.rules/continuous-improvement.mdc\n"
+        content = f"{prefix}Read and follow the canonical rule at: aias-config/rules/continuous-improvement.mdc\n"
         shortcut_path.write_text(content, encoding="utf-8")
         count += 1
 
     for mode in generated_modes:
         shortcut_path = rules_dir / f"{mode}.md"
         canonical_path = MODES_OUTPUT_DIR / f"{mode}.mdc"
-        canonical_ref = f"aias/.modes/{mode}.mdc"
+        canonical_ref = f"aias-config/modes/{mode}.mdc"
         desc = _extract_description(canonical_path)
         desc_line = f"[{mode}] {desc}\n" if desc else ""
         globs_raw = mode_globs.get(mode, "")
@@ -1073,7 +1081,7 @@ def _generate_windsurf_shortcuts() -> int:
         canonical_path = RULES_OUTPUT_DIR / f"{rule_name}.mdc"
         desc = _extract_description(canonical_path)
         prefix = f"[{rule_name}] {desc}\n" if desc else ""
-        content = f"{prefix}Read and follow the canonical rule at: aias/.rules/{rule_name}.mdc\n"
+        content = f"{prefix}Read and follow the canonical rule at: aias-config/rules/{rule_name}.mdc\n"
         shortcut_path.write_text(content, encoding="utf-8")
         count += 1
 
@@ -1082,7 +1090,7 @@ def _generate_windsurf_shortcuts() -> int:
         shortcut_path = rules_dir / "continuous-improvement.md"
         desc = _extract_description(ci_source)
         prefix = f"[continuous-improvement] {desc}\n" if desc else ""
-        content = f"{prefix}Read and follow the canonical rule at: aias/.rules/continuous-improvement.mdc\n"
+        content = f"{prefix}Read and follow the canonical rule at: aias-config/rules/continuous-improvement.mdc\n"
         shortcut_path.write_text(content, encoding="utf-8")
         count += 1
 
@@ -1102,12 +1110,12 @@ def _generate_copilot_shortcuts(
     for rule_name in ("base", "output-contract"):
         desc = _extract_description(RULES_OUTPUT_DIR / f"{rule_name}.mdc")
         desc_part = f" {desc}" if desc else ""
-        rule_lines.append(f"- [{rule_name}]{desc_part} — aias/.rules/{rule_name}.mdc")
+        rule_lines.append(f"- [{rule_name}]{desc_part} — aias-config/rules/{rule_name}.mdc")
     ci_source = RULES_OUTPUT_DIR / "continuous-improvement.mdc"
     if ci_source.is_file():
         desc = _extract_description(ci_source)
         desc_part = f" {desc}" if desc else ""
-        rule_lines.append(f"- [continuous-improvement]{desc_part} — aias/.rules/continuous-improvement.mdc")
+        rule_lines.append(f"- [continuous-improvement]{desc_part} — aias-config/rules/continuous-improvement.mdc")
 
     if rule_lines:
         instructions_path = github_dir / "copilot-instructions.md"
@@ -1120,7 +1128,7 @@ def _generate_copilot_shortcuts(
     for mode in generated_modes:
         shortcut_path = instr_dir / f"{mode}.instructions.md"
         canonical_path = MODES_OUTPUT_DIR / f"{mode}.mdc"
-        canonical_ref = f"aias/.modes/{mode}.mdc"
+        canonical_ref = f"aias-config/modes/{mode}.mdc"
         desc = _extract_description(canonical_path)
         desc_line = f"[{mode}] {desc}\n" if desc else ""
         globs_raw = mode_globs.get(mode, "")
@@ -1139,8 +1147,10 @@ def _generate_copilot_shortcuts(
 
     agents_dir = github_dir / "agents"
     agents_dir.mkdir(parents=True, exist_ok=True)
-    if COMMANDS_DIR.is_dir():
-        for cmd_file in sorted(COMMANDS_DIR.glob("*.md")):
+    for cmd_dir in (FW_COMMANDS_DIR, PROJECT_COMMANDS_DIR):
+        if not cmd_dir.is_dir():
+            continue
+        for cmd_file in sorted(cmd_dir.glob("*.md")):
             _create_symlink(agents_dir / cmd_file.name, cmd_file)
             count += 1
 
@@ -1153,13 +1163,17 @@ def _generate_codex_shortcuts() -> int:
 
     cmds_dir = ROOT / ".codex" / "commands"
     cmds_dir.mkdir(parents=True, exist_ok=True)
-    if COMMANDS_DIR.is_dir():
-        for cmd_file in sorted(COMMANDS_DIR.glob("*.md")):
+    for cmd_dir in (FW_COMMANDS_DIR, PROJECT_COMMANDS_DIR):
+        if not cmd_dir.is_dir():
+            continue
+        for cmd_file in sorted(cmd_dir.glob("*.md")):
             _create_symlink(cmds_dir / cmd_file.name, cmd_file)
             count += 1
 
-    if SKILLS_DIR.is_dir():
-        for skill_dir in sorted(SKILLS_DIR.iterdir()):
+    for skills_dir in (FW_SKILLS_DIR, PROJECT_SKILLS_DIR):
+        if not skills_dir.is_dir():
+            continue
+        for skill_dir in sorted(skills_dir.iterdir()):
             if skill_dir.is_dir() and (skill_dir / "SKILL.md").is_file():
                 target_dir = ROOT / ".agents" / "skills" / skill_dir.name
                 target_dir.mkdir(parents=True, exist_ok=True)
@@ -1176,10 +1190,15 @@ def _generate_skill_shortcuts(tools: List[str]) -> Tuple[int, int]:
     """
     cursor_count = 0
     claude_count = 0
-    if not SKILLS_DIR.is_dir():
+
+    all_skill_dirs: List[pathlib.Path] = []
+    for skills_dir in (FW_SKILLS_DIR, PROJECT_SKILLS_DIR):
+        if skills_dir.is_dir():
+            all_skill_dirs.extend(sorted(skills_dir.iterdir()))
+    if not all_skill_dirs:
         return cursor_count, claude_count
 
-    for skill_dir in sorted(SKILLS_DIR.iterdir()):
+    for skill_dir in all_skill_dirs:
         if not skill_dir.is_dir() or not (skill_dir / "SKILL.md").is_file():
             continue
 
@@ -1275,9 +1294,9 @@ def main() -> int:
 
     print(f"\nMode generation completed for stacks: {', '.join(mode_stacks)}.")
     if transversal_copied:
-        print(f"Transversal modes copied to aias/.modes/: {', '.join(transversal_copied)}")
+        print(f"Transversal modes copied to aias-config/modes/: {', '.join(transversal_copied)}")
     print(f"Rule generation completed for workspaces: {', '.join(rule_workspaces)}.")
-    print(f"Canonical output: aias/.rules/ (flat), aias/.modes/ (flat)")
+    print(f"Canonical output: aias-config/rules/ (flat), aias-config/modes/ (flat)")
     if RULE_GENERATION_SKIP:
         print(f"Skipped (manual-maintenance): {', '.join(sorted(RULE_GENERATION_SKIP))}.")
 
