@@ -39,13 +39,13 @@ This command may use **only** the following inputs:
 - Codebase analysis results (files, patterns, dependencies found during analysis)
 - **Upstream artifacts** detected in TASK_DIR: `*.product.md`, `*.fix.md`, `*.issue.md`, `*.assessment.md` — if present, load and incorporate as additional context
 - Service configs:
-  - `aias-providers/tracker-config.md`
-  - `aias-providers/design-config.md`
-  - `aias-providers/knowledge-config.md`
+  - `aias-config/providers/tracker-config.md`
+  - `aias-config/providers/design-config.md`
+  - `aias-config/providers/knowledge-config.md`
 
 Context enrichment requirements:
-- If tracker data is not already in context and a task id or tracker URL was provided, resolve tracker provider from `aias-providers/tracker-config.md`; if missing/invalid/unresolvable, abort and request provider configuration.
-- If design context is not already available and a design URL was provided, resolve design provider from `aias-providers/design-config.md`; if missing/invalid/unresolvable, abort and request provider configuration.
+- If tracker data is not already in context and a task id or tracker URL was provided, resolve tracker provider from `aias-config/providers/tracker-config.md`; if missing/invalid/unresolvable, abort and request provider configuration.
+- If design context is not already available and a design URL was provided, resolve design provider from `aias-config/providers/design-config.md`; if missing/invalid/unresolvable, abort and request provider configuration.
 - If classification is B or C and knowledge provider config is missing/invalid/unresolvable, abort before Phase 5c.
 
 Rules:
@@ -329,7 +329,7 @@ All criteria that determine when the implemented scope is ready for QA.
 
 ### Category 12: Design Specification (conditional) → `specs.design.md`
 
-**Only collect when a design URL is provided.** Resolve design provider from `aias-providers/design-config.md`. If config/provider is unavailable, abort and request configuration. Extract component hierarchy, layout/visual properties, typography, interactive states, and token references.
+**Only collect when a design URL is provided.** Resolve design provider from `aias-config/providers/design-config.md`. If config/provider is unavailable, abort and request configuration. Extract component hierarchy, layout/visual properties, typography, interactive states, and token references.
 
 If the active mode defines a **DESIGN SYSTEM MAPPING** section, apply it: map raw design values (colors, typography, spacing) to the project's design tokens. Present both the raw value and the mapped token for each property so the developer can verify the match.
 
