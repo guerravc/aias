@@ -16,7 +16,7 @@ Both the `/aias` command and the CLI script produce identical artifacts. The com
 
 Invocation mirrors the CLI interface:
 
-- `/aias init` — Full project onboarding (interactive, 7 steps)
+- `/aias init` — Full project onboarding (interactive, 6 steps)
 - `/aias new --mode <name>` — Create a mode (file-specific or intelligent)
 - `/aias new --rule <name>` — Create an always-apply rule
 - `/aias new --command <name>` — Create a command
@@ -29,6 +29,7 @@ Invocation mirrors the CLI interface:
 - `/aias generate --shortcuts` — Run generator with shortcuts (reads tools from stack profile)
 - `/aias generate --shortcuts --tools cursor,claude` — Override tools for this run
 - `/aias health` — Verify setup health
+- `/aias configure-providers` — AI-assisted provider configuration with MCP discovery (generates referenced files in `aias-providers/<provider_id>/`)
 
 Short aliases: `gen` for `generate`, `gen -s` for `generate --shortcuts`.
 
@@ -54,6 +55,7 @@ Usage notes:
 | `new --stack-fragment` | Chat answers (fragment type A/B/C, details) | `readme-output-contract.md` § Fragment Structure Options |
 | `generate` | None (invokes generator). With `--shortcuts`: reads `binding.generation.tools` from stack profile. Optional `--tools <csv>` overrides binding. | — |
 | `health` | None (runs checks) | — |
+| `configure-providers` | Provider category selection + MCP connection | `readme-provider-config.md`, `readme-tracker-field-mapping.md`, `readme-knowledge-publishing-config.md`, `readme-tracker-status-mapping.md` |
 
 ---
 
@@ -62,17 +64,18 @@ Usage notes:
 - **File creation**: Each `new` subcommand writes a file to the canonical location. The agent shows the complete file content and confirms the write.
 - **Generation**: The `generate` subcommand invokes `generate_modes_and_rules.py` via shell and reports the result. With `--shortcuts`, the generator reads `binding.generation.tools` from the stack profile to determine which tools to produce shortcuts for. An optional `--tools <csv>` flag overrides the binding for that run.
 - **Health**: The `health` subcommand produces a table in chat with check name, status (OK/WARN/FAIL), and detail.
-- **Init**: Interactive onboarding in 7 steps:
+- **Init**: Interactive onboarding in 6 steps:
   1. **Detection** — check for existing `RHOAIAS.md`, `stack-profile.md`, `stack-fragment.md`
   2. **Context** — create `RHOAIAS.md` (ask: project name, platform, description, architecture, technologies)
   3. **Stack profile** — create `stack-profile.md` (ask: language, build system, UI framework, test framework, **target tools** — see § 5 Tool selection, **tasks directory** — see § 5 Tasks directory)
   4. **Stack fragment** — create `stack-fragment.md` (ask: fragment type A/B/C, details)
-  5. **Provider configs** (optional) — scaffold `aias-providers/*-config.md` for selected categories
-  6. **Context symlinks** — create context symlinks to `RHOAIAS.md`, scoped by tool selection:
+  5. **Context symlinks** — create context symlinks to `RHOAIAS.md`, scoped by tool selection:
      - `cursor`, `windsurf`, or `copilot` selected → `AGENTS.md`
      - `claude` selected → `CLAUDE.md`
      - `codex` selected → `codex.md`
-  7. **Generation** — invoke generator with `--shortcuts`
+  6. **Generation** — invoke generator with `--shortcuts`
+
+  > **Provider configuration** is handled separately via `new --provider` (skeleton) or `/aias configure-providers` (AI-assisted discovery with MCP). Run after `init` when you need tracker, knowledge, design, or VCS integration.
 
 ---
 
@@ -166,6 +169,42 @@ Each `new` subcommand produces a specific artifact structure. See the plan (§ C
 - Do NOT overwrite or modify files in `aias/.canonical/` — these are framework source templates maintained exclusively by the framework maintainer. The `init` and `new` subcommands create project-level artifacts only (stack-profile.md, stack-fragment.md, RHOAIAS.md, aias-providers/, modes, rules, commands, skills).
 - Do NOT use Glob to verify file existence before writing. Use Shell (`ls`) or Read instead — Glob respects git exclusion rules and may report files as missing when they exist on disk.
 - Do NOT modify `binding.generation.tools` after the user has set it. If the generator fails, report errors to the user — do NOT rewrite the stack profile to fix them.
+
+---
+
+## 8. `configure-providers` — AI-Assisted Provider Configuration
+
+This is an **AI agent command** (not a CLI subcommand). It uses MCP discovery to generate referenced configuration files with real project data.
+
+### Flow
+
+1. **Prerequisite check**: Verify that `aias-providers/` contains at least one `*-config.md`. If not, instruct the user to run `aias init` or `aias new --provider <category>` first.
+2. **Provider selection**: List existing `*-config.md` files and ask the user which provider to configure.
+3. **MCP availability check**: Attempt to connect to the MCP server declared in the selected provider config.
+4. **Discovery mode** (MCP available):
+   - For `tracker`: read sample tickets, discover field schemas via `getJiraIssue` with metadata, list available transitions, statuses, components, priorities. Generate `jira-field-mapping.md` and `tracker-status-mapping.md` with real field IDs, schemas, and option catalogs.
+   - For `knowledge`: read space metadata, discover page hierarchy. Generate `confluence-config.md` with real space key, root page ID, and TECH resolution table.
+5. **Fallback mode** (MCP unavailable): Read the governing contract for each file (`readme-tracker-field-mapping.md`, `readme-knowledge-publishing-config.md`, `readme-tracker-status-mapping.md`) and generate a skeleton file with contractual placeholders that the user must fill manually.
+6. **Write files**: Write generated files to `aias-providers/<provider_id>/` (e.g., `aias-providers/atlassian/`).
+7. **Update config**: Update `resource_files` and `*_source` paths in the corresponding `*-config.md` to point to the newly created files.
+8. **Report**: Show the user which files were generated and their locations.
+
+No templates directory is created. The contracts are the single source of truth for file structure.
+
+---
+
+## 9. `health` — Legacy Migration Assistance
+
+When the AI agent executes `/aias health` and the CLI output contains `[WARN]` entries with "Legacy location":
+
+1. Parse the health output for legacy warnings.
+2. Present an interactive gate: "Configuration files detected in legacy location (`aias/.skills/`). Migrate to `aias-providers/<provider_id>/`?"
+3. If the user accepts:
+   - Copy files from legacy to canonical location (`aias-providers/<provider_id>/`).
+   - Update `resource_files` and `*_source` paths in the corresponding `*-config.md`.
+   - Do NOT delete the originals (they coexist during v7.5).
+   - Report migration results.
+4. If the user declines: proceed without migration.
 
 ---
 
