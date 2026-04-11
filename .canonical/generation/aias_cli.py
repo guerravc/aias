@@ -429,6 +429,34 @@ def new_provider(category: str) -> None:
         print("Error: mcp_server is required when provider_mode is mcp.")
         sys.exit(1)
 
+    has_resource_files = category in ("tracker", "knowledge")
+    resource_files_block = ""
+    resource_files_example = ""
+    if has_resource_files:
+        resource_files_block = (
+            f"  resource_files: []\n"
+            f"  # Referenced files not yet configured. Run /aias configure-providers to generate them."
+        )
+        resource_files_example = (
+            f"\n          resource_files: []\n"
+            f"          # Run /aias configure-providers to populate"
+        )
+
+    skill_binding_section = f"""\
+        ```yaml
+        skill_binding:
+          skill: {skill_binding}
+          capability: {capability}"""
+    if has_resource_files:
+        skill_binding_section += f"\n          resource_files: []\n          # Referenced files not yet configured. Run /aias configure-providers to generate them."
+    skill_binding_section += "\n        ```"
+
+    example_skill_binding = f"""\
+          skill: {skill_binding}
+          capability: {capability}"""
+    if has_resource_files:
+        example_skill_binding += f"\n          resource_files: []\n          # Run /aias configure-providers to populate"
+
     content = textwrap.dedent(f"""\
         # Provider Config — {category}
 
@@ -446,11 +474,7 @@ def new_provider(category: str) -> None:
 
         ## Skill binding
 
-        ```yaml
-        skill_binding:
-          skill: {skill_binding}
-          capability: {capability}
-        ```
+        {skill_binding_section}
 
         ## Provider parameters
 
@@ -473,8 +497,7 @@ def new_provider(category: str) -> None:
         active_provider: {provider}
         provider_mode: mcp
         skill_binding:
-          skill: {skill_binding}
-          capability: {capability}
+{example_skill_binding}
         providers:
           {provider}:
             enabled: true
@@ -750,24 +773,7 @@ def cmd_init() -> None:
     if not fragment.is_file() or confirm("Create/overwrite stack-fragment.md?", default_yes=True):
         new_stack_fragment()
 
-    # Step 5: Provider configs (optional)
-    providers_dir = ROOT / "aias-providers"
-    existing_configs = list(providers_dir.glob("*-config.md")) if providers_dir.is_dir() else []
-
-    if existing_configs:
-        print(f"\nProvider configs already exist ({len(existing_configs)} found in aias-providers/):")
-        for c in sorted(existing_configs):
-            print(f"  - {c.name}")
-        if not confirm("Reconfigure provider configs?"):
-            print("  Skipping provider setup.")
-        else:
-            _init_providers()
-    elif confirm("\nConfigure external providers? (tracker, knowledge, design, vcs)"):
-        _init_providers()
-    else:
-        print("  Skipping provider setup. Run 'aias new --provider <category>' later if needed.")
-
-    # Step 6: Context symlinks (→ RHOAIAS.md, scoped by tool selection)
+    # Step 5: Context symlinks (→ RHOAIAS.md, scoped by tool selection)
     selected_tools = _read_tools_from_profile()
     print("\nCreating context symlinks → RHOAIAS.md...")
     rhoaias_target = ROOT / "RHOAIAS.md"
@@ -787,7 +793,7 @@ def cmd_init() -> None:
         _create_symlink(link_path, rhoaias_target)
         print(f"  Created: {filename} → RHOAIAS.md")
 
-    # Step 7: Generate
+    # Step 6: Generate
     rc = run_generator(shortcuts=True)
     if rc == 0:
         print("\n" + "=" * 60)
@@ -1022,7 +1028,51 @@ def cmd_health() -> None:
     else:
         results.append(("Provider configs", "WARN", "aias-providers/ not found — run 'aias new --provider <category>' to create"))
 
-    # 10. Tasks directory
+    # 10. Provider referenced files (resource_files validation)
+    CATEGORIES_WITH_RESOURCE_FILES = {"tracker", "knowledge"}
+    LEGACY_PREFIX = "aias/.skills/"
+    if PROVIDERS_DIR.is_dir():
+        for cfg in sorted(PROVIDERS_DIR.glob("*-config.md")):
+            cat = cfg.stem.replace("-config", "")
+            if cat not in CATEGORIES_WITH_RESOURCE_FILES:
+                continue
+            text = cfg.read_text(encoding="utf-8")
+            resource_files: List[str] = []
+            has_resource_files_key = False
+            for line in text.splitlines():
+                stripped = line.strip()
+                if stripped.startswith("resource_files:"):
+                    has_resource_files_key = True
+                    if "[]" in stripped:
+                        resource_files = []
+                    continue
+                if has_resource_files_key and stripped.startswith("- "):
+                    path_val = stripped[2:].strip().strip("'\"")
+                    if path_val and not path_val.startswith("#"):
+                        resource_files.append(path_val)
+                elif has_resource_files_key and not stripped.startswith("-") and not stripped.startswith("#"):
+                    break
+
+            check_name = f"Referenced files ({cat})"
+            if not has_resource_files_key:
+                results.append((check_name, "FAIL",
+                    f"Missing resource_files in {cfg.name}. Run /aias configure-providers to generate referenced files"))
+            elif not resource_files:
+                results.append((check_name, "WARN",
+                    f"No referenced files configured in {cfg.name}. Run /aias configure-providers to generate referenced files"))
+            else:
+                for rf in resource_files:
+                    rf_path = ROOT / rf
+                    if rf.startswith(LEGACY_PREFIX):
+                        results.append((check_name, "WARN",
+                            f"Legacy location: {rf}. Run /aias health in AI assistant to migrate"))
+                    elif rf_path.is_file():
+                        results.append((check_name, "OK", f"{rf} exists"))
+                    else:
+                        results.append((check_name, "FAIL",
+                            f"Missing: {rf}. Run /aias configure-providers to generate missing files"))
+
+    # 11. Tasks directory
     tasks_dir_raw = _read_tasks_dir_from_profile()
     if not tasks_dir_raw:
         results.append(("Tasks directory", "FAIL", "binding.generation.tasks_dir not found in stack-profile.md"))
@@ -1044,10 +1094,12 @@ def cmd_health() -> None:
         if status == "FAIL":
             has_fails = True
 
+    has_warns = any(r[1] == "WARN" for r in results)
     print()
     if has_fails:
-        print("Some checks failed. Run 'aias init' to set up missing files,")
-        print("or 'aias generate --shortcuts' to regenerate outputs.")
+        print("Some checks failed. Review the details above for specific corrective actions.")
+    elif has_warns:
+        print("All critical checks passed. Warnings above may require attention.")
     else:
         print("All checks passed.")
 
