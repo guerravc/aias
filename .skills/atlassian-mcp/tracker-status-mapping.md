@@ -71,10 +71,10 @@ provider_to_canonical:
 
 ```yaml
 command_triggers:
-  /validate-plan:
+  /enrich:
     from: pending_dor
     to: ready
-  /implement:
+  /blueprint:
     from: ready
     to: in_progress
   /pr:
@@ -110,8 +110,8 @@ canonical_to_provider:
   completed: { state_name: "DONE", container_type: "status" }
   cancelled: { state_name: "CANCELLED", container_type: "status" }
 command_triggers:
-  /validate-plan: { from: pending_dor, to: ready }
-  /implement: { from: ready, to: in_progress }
+  /enrich: { from: pending_dor, to: ready }
+  /blueprint: { from: ready, to: in_progress }
   /pr: { from: in_progress, to: in_review }
   /commit: { verify: in_review }
 ```
