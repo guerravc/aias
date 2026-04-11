@@ -20,7 +20,7 @@ ARTIFACT LOADING
 When TASK_DIR is set, follow the **rho-aias** skill loading protocol (Phases 0-3). `*.product.md` and `*.design.md` are optional continuity context.
 
 CONTEXT ENRICHMENT
-- Tracker references -> resolve via `aias-providers/tracker-config.md` for read enrichment.
+- Tracker references -> resolve via `aias-config/providers/tracker-config.md` for read enrichment.
 - External write operations require explicit user instruction.
 - If required service config is missing, invalid, or points to an unresolvable provider, abort the task and request provider configuration before continuing.
 
