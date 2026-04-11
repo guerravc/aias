@@ -2,19 +2,21 @@
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # CRÍTICO: Desactivamos las credenciales automáticas 
-          # para que no interfieran con tu PAT en el push.
-          persist-credentials: false 
+          # Volvemos a true para que el checkout no falle, 
+          # pero lo ignoraremos en el paso del push.
+          persist-credentials: true 
 
       - name: Mirror Push al Destino
         env:
-          # Asegúrate de que el secreto se llame exactamente BACKUP_TOKEN
-          GITHUB_TOKEN: ${{ secrets.BACKUP_TOKEN }}
+          BACKUP_TOKEN: ${{ secrets.BACKUP_TOKEN }}
         run: |
-          # Usamos la sintaxis de autenticación por token
-          DEST_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/guerravc/rho-aias.git"
+          # 1. Limpiamos cualquier configuración de persistencia previa para evitar el 403
+          git config --local --unset-all http.https://github.com/.extraheader || true
           
+          # 2. Construimos la URL con el token directamente
+          # Nota: Usamos 'x-access-token' que es el estándar para Fine-grained PATs
+          DEST_URL="https://x-access-token:${BACKUP_TOKEN}@github.com/guerravc/rho-aias.git"
+          
+          # 3. Agregamos el remoto y ejecutamos el mirror
           git remote add backup "$DEST_URL"
-          
-          # Push mirror
           git push --mirror backup
