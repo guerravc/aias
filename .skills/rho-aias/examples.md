@@ -22,7 +22,7 @@ task_id: MAX-12345
 started: 2026-01-20
 status: pending_dor
 tracker_status: PENDING DOR
-completed_steps: [product-analysis]
+completed_steps: [refinement]
 current_step: blueprint
 published: null
 completed: null
@@ -51,7 +51,7 @@ task_id: MAX-12345
 started: 2026-01-20
 status: pending_dor
 tracker_status: PENDING DOR
-completed_steps: [product-analysis, blueprint]
+completed_steps: [refinement, blueprint]
 current_step: validate
 published: null
 completed: null
@@ -74,7 +74,7 @@ task_id: MAX-12345
 started: 2026-01-20
 status: ready
 tracker_status: TO DO
-completed_steps: [product-analysis, blueprint, validate]
+completed_steps: [refinement, blueprint, validate]
 current_step: implement
 published: null
 completed: null
@@ -97,7 +97,7 @@ task_id: MAX-12345
 started: 2026-01-20
 status: in_progress
 tracker_status: IN PROGRESS
-completed_steps: [product-analysis, blueprint, validate]
+completed_steps: [refinement, blueprint, validate]
 current_step: implement
 published: null
 completed: null
@@ -120,7 +120,7 @@ task_id: MAX-12345
 started: 2026-01-20
 status: in_review
 tracker_status: IN REVIEW
-completed_steps: [product-analysis, blueprint, validate, implement, commit, pr]
+completed_steps: [refinement, blueprint, validate, implement, commit, pr]
 current_step: closure
 published: null
 completed: null
@@ -143,7 +143,7 @@ task_id: MAX-12345
 started: 2026-01-20
 status: completed
 tracker_status: IN REVIEW
-completed_steps: [product-analysis, blueprint, validate, implement, commit, pr, closure]
+completed_steps: [refinement, blueprint, validate, implement, commit, pr, closure]
 current_step: null
 published: 2026-01-25
 completed: 2026-01-25
@@ -329,7 +329,7 @@ task_id: MAX-22222
 started: 2026-01-24
 status: pending_dor
 tracker_status: PENDING DOR
-completed_steps: [product-analysis]
+completed_steps: [refinement]
 current_step: closure
 published: null
 completed: null
@@ -347,7 +347,7 @@ task_id: MAX-22222
 started: 2026-01-24
 status: completed
 tracker_status: PENDING DOR
-completed_steps: [product-analysis, closure]
+completed_steps: [refinement, closure]
 current_step: null
 published: null
 completed: 2026-01-24
