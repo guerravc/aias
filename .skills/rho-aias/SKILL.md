@@ -96,13 +96,21 @@ Every plan is classified to determine its publication and approval requirements:
 
 | Type | Scope | Publication | Approval | Closure |
 |------|-------|-------------|----------|---------|
-| A (Local/Low-Risk) | Bug fixes, small refactors, config | No knowledge publishing required | Not required | `/report` or `/brief` to tracker |
-| B (Medium-Impact) | Features, UX/UI, internal tools | Knowledge publish via `/publish` | Not required (unless objection) | `/publish` |
-| C (Critical/Strategic) | Arch redesigns, cross-team, launches | Knowledge publish via `/publish` | Required before `/implement` | `/publish` |
+| A (Local/Low-Risk) | Bug fixes, small refactors, config | Unconditional (Phase 5c) | Not required | `/publish` (reconciliation + closure). `/brief`/`/report` available as lightweight alternatives |
+| B (Medium-Impact) | Features, UX/UI, internal tools | Unconditional (Phase 5c) | Not required (unless objection) | `/publish` |
+| C (Critical/Strategic) | Arch redesigns, cross-team, launches | Unconditional (Phase 5c) | Required before `/implement` | `/publish` |
+
+Classification determines governance gates, not publication. Phase 5c always publishes after every command regardless of classification.
 
 - Assigned by `/blueprint` in `status.md` (`classification: A | B | C`).
 - Validated by `/validate-plan` (gap if missing).
 - `/charter` can **escalate** (A→B, B→C) but **never downgrade**.
+
+### Refinement and Amendment (v8.0)
+
+- **Refinement validated**: `/enrich` sets `refinement_validated: true` in `status.md` after successful publish. When present, classification-based pre-implementation approval gates MAY be relaxed.
+- **Amendment Approval**: `/validate-plan` and `/consolidate-plan` include an Amendment gate for DoR/DoD changes discovered during planning (`apply_local`/`pause`/`reject`). `apply_local` modifies locally but does not publish via Phase 5c.
+- **DoR Readiness Check**: `/enrich` includes a DoR Readiness Check gate (blocking/non-blocking classification) before writing DoR/DoD artifacts.
 
 Important terminology:
 - **Command Type A** refers to chat-only command behavior in `readme-commands.md`.
@@ -187,6 +195,9 @@ Phase 6 — TRACKER SYNC
   operation and report provider unavailability.
   Resolve canonical transition via provider status mapping.
   Ownership rule:
+    - /enrich owns canonical transition pending_dor -> ready
+    - /blueprint owns canonical transition ready -> in_progress
+    - /blueprint (bug exception) owns canonical transition pending_dor -> in_progress
     - /pr owns canonical transition in_progress -> in_review
     - /commit only verifies in_review; never owns primary transition
   Boundary: NEVER transition to DONE, NEVER transition to CANCELLED.
