@@ -54,7 +54,7 @@ Use this when you need maximum control over the reasoning step before committing
 flowchart TD
     Start["Task enters framework"]
 
-    Start --> Entry{"Feature or Bugfix?"}
+    Start --> Entry{"Feature, Bugfix,<br/>or Refactor?"}
 
     Entry -->|Feature| Product["@product<br/>analysis"]
     Product --> Enrich["/enrich<br/>DoR + DoD + publish<br/>pending_dor → ready"]
@@ -80,8 +80,13 @@ flowchart TD
     QA --> Debug
     Debug --> Assessment{"Need feasibility gate?"}
     Assessment -->|Yes| Feasibility["/assessment"]
-    Feasibility --> Planning
-    Assessment -->|No| Planning
+    Feasibility --> BugBlueprint["/blueprint<br/>bug exception<br/>pending_dor → in_progress"]
+    Assessment -->|No| BugBlueprint
+    BugBlueprint --> Validate
+
+    Entry -->|Refactor| RefProduct["@product<br/>analysis"]
+    RefProduct --> RefEnrich["/enrich<br/>DoR refactor template<br/>pending_dor → ready"]
+    RefEnrich --> Planning
 ```
 
 This map is intentionally high level. The detailed sections below define exact mode boundaries, command sequencing, optional branches, and expected outputs.
@@ -743,7 +748,8 @@ Four commands trigger canonical tracker operations. Transitions only fire when `
 | Command | Condition | Canonical transition |
 |---------|-----------|----------------------|
 | `/enrich` | Publish to Confluence + Jira successful | `pending_dor` → `ready` |
-| `/blueprint` | Phase 0 starts with DoR/DoD valid | `ready` → `in_progress` |
+| `/blueprint` | Phase 0 starts with DoR/DoD valid (normal path) | `ready` → `in_progress` |
+| `/blueprint` (bug exception) | Phase 0 starts, DoR/DoD generated via bug exception | `pending_dor` → `in_progress` |
 | `/pr` | PR created successfully | `in_progress` → `in_review` |
 | `/commit` | Open PR detected for current branch | verify `in_review` (no-op if already there) |
 
@@ -852,7 +858,10 @@ For the complete artifact catalog (suffixes, producers, and descriptions), see `
 → `@product` + `/enrich` (DoR/DoD + publish) → `@planning` + `/blueprint` → `/validate-plan` → `@dev` + `/implement` → `/commit` → `/pr` → `/publish`
 
 **Found a bug?**
-→ `@qa` + `/issue` → `@debug` + `/fix` → `/assessment` → `@planning` + `/blueprint` (bug exception: derives DoR/DoD) → `/validate-plan` → `@dev` + `/implement` → `/report` → `/commit` → `/pr` → `/publish`
+→ `@qa` + `/issue` → `@debug` + `/fix` → `/assessment` → `@planning` + `/blueprint` (bug exception: derives DoR/DoD, `pending_dor` → `in_progress`) → `/validate-plan` → `@dev` + `/implement` → `/report` → `/commit` → `/pr` → `/publish`
+
+**Refactoring code?**
+→ `@product` + `/enrich` (DoR/DoD refactor template + publish) → `@planning` + `/blueprint` → `/validate-plan` → `@dev` + `/implement` → `/commit` → `/pr` → `/publish`
 
 **Need to trace a flow with logs?**
 → `@qa` or `@debug` + `/trace` → copy snippet → `@dev` (implement logs)
