@@ -11,7 +11,7 @@ Rho AIAS decouples external providers from command/mode behavior through a categ
 
 The current policy for commands and modes is fail-fast:
 
-- Resolve provider config from `aias-providers/<category>-config.md`
+- Resolve provider config from `aias-config/providers/<category>-config.md`
 - Validate config and skill binding
 - If missing/invalid/unresolvable, abort the dependent operation and request configuration
 
@@ -23,7 +23,7 @@ For tracker transitions, the active provider must also expose a valid `status_ma
 
 | Surface | Category-driven resolution | Failure policy |
 |---|---|---|
-| `aias-providers/*.md` | yes | fail-fast contract sections |
+| `aias-config/providers/*.md` | yes | fail-fast contract sections |
 | `aias/.commands/brief.md` | yes | abort on missing/invalid tracker config |
 | `aias/.commands/report.md` | yes | abort on missing/invalid tracker config |
 | `aias/.commands/publish.md` | yes | abort on missing/invalid knowledge/tracker config |
@@ -45,7 +45,7 @@ For tracker transitions, the active provider must also expose a valid `status_ma
 
 ## Config model
 
-Service configs live in `aias-providers/`:
+Service configs live in `aias-config/providers/`:
 
 - `knowledge-config.md`
 - `tracker-config.md`
@@ -70,15 +70,15 @@ Traceability chain (tracker transitions):
 
 1. `aias/contracts/readme-provider-config.md`
 2. `aias/contracts/readme-tracker-status-mapping.md`
-3. `aias-providers/tracker-config.md` (`status_mapping_source`, `field_mapping_source`)
-4. `aias-providers/<provider_id>/` — provider-specific mapping files referenced by `resource_files`
+3. `aias-config/providers/tracker-config.md` (`status_mapping_source`, `field_mapping_source`)
+4. `aias-config/providers/<provider_id>/` — provider-specific mapping files referenced by `resource_files`
 
 ## Resolution flow (canonical)
 
 All service-dependent consumers should follow:
 
 ```text
-1) Read aias-providers/<category>-config.md
+1) Read aias-config/providers/<category>-config.md
 2) Validate category + active provider + skill binding + required provider parameters
 3) If valid, execute with configured provider
 4) If missing/invalid/unresolvable, abort dependent operation and request configuration
@@ -100,7 +100,7 @@ resolveServiceOrAbort(category):
 
 Goal: switch tracker behavior without editing commands or modes.
 
-1. Update `aias-providers/tracker-config.md`:
+1. Update `aias-config/providers/tracker-config.md`:
    - set `active_provider: linear`
    - set `skill_binding.skill` to the Linear integration skill
    - set `providers.linear.enabled: true`
