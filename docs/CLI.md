@@ -44,11 +44,11 @@ python3 aias/.canonical/generation/aias_cli.py new <flag> [name]
 
 | Flag | Artifact | Name required | Output location |
 |---|---|---|---|
-| `-m`, `--mode` | Mode rule | Yes (kebab-case) | `aias/.modes/<name>.mdc` |
-| `-r`, `--rule` | Always-apply rule | Yes (kebab-case) | `aias/.rules/<name>.mdc` |
+| `-m`, `--mode` | Mode rule | Yes (kebab-case) | `aias-config/modes/<name>.mdc` |
+| `-r`, `--rule` | Always-apply rule | Yes (kebab-case) | `aias-config/rules/<name>.mdc` |
 | `-c`, `--command` | Command definition | Yes (kebab-case) | `aias/.commands/<name>.md` |
 | `-s`, `--skill` | Skill | Yes (kebab-case) | `aias/.skills/<name>/SKILL.md` |
-| `-P`, `--provider` | Provider config | Yes (category) | `aias-providers/<category>-config.md` |
+| `-P`, `--provider` | Provider config | Yes (category) | `aias-config/providers/<category>-config.md` |
 | `-C`, `--context` | RHOAIAS.md | No | `RHOAIAS.md` |
 | `-p`, `--stack-profile` | Stack profile | No | `stack-profile.md` |
 | `-f`, `--stack-fragment` | Stack fragment | No | `stack-fragment.md` |
@@ -115,7 +115,7 @@ With `--shortcuts`, the generator reads `binding.generation.tools` from `stack-p
 
 ### `health` — Setup Verification
 
-Runs 11 checks and reports status.
+Runs setup verification checks and reports status.
 
 ```bash
 python3 aias/.canonical/generation/aias_cli.py health
@@ -126,28 +126,39 @@ python3 aias/.canonical/generation/aias_cli.py health
 | 1 | `RHOAIAS.md` exists | Exists | — | Not found |
 | 2 | `stack-profile.md` exists | Exists | — | Not found |
 | 3 | `stack-fragment.md` exists | Exists | — | Not found |
-| 4 | `aias/` structure | All subdirectories present | Some missing | `aias/` not found |
+| 4 | `aias/` structure | Framework directories present | Some missing | `aias/` not found |
+| 4b | `aias-config/` structure | All subdirectories present | Not found or some missing | — |
 | 5 | Contracts exist | >= 10 files | — | Not found |
 | 6 | Generator exists | Present | — | Not found |
 | 7 | Shortcuts up to date | Counts match canonical (scoped to selected tools) | Divergence / no tools binding | — |
 | 8 | Context symlinks | Expected symlinks → `RHOAIAS.md` (scoped to selected tools) | Missing, broken, or no tools binding | — |
-| 9 | Provider configs | Config(s) present | Missing or empty `aias-providers/` | — |
-| 10 | Referenced files | All `resource_files` paths exist in `aias-providers/<provider>/` | Empty `resource_files` or `[LEGACY]` paths in `aias/.skills/` | Missing `resource_files` key or missing files |
+| 9 | Provider configs | Config(s) present in `aias-config/providers/` | Missing or empty | — |
+| 9b | Legacy providers | — | `aias-providers/` exists at root | — |
+| 9c | Legacy rules/modes | — | `.mdc` files in `aias/.rules/` or `aias/.modes/` | — |
+| 9d | Legacy shortcuts | — | Symlinks point to `aias/.rules/` or `aias/.modes/` | — |
+| 10 | Referenced files | All `resource_files` paths exist | Legacy paths (`aias/.skills/`, `aias-providers/`) | Missing `resource_files` key or missing files |
 | 11 | Tasks directory | `binding.generation.tasks_dir` present and directory exists | Directory does not exist yet | Binding missing |
 
 Each check reports a specific corrective action message (not a generic "Run aias init").
 
-#### Legacy detection (`[LEGACY]`)
+#### Legacy detection
 
-When `resource_files` entries point to `aias/.skills/`, the check reports `[WARN]` with "Legacy location". This is not a hard failure — it does not block "All checks passed". When the AI agent runs `/aias health` and detects these warnings, it offers an interactive migration gate (see `/aias` command § 9).
+Legacy checks (9b, 9c, 9d, and legacy paths in check 10) detect pre-v7.6 file locations. These produce `[WARN]` — not a hard failure, and do not block "All checks passed". When the AI agent runs `/aias health` and detects these warnings, it offers interactive migration gates (see `/aias` command § 9):
+
+| Legacy scenario | Detection | Migration |
+|---|---|---|
+| `aias-providers/` at root | Check 9b | Copy to `aias-config/providers/`, update paths in configs |
+| `.mdc` files in `aias/.rules/` or `aias/.modes/` | Check 9c | Re-run `aias generate --shortcuts` |
+| Shortcuts pointing to `aias/.rules/` or `aias/.modes/` | Check 9d | Re-run `aias generate --shortcuts` |
+| `resource_files` with `aias/.skills/` or `aias-providers/` prefix | Check 10 | Copy files to `aias-config/providers/<provider>/`, update configs |
 
 #### Post-submodule update flow
 
 After updating the `aias/` submodule to a new version:
 
-1. Run `generate --shortcuts` to regenerate modes, rules, and shortcuts.
+1. Run `generate --shortcuts` to regenerate modes, rules, and shortcuts into `aias-config/`.
 2. Run `health` to detect any new checks or legacy warnings.
-3. If `[LEGACY]` is reported, run `/aias health` in the AI assistant to trigger assisted migration.
+3. If legacy warnings are reported, run `/aias health` in the AI assistant to trigger assisted migration.
 
 ---
 
