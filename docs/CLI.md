@@ -17,15 +17,16 @@ python3 aias/.canonical/generation/aias_cli.py <subcommand> [options]
 
 ### `init` — Project Onboarding
 
-Full interactive onboarding in 7 steps:
+Full interactive onboarding in 6 steps:
 
 1. **Detection** — checks for existing `RHOAIAS.md`, `stack-profile.md`, `stack-fragment.md`
 2. **Context** — creates `RHOAIAS.md` (project name, platform, description, architecture, technologies)
 3. **Stack profile** — creates `stack-profile.md` (language, build system, UI framework, testing, target tools, tasks directory)
 4. **Stack fragment** — creates `stack-fragment.md` (build system integration type A/B/C)
-5. **Provider configs** (optional) — scaffolds `aias-providers/*-config.md` for selected categories (tracker, knowledge, design, vcs)
-6. **Context symlinks** — creates context symlinks → `RHOAIAS.md`, scoped by tool selection (`AGENTS.md` for cursor/windsurf/copilot, `CLAUDE.md` for claude, `codex.md` for codex)
-7. **Generation** — runs `generate --shortcuts`
+5. **Context symlinks** — creates context symlinks → `RHOAIAS.md`, scoped by tool selection (`AGENTS.md` for cursor/windsurf/copilot, `CLAUDE.md` for claude, `codex.md` for codex)
+6. **Generation** — runs `generate --shortcuts`
+
+> **Provider configuration** is handled separately. Use `new --provider <category>` for skeleton configs, or `/aias configure-providers` in the AI assistant for MCP-assisted discovery.
 
 ```bash
 python3 aias/.canonical/generation/aias_cli.py init
@@ -114,7 +115,7 @@ With `--shortcuts`, the generator reads `binding.generation.tools` from `stack-p
 
 ### `health` — Setup Verification
 
-Runs 10 checks and reports status.
+Runs 11 checks and reports status.
 
 ```bash
 python3 aias/.canonical/generation/aias_cli.py health
@@ -131,9 +132,22 @@ python3 aias/.canonical/generation/aias_cli.py health
 | 7 | Shortcuts up to date | Counts match canonical (scoped to selected tools) | Divergence / no tools binding | — |
 | 8 | Context symlinks | Expected symlinks → `RHOAIAS.md` (scoped to selected tools) | Missing, broken, or no tools binding | — |
 | 9 | Provider configs | Config(s) present | Missing or empty `aias-providers/` | — |
-| 10 | Tasks directory | `binding.generation.tasks_dir` present and directory exists | Directory does not exist yet | Binding missing |
+| 10 | Referenced files | All `resource_files` paths exist in `aias-providers/<provider>/` | Empty `resource_files` or `[LEGACY]` paths in `aias/.skills/` | Missing `resource_files` key or missing files |
+| 11 | Tasks directory | `binding.generation.tasks_dir` present and directory exists | Directory does not exist yet | Binding missing |
 
-If FAILs are detected, the CLI suggests `aias init` or `aias generate --shortcuts`.
+Each check reports a specific corrective action message (not a generic "Run aias init").
+
+#### Legacy detection (`[LEGACY]`)
+
+When `resource_files` entries point to `aias/.skills/`, the check reports `[WARN]` with "Legacy location". This is not a hard failure — it does not block "All checks passed". When the AI agent runs `/aias health` and detects these warnings, it offers an interactive migration gate (see `/aias` command § 9).
+
+#### Post-submodule update flow
+
+After updating the `aias/` submodule to a new version:
+
+1. Run `generate --shortcuts` to regenerate modes, rules, and shortcuts.
+2. Run `health` to detect any new checks or legacy warnings.
+3. If `[LEGACY]` is reported, run `/aias health` in the AI assistant to trigger assisted migration.
 
 ---
 
