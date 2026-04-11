@@ -25,7 +25,7 @@ A **base rule** is a Cursor rule file (`.mdc` format) with `alwaysApply: true` t
 
 ### Location
 
-- **Canonical location:** `aias/.rules/base.mdc` — the generated source of truth
+- **Canonical location:** `aias-config/rules/base.mdc` — the generated source of truth
 - **Tool-specific locations** (shortcuts only — see `readme-tool-adapter.md`):
   - Cursor: `.cursor/rules/base.mdc`
   - Claude Code: `.claude/rules/base.md`
@@ -168,16 +168,16 @@ CODE PRESERVATION
 Instructs the agent on how to work with the agentic architecture's commands and skills.
 
 **Must include:**
-- That slash commands (`/X`) are loaded from `aias/.commands/` (or the tool's resolved command path) and must be followed strictly
+- That slash commands (`/X`) are loaded from `aias/.commands/` (framework) or `aias-config/commands/` (project) and must be followed strictly
 - That commands are NOT rules — the agent must not search rule directories for commands
-- That skills referenced by modes/commands are loaded from `aias/.skills/` (or the tool's resolved skill path)
+- That skills referenced by modes/commands are loaded from `aias/.skills/` (framework) or `aias-config/skills/` (project)
 - That the agent must never execute a command or skill from memory
 
 **Example:**
 ```
 COMMANDS AND SKILLS
-- When the user invokes a slash command (e.g., `/commit`, `/brief`, `/pr`), follow the command definition strictly. Commands are loaded from `aias/.commands/` — they are NOT rules. Do not search rule directories for commands.
-- When a mode or command references a skill by name (e.g., "use the **atlassian-mcp** skill"), follow the skill definition. Skills are loaded from `aias/.skills/`.
+- When the user invokes a slash command (e.g., `/commit`, `/brief`, `/pr`), follow the command definition strictly. Commands are loaded from `aias/.commands/` or `aias-config/commands/` — they are NOT rules. Do not search rule directories for commands.
+- When a mode or command references a skill by name (e.g., "use the **atlassian-mcp** skill"), follow the skill definition. Skills are loaded from `aias/.skills/` or `aias-config/skills/`.
 - Never execute a command or skill from memory. Always follow the loaded definition.
 ```
 
@@ -309,8 +309,8 @@ LANGUAGE
 - Code, identifiers, filenames, docstrings, and commit messages: English.
 
 COMMANDS AND SKILLS
-- When the user invokes a slash command (e.g., `/commit`, `/brief`, `/pr`), follow the command definition strictly. Commands are loaded from `aias/.commands/` — they are NOT rules. Do not search rule directories for commands.
-- When a mode or command references a skill by name (e.g., "use the **atlassian-mcp** skill"), follow the skill definition. Skills are loaded from `aias/.skills/`.
+- When the user invokes a slash command (e.g., `/commit`, `/brief`, `/pr`), follow the command definition strictly. Commands are loaded from `aias/.commands/` or `aias-config/commands/` — they are NOT rules. Do not search rule directories for commands.
+- When a mode or command references a skill by name (e.g., "use the **atlassian-mcp** skill"), follow the skill definition. Skills are loaded from `aias/.skills/` or `aias-config/skills/`.
 - Never execute a command or skill from memory. Always follow the loaded definition.
 
 ENGINEERING PRINCIPLES
@@ -511,11 +511,11 @@ The COMMANDS AND SKILLS section in every `base.mdc` must include:
 
 ### Canonical Location
 
-The canonical location for generated base rules is `aias/.rules/base.mdc`. Tool-specific directories (`.cursor/rules/`, `.claude/rules/`, `.windsurf/rules/`, `.github/`) contain **shortcut files** that reference the canonical source. See `readme-tool-adapter.md` for shortcut format per tool.
+The canonical location for generated base rules is `aias-config/rules/base.mdc`. Tool-specific directories (`.cursor/rules/`, `.claude/rules/`, `.windsurf/rules/`, `.github/`) contain **shortcut files** that reference the canonical source. See `readme-tool-adapter.md` for shortcut format per tool.
 
 ### Command and Skill Paths
 
-The COMMANDS AND SKILLS section must reference `aias/.commands/` for commands and `aias/.skills/` for skills. These are the canonical locations; tool-specific paths (e.g., `~/.cursor/commands/`) are resolved by each tool's shortcut layer.
+The COMMANDS AND SKILLS section must reference `aias/.commands/` (framework) and `aias-config/commands/` (project) for commands, and `aias/.skills/` (framework) and `aias-config/skills/` (project) for skills. These are the canonical locations; tool-specific paths (e.g., `~/.cursor/commands/`) are resolved by each tool's shortcut layer.
 
 ---
 
