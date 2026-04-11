@@ -37,8 +37,8 @@ This command may use **only** the following inputs:
 - Chat context explicitly provided by the user
 - Explicit file include / exclude instructions from the user
 - Service configs:
-  - `aias-providers/vcs-config.md`
-  - `aias-providers/tracker-config.md`
+  - `aias-config/providers/vcs-config.md`
+  - `aias-config/providers/tracker-config.md`
 - **Repository resolution** (in order of precedence):
   1. **Workspace:** current `.code-workspace` `folders` — use the path of the folder that is a git root (if `cursor.commitRoot` is set, use that folder by name or index; otherwise the first folder that is a git root).
   2. **Fallback:** `${HOME}/.cursor/projects.json` — resolve `basePath` + `projects.<alias>.repoDir` (or `defaults.project` when no alias).
@@ -101,10 +101,10 @@ COMMIT SUMMARY:
 ```
 
 TRACKER SYNC (Phase 6 — after commits, execution mode only)
-- After all commits are done, resolve VCS provider from `aias-providers/vcs-config.md`.
+- After all commits are done, resolve VCS provider from `aias-config/providers/vcs-config.md`.
 - Detect if there is an open PR for the current branch via the resolved VCS skill.
 - If an open PR is detected AND `task_id` is resolvable from TASK_DIR `status.md`:
-  - Resolve tracker provider from `aias-providers/tracker-config.md`.
+  - Resolve tracker provider from `aias-config/providers/tracker-config.md`.
   - Read current tracker status resolved via provider mapping.
   - Verify canonical `in_review` state only (no primary transition ownership in this command).
   - If already `in_review`: no-op, report `in_review (verified)`.
