@@ -178,7 +178,23 @@ If some files already exist, the CLI detects them and asks before overwriting.
 
 ### 3. Configure services (optional)
 
-Set up external provider bindings in `aias-providers/` for any categories your workflow uses:
+Set up external provider bindings in `aias-providers/` for any categories your workflow uses.
+
+#### Recommended: AI-assisted discovery (`/aias configure-providers`)
+
+In your AI coding tool, run `/aias configure-providers`. The agent:
+
+1. Detects existing `*-config.md` files in `aias-providers/`.
+2. Connects to the MCP server for the selected provider.
+3. Discovers field schemas, statuses, spaces, and hierarchies from live data.
+4. Generates complete configuration files in `aias-providers/<provider_id>/` (e.g., `aias-providers/atlassian/jira-field-mapping.md`).
+5. Updates `resource_files` and `*_source` paths in the provider config.
+
+If MCP is unavailable, the agent falls back to generating contractual skeletons for manual completion.
+
+#### Alternative: CLI skeleton (`aias new --provider`)
+
+Create basic provider config skeletons via the CLI:
 
 ```bash
 # Create a tracker config (e.g., Jira)
@@ -194,7 +210,7 @@ python3 aias/.canonical/generation/aias_cli.py new --provider design
 python3 aias/.canonical/generation/aias_cli.py new --provider vcs
 ```
 
-Fill in the `active_provider`, `skill_binding`, and provider-specific parameters in each generated file.
+For `tracker` and `knowledge` categories, the generated config includes an empty `resource_files: []`. Run `/aias configure-providers` afterward to populate the referenced files, or create them manually following the governing contracts (`readme-tracker-field-mapping.md`, `readme-knowledge-publishing-config.md`, `readme-tracker-status-mapping.md`).
 
 ### 4. Verify setup
 
@@ -202,7 +218,7 @@ Fill in the `active_provider`, `skill_binding`, and provider-specific parameters
 python3 aias/.canonical/generation/aias_cli.py health
 ```
 
-This runs 9 checks covering file existence, directory structure, contract presence, generator availability, shortcut freshness, and context symlinks. Any failures include remediation guidance.
+This runs 11 checks covering file existence, directory structure, contract presence, generator availability, shortcut freshness, context symlinks, and provider referenced files. Any failures include specific remediation guidance. Legacy configuration locations are reported as warnings (see [CLI.md](CLI.md) § Legacy detection).
 
 ### 5. Start working
 
