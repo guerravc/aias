@@ -100,10 +100,11 @@ This section is pre-filled and references the canonical artifact locations:
 
 This project uses [Rho AIAS](https://github.com/org/rho-aias) for AI-assisted development.
 
-- **Rules**: `aias/.rules/` — Generated behavioral rules (always-apply and output contracts)
-- **Modes**: `aias/.modes/` — Generated task-specific modes (planning, dev, QA, debug, review, product, integration)
-- **Commands**: `aias/.commands/` — Command definitions (blueprint, implement, commit, PR, etc.)
-- **Skills**: `aias/.skills/` — Reusable operational skills (rho-aias, atlassian-mcp, figma-mcp, etc.)
+- **Rules**: `aias-config/rules/` — Generated behavioral rules (always-apply and output contracts)
+- **Modes**: `aias-config/modes/` — Generated task-specific modes (planning, dev, QA, debug, review, product, integration)
+- **Commands**: `aias/.commands/` (framework) + `aias-config/commands/` (project) — Command definitions
+- **Skills**: `aias/.skills/` (framework) + `aias-config/skills/` (project) — Reusable operational skills
+- **Providers**: `aias-config/providers/` — Provider configuration files
 
 > This file is the single source of truth for project context. All tool-specific config files (`AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, `codex.md`) are shortcuts to this file.
 ```
