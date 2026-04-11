@@ -1,22 +1,32 @@
-- name: Checkout Origen
+name: Mirror Backup Sync
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  mirror_backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Origen
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          # Volvemos a true para que el checkout no falle, 
-          # pero lo ignoraremos en el paso del push.
-          persist-credentials: true 
+          persist-credentials: true
 
       - name: Mirror Push al Destino
         env:
           BACKUP_TOKEN: ${{ secrets.BACKUP_TOKEN }}
         run: |
-          # 1. Limpiamos cualquier configuración de persistencia previa para evitar el 403
+          # 1. Limpiar credenciales del checkout para evitar conflicto 403
           git config --local --unset-all http.https://github.com/.extraheader || true
           
-          # 2. Construimos la URL con el token directamente
-          # Nota: Usamos 'x-access-token' que es el estándar para Fine-grained PATs
+          # 2. Configurar el remoto de destino
           DEST_URL="https://x-access-token:${BACKUP_TOKEN}@github.com/guerravc/rho-aias.git"
-          
-          # 3. Agregamos el remoto y ejecutamos el mirror
           git remote add backup "$DEST_URL"
+          
+          # 3. Ejecutar mirror
           git push --mirror backup
