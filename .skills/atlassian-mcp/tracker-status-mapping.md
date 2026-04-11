@@ -1,4 +1,4 @@
-> **DEPRECATED (v7.5)** — This file has moved to `aias-providers/atlassian/tracker-status-mapping.md`.
+> **DEPRECATED (v7.5)** — This file has moved to `aias-config/providers/atlassian/tracker-status-mapping.md`.
 > This copy is kept for backward compatibility during migration.
 > Run `/aias health` to detect and migrate automatically.
 > This file will be removed in a future version.
@@ -9,7 +9,7 @@
 
 Define the provider mapping from framework canonical tracker states to Jira workflow states.
 
-This file is consumed through `status_mapping_source` in `aias-providers/tracker-config.md`.
+This file is consumed through `status_mapping_source` in `aias-config/providers/tracker-config.md`.
 
 ## Provider
 
