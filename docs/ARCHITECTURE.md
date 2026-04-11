@@ -410,7 +410,7 @@ Task artifacts go through a lifecycle tracked by `status.md` in the task directo
 | `completed` | All artifacts published | `/publish` completes |
 | `cancelled` | Task abandoned | Manual action only |
 
-Transitions are directional. The typical forward path is: `pending_dor` -> `ready` -> `in_progress` -> `in_review` -> `completed`. The `cancelled` state is reachable from any state but only through manual intervention.
+Transitions are directional. The typical forward path is: `pending_dor` -> `ready` -> `in_progress` -> `in_review` -> `completed`. For the bugfix flow, `/blueprint` bug exception transitions `pending_dor` -> `in_progress` directly (skipping `ready`). The `cancelled` state is reachable from any state but only through manual intervention.
 
 ### Artifact Sync States
 
