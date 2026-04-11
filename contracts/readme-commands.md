@@ -696,7 +696,7 @@ The `/pr` command includes a Plan Delta section comparing planned artifacts vs a
 
 ### Tracker Sync Convention
 
-Commands that trigger tracker transitions MUST declare the transition in their Output Contract (Section 4) under a "TRACKER SYNC (Phase 6)" subsection. Only four commands trigger transitions: `/validate-plan`, `/implement`, `/pr`, `/commit`. Transitions must be expressed in canonical status form and resolved through `status_mapping_source` defined in `aias-providers/tracker-config.md`. See `aias/contracts/readme-tracker-status-mapping.md` for mapping rules.
+Commands that trigger tracker transitions MUST declare the transition in their Output Contract (Section 4) under a "TRACKER SYNC (Phase 6)" subsection. Only four commands trigger transitions: `/validate-plan`, `/implement`, `/pr`, `/commit`. Transitions must be expressed in canonical status form and resolved through `status_mapping_source` defined in `aias-config/providers/tracker-config.md`. See `aias/contracts/readme-tracker-status-mapping.md` for mapping rules.
 
 ### Skills Reference Convention
 
