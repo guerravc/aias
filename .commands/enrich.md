@@ -1,11 +1,12 @@
-# Enrich (Tracker-Backed Task Enrichment) — v4
+# Enrich (Tracker-Backed Task Refinement) — v5
 
 ## 1. Identity
 
 **Command Type:** Type B — Procedural / Execution
 
-You are **analyzing and enriching** a task that lacks sufficient detail for autonomous development.
-This command reads tracker data for the provided task id via the resolved tracker provider, evaluates its completeness against a product and technical checklist, classifies the task shape for description formatting, generates missing content, writes the product analysis to the task directory, and can push a curated remote enrichment to the resolved tracker provider after confirmation. The local artifact remains the complete canonical analysis; tracker fields receive a provider-adapted representation for collaboration.
+You are **analyzing, enriching, and refining** a task for autonomous development. This command reads tracker data for the provided task id via the resolved tracker provider, evaluates its completeness against a product and technical checklist, classifies the task shape for description formatting, generates missing content, writes the product analysis to the task directory, and can push a curated remote enrichment to the resolved tracker provider after confirmation. Additionally, it produces **Definition of Ready** (`dor.plan.md`) and **Definition of Done** (`dod.plan.md`) artifacts from a dedicated structuring phase, publishes all artifacts to the knowledge provider, and triggers the canonical tracker transition `pending_dor` -> `ready` when publishing succeeds.
+
+The local artifact remains the complete canonical analysis; tracker fields receive a provider-adapted representation for collaboration.
 
 **Skills referenced:** `rho-aias`, `technical-writing`, `incremental-decomposition`.
 
@@ -21,9 +22,10 @@ Usage notes:
 
 - `<TASK_ID>` is required (e.g., `MAX-12761`). When the task id maps to a tracker ticket, the resolved tracker provider is used for enrichment. It also sets TASK_DIR to <resolved_tasks_dir>/<TASK_ID>/. (Default: `~/.cursor/plans/`)
 - The enriched output is always written to `analysis.product.md` in TASK_DIR.
+- DoR/DoD artifacts (`dor.plan.md`, `dod.plan.md`) are written to TASK_DIR after the readiness check.
 - Remote enrichment is written to the resolved tracker provider only after user confirmation.
 - `Enhanced by` headers exist only in the remote push representation. They do NOT appear in `analysis.product.md` or the local preview content.
-- This command does NOT trigger any tracker status transition (it is a pre-DoR activity).
+- When publishing succeeds, this command triggers the canonical tracker transition `pending_dor` -> `ready`.
 - This command works best after `@product` has provided product analysis (JTBD, 5 Whys, User Journey, MoSCoW), but it can also be used standalone.
 
 ---
@@ -45,7 +47,10 @@ This command may use **only** the following inputs:
   - transitions
 - Chat context explicitly provided by the user (including prior `@product` analysis if present)
 - Project architecture and conventions from the active base rule
-- Upstream artifacts from TASK_DIR if they exist (loaded via **rho-aias** skill (Phases 0–3)
+- Upstream artifacts from TASK_DIR if they exist (loaded via **rho-aias** skill (Phases 0–3)):
+  - `report.issue.md` (for bugfix DoR derivation)
+  - `analysis.fix.md` (for bugfix DoR derivation)
+  - `feasibility.assessment.md` (for bugfix DoR derivation)
 - Service configs:
   - `aias-config/providers/tracker-config.md`
   - `aias-config/providers/knowledge-config.md`
@@ -60,6 +65,14 @@ Rules:
 ---
 
 ## 4. Output Contract (Format)
+
+### File Output
+
+| Artifact | Content |
+|----------|---------|
+| `analysis.product.md` | Gap summary, enhanced ticket content, product analysis |
+| `dor.plan.md` | Definition of Ready — scope, criteria, and constraints for the task |
+| `dod.plan.md` | Definition of Done — checklist of criteria for QA readiness |
 
 ### Local Artifact
 
@@ -136,37 +149,89 @@ Present tracker write preview in chat:
 - `Enhanced by` block action per field (`create` / `update` / `skip`)
 - Description subset summary
 - Format per field (`markdown` / `adf`)
-- Status transition: none
+- Status transition that will fire after publishing: `pending_dor` → `ready`
 
 **AskQuestion:**
 - **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
 - **Prompt:** "Write enriched fields to <TASK_ID> via tracker provider?"
 - **Options:**
   - `write`: "Write enriched fields to tracker"
-  - `skip`: "Skip tracker write — keep local artifact only"
+  - `skip`: "Skip tracker write — keep local artifacts only (no tracker transition)"
 - **allow_multiple:** false
 
 **On response:**
 - `write` → Write enriched fields to the resolved tracker provider
-- `skip` → Skip tracker write; `analysis.product.md` is still written locally
+- `skip` → Skip tracker write; local artifacts are still written but tracker transition does not fire
 
 **Anti-bypass:** Inherits Gate Invocation Protocol. No additional rules.
 
+### Gate: DoR Readiness Check
+
+**Type:** Confirmation
+**Fires:** Phase 3-DoR, after structuring DoR/DoD artifacts but before writing them.
+**Skippable:** No.
+
+**Context output:**
+Present DoR readiness check in chat. Each dimension is classified as **BLOCKING** or **non-blocking** based on the scope of the task (e.g., UI specification is BLOCKING only when the task has UI scope):
+
+```
+DoR READINESS (<work_type>):
+  [ok] <Dimension>: present
+  [!!] <Dimension>: missing — BLOCKING (<reason>)
+  [--] <Dimension>: missing — non-blocking (recommended)
+  ...
+
+  Readiness: <READY | BLOCKED (N blocking items)>
+  Recommendation: <action suggestion>
+```
+
+**AskQuestion:**
+- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
+- **Prompt:** "DoR readiness check complete. <N> blocking items. Proceed?"
+- **Options:**
+  - `proceed`: "Proceed — no blocking items" (only when zero blockers)
+  - `override`: "Accept risk and proceed despite blockers"
+  - `stop`: "Stop — resolve blockers first"
+- **allow_multiple:** false
+
+**On response:**
+- `proceed` → Continue to write artifacts
+- `override` → Continue with acknowledged risk
+- `stop` → Halt execution; inform user which blockers need resolution
+
 ### End-of-Response Confirmation
 
-After writing the artifact:
+After writing all artifacts:
 ```
-Saved artifact to: <absolute_path>/analysis.product.md
+Saved artifacts to: <absolute_path>/
+  - analysis.product.md
+  - dor.plan.md
+  - dod.plan.md
 [Tracker fields updated: <list> | Tracker update skipped]
+[Knowledge provider: <published | skipped | failed>]
+[Tracker transition: pending_dor → ready | skipped]
 ```
+
+### TRACKER SYNC (Phase 6 — after publishing)
+
+- When readiness check passes (no blockers or override accepted) AND tracker write confirmed AND `task_id` in `status.md` is valid for the resolved tracker provider:
+  1. Publish artifacts to resolved knowledge provider (Phase 5c).
+  2. If knowledge publish succeeds: resolve tracker provider from `aias-config/providers/tracker-config.md`.
+  3. Transition canonical tracker status from `pending_dor` -> `ready` using provider mapping.
+  4. If config is missing, invalid, or unresolvable: abort sync and request provider configuration.
+  5. Report transition result in chat.
+- When readiness check fails (blocker without override) OR tracker write skipped: no publish, no tracker transition.
+- When knowledge publish fails: no tracker transition (artifacts remain local, report error).
 
 ### Status Update (Phase 5)
 
-After writing `analysis.product.md`:
+After writing artifacts:
 1. Create TASK_DIR and `status.md` if they do not exist (profile: infer from context, default `feature`; if only enrichment is planned, use `enrichment`).
-2. Add `analysis.product.md` to `artifacts` map with status `created` or `modified`.
-3. Add `product-analysis` to `completed_steps`. Set `current_step` based on the profile: if `enrichment` → `closure`; otherwise → `blueprint`.
-4. Run Phase 5c (classification-gated): sync non-synced artifacts to resolved knowledge provider only if classification in `status.md` is B or C. Skip if null or A (see **rho-aias** skill § Phase 5c).
+2. Add `analysis.product.md`, `dor.plan.md`, and `dod.plan.md` to `artifacts` map with status `created` or `modified`.
+3. Add `refinement` to `completed_steps`. Set `current_step` based on the profile: if `enrichment` → `closure`; otherwise → `blueprint`.
+4. Set `refinement_validated` in `status.md`: `true` if tracker write was confirmed and publish succeeded; `false` otherwise.
+5. Set `status` in `status.md`: `ready` if tracker transition succeeded; preserve previous value otherwise.
+6. Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification.
 
 ---
 
@@ -181,6 +246,7 @@ After writing `analysis.product.md`:
 - For remote tracker writes, treat the tracker field payload as a derived representation of the local analysis, not as the canonical source.
 - The local artifact and local preview MUST stay provider-agnostic and MUST NOT contain `Enhanced by` headers.
 - Classification signals from tracker metadata MAY be used to shape `Description`, but `/enrich` MUST surface ambiguity or conflict through the Classification Comprehension gate instead of deciding silently.
+- DoR Test criteria define **what** must be tested (scenarios, happy path, edge/corner cases, failure scenarios). They do NOT define **how** to implement the tests — that is the responsibility of `/blueprint` (Category 9: Testing).
 
 ---
 
@@ -194,7 +260,7 @@ After writing `analysis.product.md`:
 4. Use the resolved provider to read the ticket: description, acceptance criteria, comments, linked issues, status.
 5. If `@product` analysis is present in the chat context, collect it as supplementary input.
 
-### Phase 2 — Analyze
+### Phase 2 — Analyze (Completeness Checklist)
 
 Evaluate the ticket against the Completeness Checklist:
 
@@ -236,6 +302,39 @@ If tracker signals and user-declared classification conflict, or if confidence i
    - `Test Steps` = field-specific test steps only
    - tracker-owned fields (`Priority`, `Components`) only when supported and justified
 
+### Phase 3-DoR — Structure DoR/DoD
+
+Structure the information collected in Phase 2 and Phase 3 into DoR and DoD artifacts. This phase transforms already-collected data — it does NOT re-collect or re-ask the user for information that is already available.
+
+**Sources:** Completeness Checklist results (Phase 2), enriched content (Phase 3), upstream artifacts from TASK_DIR, chat context. No codebase reading.
+
+**DoR feature template** — 6 dimensions:
+
+| Dimension | Source | Content |
+|-----------|--------|---------|
+| **Functional** | Checklist: User flow + Acceptance criteria | Happy path, UX expectations, visible states |
+| **Non-Functional** | Checklist: NFRs | Performance, security, accessibility constraints |
+| **Technical constraints** | Checklist: File impact + Dependencies + API/Data | Known constraints from product perspective (NOT codebase architecture — that is `/blueprint`) |
+| **Test criteria** | Checklist: Test criteria | **What** must be tested: happy path scenarios, edge cases, corner cases, failure scenarios. Does NOT define how to implement tests (that is `/blueprint` Cat 9). |
+| **Commitment** | Tracker: status, linked issues, comments | Analysis of the requirement, team dependencies, blocking items, branch status |
+| **Out of scope** | Checklist: Out of scope | Explicit boundaries of what is NOT included in this task |
+
+**DoR bugfix template** (when upstream artifacts `report.issue.md`, `analysis.fix.md`, `feasibility.assessment.md` exist):
+
+| Dimension | Source | Content |
+|-----------|--------|---------|
+| **Steps to reproduce** | `report.issue.md` | Exact reproduction steps |
+| **Expected vs actual** | `report.issue.md` | Expected behavior and observed behavior |
+| **Root cause hypothesis** | `analysis.fix.md` | Likely root cause from prior analysis |
+| **Viable solutions** | `feasibility.assessment.md` | Evaluated solution approaches |
+| **Regression scope** | All upstream artifacts | Areas at risk of regression |
+| **Affected versions** | `report.issue.md`, tracker | Versions where the bug is present |
+
+**DoD feature:** Checklist of criteria that determine when the implemented scope is ready for QA (not production).
+**DoD bugfix:** Fix implemented, root cause confirmed, regression tests pass, no new bugs introduced.
+
+After structuring, fire **Gate: DoR Readiness Check**.
+
 ### Phase 3b — Field Write Plan
 
 Before presenting the write preview, resolve the format for each target field:
@@ -255,11 +354,13 @@ Include the resolved write plan in the **Gate: Tracker Write Preview** context o
 
 ### Phase 4 — Present + Write
 
-1. Show in chat: Gap Summary table + Enhanced Ticket content.
+1. Show in chat: Gap Summary table + Enhanced Ticket content + DoR/DoD summary.
 2. Write `analysis.product.md` to TASK_DIR.
-3. Fire **Gate: Tracker Write Preview** (remote field enrichment only).
-4. If confirmed: write the remote enrichment payload to the resolved tracker provider.
-5. Run Phase 5 (status update + knowledge sync).
+3. Write `dor.plan.md` and `dod.plan.md` to TASK_DIR.
+4. Fire **Gate: Tracker Write Preview** (remote field enrichment only).
+5. If confirmed: write the remote enrichment payload to the resolved tracker provider.
+6. Run Phase 5 (status update).
+7. Run Phase 6 (tracker sync — publish + transition).
 
 SERVICE RESOLUTION PSEUDOFLOW:
 
@@ -278,9 +379,10 @@ This command must **NOT**:
 - Publish local filesystem paths or machine-specific references to the tracker provider
 - Populate or publish RCA fields
 - Push RCA narrative into tracker `Description`
-- Trigger any tracker status transition
 - Infer task ids or tracker ticket ids from vague references
 - Invent technical details not derivable from the ticket or project architecture
 - Proceed if resolved tracker provider cannot read the ticket (STOP and inform)
 - Execute any git, build, or deployment operations
 - Write artifacts outside TASK_DIR
+- Define **how** to implement tests (that is `/blueprint` Cat 9 responsibility); DoR Test criteria only define **what** must be tested
+- Read the codebase to determine architecture or file structure for DoR Technical constraints (that is `/blueprint` responsibility); DoR Technical constraints only capture what is known from the product/ticket perspective
