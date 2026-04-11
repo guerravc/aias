@@ -61,16 +61,17 @@ Each config follows the same structure:
 - `Failure behavior` (fail-fast rules)
 - For `tracker`: `status_mapping_source` for the active provider
 
-Related tracker mapping contract:
+Related tracker contracts:
 
-- `aias/contracts/readme-tracker-status-mapping.md`
+- `aias/contracts/readme-tracker-status-mapping.md` — status transition mappings
+- `aias/contracts/readme-tracker-field-mapping.md` — field mapping for write commands
 
 Traceability chain (tracker transitions):
 
 1. `aias/contracts/readme-provider-config.md`
 2. `aias/contracts/readme-tracker-status-mapping.md`
-3. `aias-providers/tracker-config.md` (`status_mapping_source`)
-4. provider mapping file referenced by `status_mapping_source`
+3. `aias-providers/tracker-config.md` (`status_mapping_source`, `field_mapping_source`)
+4. `aias-providers/<provider_id>/` — provider-specific mapping files referenced by `resource_files`
 
 ## Resolution flow (canonical)
 
