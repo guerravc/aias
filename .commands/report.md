@@ -118,7 +118,9 @@ Present publish preview in chat:
 - RCA report summary (problem, RCA analysis, corrective action, preventive action)
 - Target task ID / tracker reference
 - Issue type and RCA field support status
-- Structured fields to update
+- `rca_strategy`: `field_first` or `comment_fallback` (with justification)
+- If `field_first`: list each RCA field to write with resolved `content_format` (markdown/adf/option_id) and `decision_source` (runtime/mapping/default)
+- If `comment_fallback`: indicate publication as structured comment
 - Comment fallback: yes / no
 
 **AskQuestion:**
@@ -144,6 +146,17 @@ resolveTrackerProvider():
     use active_provider + skill_binding + provider parameters
   else:
     abort and request tracker service configuration
+
+  load field_mapping_source (MANDATORY for write commands)
+  if field mapping is missing/unresolvable:
+    STOP with MISSING_FIELD_MAPPING
+    request configuration via /aias configure-providers
+
+  resolve RCA field availability from field mapping + runtime metadata:
+    if RCA custom fields exist in provider:
+      rca_strategy = field_first
+    else:
+      rca_strategy = comment_fallback
 ```
 
 ---
