@@ -32,8 +32,8 @@ This command may use **only** the following inputs:
 - `status.md` for artifact sync map, task_id, and current state
 - Plan artifacts (`*.plan.md`) and implementation state (`git diff` if available) for Plan Delta generation
 - Service configs:
-  - `aias-providers/knowledge-config.md`
-  - `aias-providers/tracker-config.md`
+  - `aias-config/providers/knowledge-config.md`
+  - `aias-config/providers/tracker-config.md`
 - Chat context explicitly provided by the user
 
 Rules:
@@ -78,7 +78,7 @@ This command executes four sequential steps:
 
 This step always executes full knowledge sync **regardless of classification** — `/publish` is the explicit override that ensures all artifacts reach the knowledge provider even for Type A tasks.
 
-Resolve the knowledge provider from `aias-providers/knowledge-config.md`:
+Resolve the knowledge provider from `aias-config/providers/knowledge-config.md`:
 - If config exists and is valid, use `active_provider` + `skill_binding` + provider parameters.
 - If config is missing, invalid, or unresolvable, abort and request provider configuration.
 
@@ -118,7 +118,7 @@ Write `delta.publish.md` to TASK_DIR and publish it as a child artifact/page in 
 
 ### Step 4: Tracker Comment
 
-Resolve tracker provider from `aias-providers/tracker-config.md`.
+Resolve tracker provider from `aias-config/providers/tracker-config.md`.
 If tracker config is missing, invalid, or unresolvable, abort tracker comment and request provider configuration.
 
 Post a closure comment on the ticket only when the resolved tracker provider supports comments and `task_id` is valid for that provider:
