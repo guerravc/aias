@@ -31,8 +31,8 @@ This command may use **only** the following inputs:
 - Chat context explicitly provided by the user
 - Codebase state (files, dependencies, existing code)
 - Service configs:
-  - `aias-providers/tracker-config.md`
-  - `aias-providers/knowledge-config.md`
+  - `aias-config/providers/tracker-config.md`
+  - `aias-config/providers/knowledge-config.md`
 
 Rules:
 - All inputs must be explicit.
@@ -48,7 +48,7 @@ This command produces **code changes** directly in the codebase (not a file arti
 
 TRACKER SYNC (Phase 6 — first increment only)
 - Before executing the first increment, if `task_id` in `status.md` is valid for the resolved tracker provider:
-  - Resolve tracker provider from `aias-providers/tracker-config.md`.
+  - Resolve tracker provider from `aias-config/providers/tracker-config.md`.
   - Transition canonical tracker status from `ready` -> `in_progress` using provider mapping.
   - If tracker config is missing, invalid, or unresolvable: abort sync and request provider configuration.
   - Report transition result in chat.
