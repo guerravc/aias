@@ -1,31 +1,20 @@
-name: Mirror Backup Sync
-
-on:
-  schedule:
-    - cron: '0 0 * * *'
-  push:
-    branches: [ main ]
-  workflow_dispatch:
-
-jobs:
-  mirror_backup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout Origen
+- name: Checkout Origen
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0 
+          fetch-depth: 0
+          # CRÍTICO: Desactivamos las credenciales automáticas 
+          # para que no interfieran con tu PAT en el push.
+          persist-credentials: false 
 
       - name: Mirror Push al Destino
         env:
-          # Usamos el token como variable de entorno directa para que Git la maneje
+          # Asegúrate de que el secreto se llame exactamente BACKUP_TOKEN
           GITHUB_TOKEN: ${{ secrets.BACKUP_TOKEN }}
         run: |
-          # Configuramos la URL de destino de forma segura
-          # Reemplaza 'guerravc/rho-aias.git' si el destino es diferente
+          # Usamos la sintaxis de autenticación por token
           DEST_URL="https://x-access-token:${GITHUB_TOKEN}@github.com/guerravc/rho-aias.git"
           
           git remote add backup "$DEST_URL"
           
-          # Push mirror con flags de verbosidad reducida para evitar fugas en logs
+          # Push mirror
           git push --mirror backup
