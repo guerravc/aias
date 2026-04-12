@@ -474,7 +474,7 @@ Every gate defined in a command MUST use this template structure:
 | **MAY** | Optional, at implementer's discretion | Permitted but not required behavior | Expected behavior (use SHOULD) |
 
 **Application scope:**
-- All 25 commands MUST use RFC-2119 keywords for enforcement language.
+- All 22 commands MUST use RFC-2119 keywords for enforcement language.
 - All 9 canonical modes MUST use RFC-2119 keywords to replace suggestive language ("prefer", "consider", "propose", "optionally"). Each replacement requires per-instance judgment — not mechanical substitution.
 
 #### Mode Enforcement Mapping
@@ -492,7 +492,7 @@ Suggestive language in canonical modes MUST be replaced with RFC-2119 keywords:
 
 ### Command Gate Requirements
 
-All 25 commands are categorized by implementation priority for gate standardization.
+All 22 commands are categorized by implementation priority for gate standardization.
 
 #### P0 — Core (deep redesign)
 
@@ -534,9 +534,6 @@ All 25 commands are categorized by implementation priority for gate standardizat
 
 | Command | Action | Notes |
 |---|---|---|
-| `/run` | Enforcement language sweep only. | Low-risk (local simulator). |
-| `/test` | Enforcement language sweep only. | Low-risk (local test execution). |
-| `/spm` | Enforcement language sweep only. | Has `--dry-run` safety. |
 | `/guide` | Enforcement language sweep only. | Advisory, chat-only. |
 | `/explain` | Enforcement language sweep only. | Advisory, chat-only. |
 | `/self-review` | Enforcement language sweep only. | Advisory, chat-only local review. |
