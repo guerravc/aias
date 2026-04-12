@@ -113,7 +113,7 @@ TASK: Analyze with product frameworks (JTBD, 5 Whys, User Journey, MoSCoW).
 - Product analysis (JTBD, 5 Whys, User Journey, MoSCoW) → Gap Summary → Enhanced content
 - `analysis.product.md`, `dor.plan.md`, `dod.plan.md` written to `<resolved_tasks_dir>/<TASK_ID>/`
 - DoR Readiness Check gate with blocking/non-blocking classification
-- Structured fields optionally written to the resolved tracker provider after user confirmation
+- Structured fields MAY be written to the resolved tracker provider after user confirmation
 - All artifacts published to knowledge provider (Phase 5c unconditional)
 - Canonical transition **pending_dor → ready** (after successful publish)
 
