@@ -926,10 +926,36 @@ def cmd_health() -> None:
 
     results: List[HealthStatus] = []
 
-    # 1. RHOAIAS.md
+    # 1. RHOAIAS.md (existence + staleness + placeholders)
     rhoaias = ROOT / "RHOAIAS.md"
     if rhoaias.is_file():
         results.append(("RHOAIAS.md", "OK", "Exists"))
+        rhoaias_content = rhoaias.read_text(encoding="utf-8", errors="replace")
+        if re.search(r"<\s+[^>]+\s+>", rhoaias_content):
+            results.append(("RHOAIAS.md freshness", "WARN",
+                "Contains unfilled placeholders — complete onboarding"))
+        else:
+            try:
+                mtime = rhoaias.stat().st_mtime
+                import datetime
+                age_days = (datetime.datetime.now().timestamp() - mtime) / 86400
+                git_count = subprocess.run(
+                    ["git", "rev-list", "--count",
+                     f"--after={int(mtime)}", "HEAD"],
+                    capture_output=True, text=True, cwd=str(ROOT),
+                ).stdout.strip()
+                commits_since = int(git_count) if git_count.isdigit() else 0
+                if age_days > 60 and commits_since > 30:
+                    results.append(("RHOAIAS.md freshness", "WARN",
+                        f"Last modified {int(age_days)} days ago "
+                        f"({commits_since} commits since). "
+                        "Consider `/aias refresh-context`"))
+                else:
+                    results.append(("RHOAIAS.md freshness", "OK",
+                        f"Modified {int(age_days)} days ago "
+                        f"({commits_since} commits since)"))
+            except Exception:
+                pass
     else:
         results.append(("RHOAIAS.md", "FAIL", "Not found"))
 
