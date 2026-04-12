@@ -79,8 +79,8 @@ For the full walkthrough, see [docs/QUICKSTART.md](docs/QUICKSTART.md). For a gr
 |---|---|---|---|---|---|
 | **Cursor** | Full | Full | Full | Full | `AGENTS.md` → `RHOAIAS.md` |
 | **Claude Code** | Full | Partial (`paths:`) | — | Full | `CLAUDE.md` → `RHOAIAS.md` |
-| **Windsurf** | Full | — | — | — | `AGENTS.md` → `RHOAIAS.md` |
-| **GitHub Copilot** | Full | Full (`applyTo:`) | Full (agents) | — | `AGENTS.md` → `RHOAIAS.md` |
+| **Windsurf** | Partial | — | — | — | `AGENTS.md` → `RHOAIAS.md` |
+| **GitHub Copilot** | Full | Partial (`applyTo:`) | Full (agents) | — | `AGENTS.md` → `RHOAIAS.md` |
 | **Codex** | — | — | Full | Full | `codex.md` → `RHOAIAS.md` |
 | **Gemini** | — | — | — | — | `GEMINI.md` → `RHOAIAS.md` |
 
