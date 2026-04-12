@@ -140,6 +140,35 @@ The generated file uses the format `< instruction text >` for each placeholder t
 
 ---
 
+## Freshness Lifecycle
+
+`RHOAIAS.md` is not a static artifact. As a project evolves — new modules, changed dependencies, restructured directories — the file MUST be kept current to preserve agent context quality across all modes and commands.
+
+### Three-layer freshness model
+
+| Layer | Mechanism | Trigger | Action |
+|-------|-----------|---------|--------|
+| **In-workflow** (proactive) | `/blueprint` impact analysis | Every task that goes through `/blueprint` | Sets `rhoaias_update` field in `status.md`; gates in `/commit` and `/pr` remind the user |
+| **Passive detection** | `aias health` staleness check | On-demand health check | Reports WARN when `RHOAIAS.md` is stale (age + commit activity) or contains unfilled placeholders |
+| **Manual catch-up** | `/aias refresh-context` | User invocation | Reads knowledge provider or filesystem, proposes section-level diffs with approval gate |
+
+### Drift signals
+
+The following signals indicate that `RHOAIAS.md` MAY need updating:
+
+- **Project Structure** — new top-level directories or modules not documented
+- **Key Technologies** — dependency manifest changes (new frameworks, language upgrades)
+- **Conventions** — architecture pattern changes, new DI approach, testing strategy shift
+- **Build and Test** — new test targets, CI/CD pipeline changes
+
+### Update governance
+
+- `RHOAIAS.md` MUST NOT be modified without human approval. All automated flows (blueprint detection, health warnings, refresh-context proposals) operate through gates — the framework informs and proposes, the human decides.
+- The `rhoaias_update` field in `status.md` tracks freshness state per task. See `reference.md` § `status.md` Format for the field definition and valid states.
+- Tasks that bypass `/blueprint` (ad-hoc `/implement`) do not activate the in-workflow freshness flow. This is a known limitation — ad-hoc work is outside the governed workflow.
+
+---
+
 ## Related Contracts
 
 - `readme-tool-adapter.md` — Contract for shortcut files (context symlinks → `RHOAIAS.md`)
@@ -147,4 +176,4 @@ The generated file uses the format `< instruction text >` for each placeholder t
 
 ---
 
-This document is the **source of truth** for project context structure and the `RHOAIAS.md` lifecycle.
+This document is the **source of truth** for project context structure, the `RHOAIAS.md` lifecycle, and the freshness governance model.
