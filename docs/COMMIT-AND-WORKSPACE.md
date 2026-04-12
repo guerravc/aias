@@ -1,29 +1,29 @@
-# /commit y resolución de repositorio (agnóstico)
+# /commit and Repository Resolution (Agnostic)
 
-## Objetivo
+## Objective
 
-Hacer que el comando `/commit` resuelva el repositorio git desde el **workspace actual** (.code-workspace) de forma agnóstica a la plataforma o tecnología.
+Enable the `/commit` command to resolve the git repository from the **current workspace** (.code-workspace) in a platform- and technology-agnostic way.
 
-## Resolución de repositorio (orden)
+## Repository Resolution (Order)
 
-1. **Workspace (preferido)**  
-   - Si el contexto actual es un workspace con `folders` y al menos una carpeta es la raíz de un repositorio git, usar esa(s) ruta(s) como **commit root(s)**.  
-   - Con un solo folder: ese path es el `PROJECT_ROOT` para git.  
-   - Con varios folders: por defecto usar el **primer folder** que sea git root; opcionalmente el workspace puede indicar cuál usar con una setting (ver más abajo).
+1. **Workspace (preferred)**  
+   - If the current context is a workspace with `folders` and at least one folder is the root of a git repository, use that path(s) as **commit root(s)**.  
+   - Single folder: that path becomes the `PROJECT_ROOT` for git.  
+   - Multiple folders: default to the **first folder** that is a git root; the workspace MAY indicate which folder to use via a setting (see below).
 
 2. **Fallback: projects.json**  
-   - Si no hay workspace, o ninguna carpeta del workspace es un git root, o el usuario invoca `/commit <projectAlias>`, usar `${HOME}/.cursor/projects.json`: resolver `basePath` + `projects.<alias>.repoDir` (o el `defaults.project`) para obtener `PROJECT_ROOT`.
+   - If there is no workspace, or no workspace folder is a git root, or the user invokes `/commit <projectAlias>`, use `${HOME}/.cursor/projects.json`: resolve `basePath` + `projects.<alias>.repoDir` (or `defaults.project`) to obtain `PROJECT_ROOT`.
 
-## Convención en el .code-workspace
+## .code-workspace Convention
 
-Opcional, para workspaces multi-root donde hace falta indicar **en qué carpeta** hacer commit:
+Optional, for multi-root workspaces where you need to specify **which folder** to commit in:
 
-- **cursor.commitRoot** (string o number):  
-  - `"<folderName>"`: nombre del folder en `folders[].name` que es el repo donde hacer commit.  
-  - `0`: usar el primer folder (por índice).  
-  - Si no está definido y hay una sola carpeta, se usa esa.
+- **cursor.commitRoot** (string or number):  
+  - `"<folderName>"`: name of the folder in `folders[].name` that is the repository to commit in.  
+  - `0`: use the first folder (by index).  
+  - If not defined and there is only one folder, that one is used.
 
-Ejemplo (un solo repo, no hace falta `cursor.commitRoot`):
+Example (single repo — `cursor.commitRoot` not needed):
 
 ```json
 {
@@ -36,7 +36,7 @@ Ejemplo (un solo repo, no hace falta `cursor.commitRoot`):
 }
 ```
 
-Ejemplo (multi-root: config + app; commit solo en el app):
+Example (multi-root: config + app; commit only in app):
 
 ```json
 {
@@ -50,8 +50,8 @@ Ejemplo (multi-root: config + app; commit solo en el app):
 }
 ```
 
-## Resumen
+## Summary
 
-- **Commit agnóstico:** resolución **workspace-first** (carpetas del .code-workspace que sean git roots), **fallback** a projects.json.  
-- **Workspace:** opcionalmente `cursor.commitRoot` para elegir carpeta en multi-root; `cursor.projectType` puede seguir usándose para hints sin que commit lo use obligatoriamente.  
-- **projects.json:** catálogo opcional de proyectos para tooling scripts; no requerido para `/commit` si se usa un workspace.
+- **Agnostic commit:** resolution is **workspace-first** (.code-workspace folders that are git roots), with **fallback** to projects.json.  
+- **Workspace:** optionally use `cursor.commitRoot` to select a folder in multi-root setups; `cursor.projectType` MAY still be used for hints without `/commit` requiring it.  
+- **projects.json:** optional project catalog for tooling scripts; not required for `/commit` when using a workspace.
