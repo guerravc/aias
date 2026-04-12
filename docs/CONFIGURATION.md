@@ -24,7 +24,7 @@ Rho AIAS configuration is composed of a small set of artifacts, each with a spec
 | Editor settings | `vscode/` (optional) | VSCode/Cursor workspace settings |
 | Project docs | `docs/` (optional) | Style guides, conventions |
 
-The first three are required. Services are needed only if your workflow involves external providers (tracker, wiki, design tool, VCS). The rest is optional.
+The first three are required. Services are needed only if your workflow involves external providers (tracker, wiki, design tool, VCS). The rest is optional. See [Progressive Adoption](PROGRESSIVE-ADOPTION.md) for which configuration is needed at each adoption level.
 
 ---
 
