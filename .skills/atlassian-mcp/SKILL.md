@@ -257,7 +257,7 @@ If runtime metadata contradicts the mapping, use runtime metadata for the write 
 **Read-only by default:**
 - Reading issues, pages, comments, and searching: always allowed.
 - Creating, editing, transitioning issues; creating or updating Confluence pages; adding comments: **only when the user explicitly asks**. Never perform write operations autonomously.
-- **Exception:** Commands that reference [tracker-status-mapping.md](../../aias-config/providers/atlassian/tracker-status-mapping.md) may perform automatic Jira transitions and Confluence publishes as part of the rho-aias loading protocol (Phase 5 and Phase 6). These are governed by the mapping rules, not by this general safety rule.
+- **Exception:** Commands that reference [tracker-status-mapping.md](../../aias-config/providers/atlassian/tracker-status-mapping.md) may perform automatic Jira transitions and Confluence publishes as part of the rho-aias skill loading protocol (Phase 5 and Phase 6). These are governed by the mapping rules, not by this general safety rule.
 
 **Abort on failure:**
 - If `getAccessibleAtlassianResources` fails or returns no `cloudId`: abort and ask the user to check Atlassian MCP configuration.
