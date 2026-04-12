@@ -1,4 +1,7 @@
-# Output Contract Rule Contract — Cursor Rules System
+# Output Contract Rule Contract — Cursor Rules System (v1.0)
+
+> **Keyword convention**: This contract uses RFC-2119 keywords (MUST, MUST NOT, SHOULD, MAY).
+> See [readme-commands.md](readme-commands.md) § RFC-2119 Keyword Policy for definitions.
 
 This document defines the **canonical contract** for output contract rules (`.cursor/rules/output-contract.mdc`) in the Cursor configuration system.
 
@@ -41,7 +44,7 @@ Mode rules (`readme-mode-rule.md`) delegate output format responsibility to the 
 
 ## Contract Structure
 
-All output contract rules **must follow this structure and order**.
+All output contract rules **MUST follow this structure and order**.
 
 ### 1. Frontmatter (Required)
 
@@ -54,7 +57,7 @@ alwaysApply: true
 
 **Required fields:**
 - `description`: One-line description of what this output contract defines
-- `alwaysApply: true`: Must be explicitly set to `true`
+- `alwaysApply: true`: MUST be explicitly set to `true`
 
 ---
 
@@ -64,7 +67,7 @@ alwaysApply: true
 
 Declare the development environment and toolchain versions.
 
-**Must include:**
+**MUST include:**
 - IDE or build tool and version
 - Platform/OS minimum deployment target
 - Additional toolchain requirements (package manager, language version, framework)
@@ -93,7 +96,7 @@ ENVIRONMENT
 
 Define the required components of every response that includes code changes.
 
-**Invariant structure** (must appear in all output contracts):
+**Invariant structure** (MUST appear in all output contracts):
 
 1. **Reasoning** (conversation language):
    - Approach summary + key trade-offs (pros/cons)
@@ -168,7 +171,7 @@ Workspace-specific considerations relevant to output quality.
 - When the workspace has domain-specific output requirements not covered by other sections
 - Examples: design system considerations (rdsui), networking considerations (rdsnetworking), macro considerations (rdsmacros), template validation (xctemplates)
 
-**Constraint:** Domain considerations must be specific to the workspace's purpose and not duplicate guidance that belongs in base rules or mode rules.
+**Constraint:** Domain considerations MUST be specific to the workspace's purpose and MUST NOT duplicate guidance that belongs in base rules or mode rules.
 
 ---
 
@@ -237,7 +240,7 @@ Examples of content that lives in a fragment:
 
 ### Fragment structure
 
-A fragment must contain:
+A fragment MUST contain:
 
 1. **At least one section header in UPPERCASE** — the header names the build system integration approach (e.g., `XCODE PROJECT INTEGRATION (NEW FILES)`, `SWIFT PACKAGE STRUCTURE`, `SOURCE SETS AND PACKAGES (NEW FILES)`)
 2. **Actionable rules** — bullet points or numbered steps that the AI assistant follows when creating or modifying files in the workspace
@@ -391,7 +394,7 @@ The `binding.rule.output_contract.<ws>.profile` binding in the stack profile ide
 | Aspect | Type | Description |
 |---|---|---|
 | Frontmatter structure | Invariant | `alwaysApply: true`, description field |
-| ENVIRONMENT section existence | Invariant | Must exist |
+| ENVIRONMENT section existence | Invariant | MUST exist |
 | ENVIRONMENT content | Parametrizable | IDE, versions, platform targets |
 | DELIVERABLES structure | Invariant | Reasoning + Code changes + Documentation |
 | DELIVERABLES detail | Parametrizable | Documentation tool, comment style, extra sub-items |
@@ -445,7 +448,7 @@ A good output contract is:
 
 ## Versioning
 
-Output contracts should be versioned when:
+Output contracts SHOULD be versioned when:
 - Environment versions change (e.g., Xcode version bump)
 - Build system integration rules change
 - File header conventions change
