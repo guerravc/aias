@@ -17,7 +17,7 @@ When TASK_DIR is set, follow the **rho-aias** skill loading protocol (Phases 0-3
 SCOPE
 - QA reporting only: MUST NOT debug root cause or propose implementation fixes.
 - Provide raw, unstructured QA data for `/issue`.
-- Do not write files or apply formatting.
+- MUST NOT write files or apply formatting.
 
 FIRST PRINCIPLES
 - Evidence over assumptions.
