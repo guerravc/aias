@@ -94,8 +94,11 @@ Commands define **how to execute** and format output. They structure data from m
 - `/assessment` — Evaluate fix feasibility; bridges `/fix` to `/blueprint` in bugfix flows (use with `@dev`)
 - `/validate-plan` — Validate plan alignment with DoR/DoD; process DoR/DoD amendments
 - `/consolidate-plan` — Work through plan gaps one by one
+- `/implement` — Execute plan increment by increment with governance gates (use with `@dev`)
 - `/publish` — Reconcile remaining artifacts, generate Plan Delta, and formally close the task
 - `/guide` — Operational reference for the rho-aias framework (profiles, commands, prompt format, status lifecycle, artifacts)
+- `/self-review` — Review your own local work (use with `@review`)
+- `/peer-review` — Review a PR or third-party change (use with `@review`)
 - `/handoff` — Generate an operational Markdown handoff snippet for the next chat or agent
 - `/run` — Build and launch app on Simulator (use with `@tooling` or directly)
 - `/test` — Run project tests (use with `@tooling` or directly)
@@ -251,6 +254,9 @@ TASK: Review the changes on the current branch. When done, /self-review.
 | `/test` | Run project tests | Project alias + flags | Execution summary (chat) |
 | `/commit` | Commit changes | Git status (automatic) | Git commit |
 | `/spm` | Manage dependencies | Package name + flags | Execution summary (chat) |
+| `/aias` | Framework management | Subcommand + flags | Health, config, scaffolding |
+| `/copyedit` | Technical writing review | Document content | Refined text |
+| `/guide` | Operational reference | Topic or subcommand | Framework reference (chat) |
 
 ---
 
@@ -343,7 +349,7 @@ TASK: /implement
 ## Further Reading
 
 - **Detailed workflows:** [WORKFLOWS.md](WORKFLOWS.md) — Feature development, bug fix, enrichment, build/run/test, CI/CD, integration, and all other end-to-end flows
-- **Artifact catalog and protocol:** `aias/.skills/rho-aias/SKILL.md` — Artifact types, loading protocol, Plan Classification, one-mode-per-chat rule
+- **Artifact catalog and protocol:** `aias/.skills/rho-aias/SKILL.md` — Artifact types, skill loading protocol, Plan Classification, one-mode-per-chat rule
 - **CLI reference:** [CLI.md](CLI.md) — `aias` subcommands, flags, and examples
 - **Framework guide:** Run `/guide` for operational reference (profiles, commands, status lifecycle, artifacts)
 - **Contracts:** `aias/contracts/readme-commands.md` (commands), `readme-mode-rule.md` (modes), `readme-skill.md` (skills)
