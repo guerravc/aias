@@ -429,8 +429,8 @@ A good base rule:
 - Defines **foundational behavior** for a specific context
 - Is **always active** (`alwaysApply: true`)
 - Is **focused, concise, and deterministic**
-- **Complements** `AGENTS.md` (which provides project context) and mode-specific rules
-- **Excludes** project context (belongs in `AGENTS.md`), task-specific, mode-specific, or command-specific content
+- **Complements** `RHOAIAS.md` (which provides project context) and mode-specific rules
+- **Excludes** project context (belongs in `RHOAIAS.md`), task-specific, mode-specific, or command-specific content
 
 When in doubt, ask: "Does this apply to **every** interaction in this context?" If yes, it belongs in the base rule. If no, it belongs elsewhere.
 
