@@ -347,6 +347,7 @@ tracker_status: IN PROGRESS
 completed_steps: [refinement, blueprint]
 current_step: validate
 refinement_validated: true
+rhoaias_update: null
 published: null
 completed: null
 artifacts:
