@@ -48,16 +48,33 @@ import sys
 from typing import Dict, List, Optional, Tuple
 
 
-ROOT = pathlib.Path(__file__).resolve().parents[3]
-CANONICAL_DIR = ROOT / "aias" / ".canonical"
-STACK_FRAGMENT_PATH = ROOT / "stack-fragment.md"
-RULES_OUTPUT_DIR = ROOT / "aias-config" / "rules"
-MODES_OUTPUT_DIR = ROOT / "aias-config" / "modes"
-FW_COMMANDS_DIR = ROOT / "aias" / ".commands"
-FW_SKILLS_DIR = ROOT / "aias" / ".skills"
-PROJECT_COMMANDS_DIR = ROOT / "aias-config" / "commands"
-PROJECT_SKILLS_DIR = ROOT / "aias-config" / "skills"
-TRANSVERSAL_MODES_DIR = ROOT / "aias" / ".canonical"  # kept for legacy reference only
+_DEFAULT_ROOT = pathlib.Path(__file__).resolve().parents[3]
+
+
+class Paths:
+    """Resolved filesystem paths. Reconfigurable via init_paths() for testing."""
+    root = _DEFAULT_ROOT
+    canonical_dir = _DEFAULT_ROOT / "aias" / ".canonical"
+    stack_fragment = _DEFAULT_ROOT / "stack-fragment.md"
+    rules_output = _DEFAULT_ROOT / "aias-config" / "rules"
+    modes_output = _DEFAULT_ROOT / "aias-config" / "modes"
+    fw_commands = _DEFAULT_ROOT / "aias" / ".commands"
+    fw_skills = _DEFAULT_ROOT / "aias" / ".skills"
+    project_commands = _DEFAULT_ROOT / "aias-config" / "commands"
+    project_skills = _DEFAULT_ROOT / "aias-config" / "skills"
+
+
+def init_paths(root: pathlib.Path) -> None:
+    """Reconfigure all paths for a different root. Used by tests."""
+    Paths.root = root
+    Paths.canonical_dir = root / "aias" / ".canonical"
+    Paths.stack_fragment = root / "stack-fragment.md"
+    Paths.rules_output = root / "aias-config" / "rules"
+    Paths.modes_output = root / "aias-config" / "modes"
+    Paths.fw_commands = root / "aias" / ".commands"
+    Paths.fw_skills = root / "aias" / ".skills"
+    Paths.project_commands = root / "aias-config" / "commands"
+    Paths.project_skills = root / "aias-config" / "skills"
 
 MODE_NAMES = ("planning", "dev", "qa", "debug", "review", "product", "integration", "delivery", "devops")
 TRANSVERSAL_RULES = ("continuous-improvement",)
@@ -162,31 +179,31 @@ def _gate_0_infrastructure() -> List[str]:
     """G0: Verify templates, stack-fragment.md, and canonical mode templates exist."""
     errors: List[str] = []
 
-    base_tpl = CANONICAL_DIR / "base-rule.md"
+    base_tpl = Paths.canonical_dir / "base-rule.md"
     if not base_tpl.is_file():
         errors.append(
-            f"[G0] Missing canonical base rule: {base_tpl.relative_to(ROOT)}\n"
+            f"[G0] Missing canonical base rule: {base_tpl.relative_to(Paths.root)}\n"
             f"      → Create it following aias/contracts/readme-base-rule.md"
         )
 
-    oc_tpl = CANONICAL_DIR / "output-contract.md"
+    oc_tpl = Paths.canonical_dir / "output-contract.md"
     if not oc_tpl.is_file():
         errors.append(
-            f"[G0] Missing canonical output contract: {oc_tpl.relative_to(ROOT)}\n"
+            f"[G0] Missing canonical output contract: {oc_tpl.relative_to(Paths.root)}\n"
             f"      → Create it following aias/contracts/readme-output-contract.md"
         )
 
-    if not STACK_FRAGMENT_PATH.is_file():
+    if not Paths.stack_fragment.is_file():
         errors.append(
-            f"[G0] Missing stack fragment: {STACK_FRAGMENT_PATH.relative_to(ROOT)}\n"
+            f"[G0] Missing stack fragment: {Paths.stack_fragment.relative_to(Paths.root)}\n"
             f"      → Create stack-fragment.md at repo root (see aias/contracts/readme-output-contract.md § Fragment Structure Options)"
         )
 
     for mode_name in MODE_NAMES:
-        mode_path = CANONICAL_DIR / f"{mode_name}.mdc"
+        mode_path = Paths.canonical_dir / f"{mode_name}.mdc"
         if not mode_path.is_file():
             errors.append(
-                f"[G0] Missing canonical mode template: {mode_path.relative_to(ROOT)}\n"
+                f"[G0] Missing canonical mode template: {mode_path.relative_to(Paths.root)}\n"
                 f"      → Create the template for mode '{mode_name}'"
             )
 
@@ -225,7 +242,7 @@ def _gate_1_profile_discovery(
 
     for profile in profiles:
         if not profile.is_file():
-            errors.append(f"[G1] Stack profile not readable: {profile.relative_to(ROOT)}")
+            errors.append(f"[G1] Stack profile not readable: {profile.relative_to(Paths.root)}")
             continue
         try:
             bindings = load_bindings(profile)
@@ -235,24 +252,24 @@ def _gate_1_profile_discovery(
 
         if "generation.stack_id" not in bindings:
             errors.append(
-                f"[G1] Missing binding.generation.stack_id in {profile.relative_to(ROOT)}\n"
+                f"[G1] Missing binding.generation.stack_id in {profile.relative_to(Paths.root)}\n"
                 f"      → Add: - `binding.generation.stack_id`: `<id>`"
             )
         if "generation.mode_output_dir" in bindings:
             val = bindings["generation.mode_output_dir"].strip()
             if val == "aias/.modes":
                 errors.append(
-                    f"[G1] Legacy binding.generation.mode_output_dir = 'aias/.modes' in {profile.relative_to(ROOT)}\n"
+                    f"[G1] Legacy binding.generation.mode_output_dir = 'aias/.modes' in {profile.relative_to(Paths.root)}\n"
                     f"      → Update to: `aias-config/modes` (aias/.modes is deprecated since v7.6)"
                 )
             elif val != "aias-config/modes":
                 errors.append(
-                    f"[G1] Invalid binding.generation.mode_output_dir in {profile.relative_to(ROOT)}\n"
+                    f"[G1] Invalid binding.generation.mode_output_dir in {profile.relative_to(Paths.root)}\n"
                     f"      → Must be: `aias-config/modes` (fixed output directory)"
                 )
         if "generation.tools" not in bindings:
             errors.append(
-                f"[G1] Missing binding.generation.tools in {profile.relative_to(ROOT)}\n"
+                f"[G1] Missing binding.generation.tools in {profile.relative_to(Paths.root)}\n"
                 f"      → Add: - `binding.generation.tools`: `cursor` (or comma-separated list)"
             )
         else:
@@ -266,12 +283,12 @@ def _gate_1_profile_discovery(
                 )
             if not tools_list:
                 errors.append(
-                    f"[G1] binding.generation.tools is empty in {profile.relative_to(ROOT)}\n"
+                    f"[G1] binding.generation.tools is empty in {profile.relative_to(Paths.root)}\n"
                     f"      → At least one tool must be specified"
                 )
         if "generation.tasks_dir" not in bindings:
             errors.append(
-                f"[G1] Missing binding.generation.tasks_dir in {profile.relative_to(ROOT)}\n"
+                f"[G1] Missing binding.generation.tasks_dir in {profile.relative_to(Paths.root)}\n"
                 f"      → Add: - `binding.generation.tasks_dir`: `~/.cursor/plans/`"
             )
         result.append((profile, bindings))
@@ -288,7 +305,7 @@ def _gate_2_mode_bindings(
     errors: List[str] = []
 
     for profile, bindings in profile_bindings:
-        rel = profile.relative_to(ROOT)
+        rel = profile.relative_to(Paths.root)
         for mode in MODE_NAMES:
             defaults = TRANSVERSAL_MODE_DEFAULTS.get(mode, {})
             for field in MODE_FRONTMATTER_KEYS:
@@ -310,7 +327,7 @@ def _gate_3_rule_bindings(
     errors: List[str] = []
 
     for profile, bindings in profile_bindings:
-        rel = profile.relative_to(ROOT)
+        rel = profile.relative_to(Paths.root)
         shared_prefix = detect_shared_prefix(bindings)
         workspace_ids = discover_rule_workspaces(bindings)
 
@@ -354,22 +371,22 @@ def _gate_4_fragment_validation(
     """G4: Verify stack-fragment.md exists at repo root and is valid."""
     errors: List[str] = []
 
-    if not STACK_FRAGMENT_PATH.is_file():
+    if not Paths.stack_fragment.is_file():
         errors.append(
-            f"[G4] Missing stack fragment: {STACK_FRAGMENT_PATH.relative_to(ROOT)}\n"
+            f"[G4] Missing stack fragment: {Paths.stack_fragment.relative_to(Paths.root)}\n"
             f"      → Create stack-fragment.md at repo root (see aias/contracts/readme-output-contract.md § Fragment Structure Options)"
         )
-    elif STACK_FRAGMENT_PATH.stat().st_size == 0:
+    elif Paths.stack_fragment.stat().st_size == 0:
         errors.append(
-            f"[G4] Empty stack fragment: {STACK_FRAGMENT_PATH.relative_to(ROOT)}\n"
+            f"[G4] Empty stack fragment: {Paths.stack_fragment.relative_to(Paths.root)}\n"
             f"      → Fill with build system integration content (see aias/contracts/readme-output-contract.md § Fragment Structure Options)"
         )
     else:
-        content = STACK_FRAGMENT_PATH.read_text(encoding="utf-8").strip()
+        content = Paths.stack_fragment.read_text(encoding="utf-8").strip()
         has_uppercase_header = bool(re.search(r"^[A-Z][A-Z /()]+", content, re.MULTILINE))
         if not has_uppercase_header:
             errors.append(
-                f"[G4] Fragment missing section header: {STACK_FRAGMENT_PATH.relative_to(ROOT)}\n"
+                f"[G4] Fragment missing section header: {Paths.stack_fragment.relative_to(Paths.root)}\n"
                 f"      → Fragment must contain at least one UPPERCASE section header"
             )
 
@@ -379,13 +396,13 @@ def _gate_4_fragment_validation(
 def _gate_5_output_directories() -> List[str]:
     """G5: Verify output directories exist or can be created."""
     errors: List[str] = []
-    for d in (RULES_OUTPUT_DIR, MODES_OUTPUT_DIR):
+    for d in (Paths.rules_output, Paths.modes_output):
         if not d.is_dir():
             try:
                 d.mkdir(parents=True, exist_ok=True)
             except OSError as e:
                 errors.append(
-                    f"[G5] Cannot create output directory: {d.relative_to(ROOT)}\n"
+                    f"[G5] Cannot create output directory: {d.relative_to(Paths.root)}\n"
                     f"      → {e}"
                 )
     return errors
@@ -444,18 +461,18 @@ def postflight_validation(generated_modes: List[str], tools: List[str]) -> List[
 def _check_shortcut_exists(path: pathlib.Path, label: str, errors: List[str]) -> None:
     """Check that a shortcut exists; report broken symlinks specifically."""
     if path.is_symlink() and not path.exists():
-        errors.append(f"[G6] Broken symlink for {label}: {path.relative_to(ROOT)}")
+        errors.append(f"[G6] Broken symlink for {label}: {path.relative_to(Paths.root)}")
     elif not path.is_file():
-        errors.append(f"[G6] Missing shortcut for {label}: {path.relative_to(ROOT)}")
+        errors.append(f"[G6] Missing shortcut for {label}: {path.relative_to(Paths.root)}")
 
 
 def _gate_6_shortcut_consistency(generated_modes: List[str], tools: List[str]) -> List[str]:
     """G6: Canonical artifacts should have corresponding shortcuts for listed tools only."""
     errors: List[str] = []
 
-    cursor_rules_dir = ROOT / ".cursor" / "rules"
-    claude_rules_dir = ROOT / ".claude" / "rules"
-    windsurf_rules_dir = ROOT / ".windsurf" / "rules"
+    cursor_rules_dir = Paths.root / ".cursor" / "rules"
+    claude_rules_dir = Paths.root / ".claude" / "rules"
+    windsurf_rules_dir = Paths.root / ".windsurf" / "rules"
 
     for base_rule in ("base", "output-contract"):
         if "cursor" in tools:
@@ -466,7 +483,7 @@ def _gate_6_shortcut_consistency(generated_modes: List[str], tools: List[str]) -
             _check_shortcut_exists(windsurf_rules_dir / f"{base_rule}.md", f"Windsurf rule: {base_rule}", errors)
 
     ci_rule = "continuous-improvement"
-    if (RULES_OUTPUT_DIR / f"{ci_rule}.mdc").is_file():
+    if (Paths.rules_output / f"{ci_rule}.mdc").is_file():
         if "cursor" in tools:
             _check_shortcut_exists(cursor_rules_dir / f"{ci_rule}.mdc", f"Cursor rule: {ci_rule}", errors)
         if "claude" in tools:
@@ -475,7 +492,7 @@ def _gate_6_shortcut_consistency(generated_modes: List[str], tools: List[str]) -
             _check_shortcut_exists(windsurf_rules_dir / f"{ci_rule}.md", f"Windsurf rule: {ci_rule}", errors)
 
     if "copilot" in tools:
-        copilot_instructions = ROOT / ".github" / "copilot-instructions.md"
+        copilot_instructions = Paths.root / ".github" / "copilot-instructions.md"
         _check_shortcut_exists(copilot_instructions, "GitHub Copilot copilot-instructions.md", errors)
 
     for mode_name in generated_modes:
@@ -484,33 +501,33 @@ def _gate_6_shortcut_consistency(generated_modes: List[str], tools: List[str]) -
         if "claude" in tools:
             _check_shortcut_exists(claude_rules_dir / f"{mode_name}.md", f"Claude Code mode: {mode_name}", errors)
         if "copilot" in tools:
-            copilot_mode = ROOT / ".github" / "instructions" / f"{mode_name}.instructions.md"
+            copilot_mode = Paths.root / ".github" / "instructions" / f"{mode_name}.instructions.md"
             _check_shortcut_exists(copilot_mode, f"GitHub Copilot mode: {mode_name}", errors)
 
-    for cmd_dir in (FW_COMMANDS_DIR, PROJECT_COMMANDS_DIR):
+    for cmd_dir in (Paths.fw_commands, Paths.project_commands):
         if not cmd_dir.is_dir():
             continue
         for cmd_file in sorted(cmd_dir.glob("*.md")):
             name = cmd_file.name
             if "cursor" in tools:
-                _check_shortcut_exists(ROOT / ".cursor" / "commands" / name, f"Cursor command: {name}", errors)
+                _check_shortcut_exists(Paths.root / ".cursor" / "commands" / name, f"Cursor command: {name}", errors)
             if "copilot" in tools:
-                _check_shortcut_exists(ROOT / ".github" / "agents" / name, f"Copilot command: {name}", errors)
+                _check_shortcut_exists(Paths.root / ".github" / "agents" / name, f"Copilot command: {name}", errors)
             if "codex" in tools:
-                _check_shortcut_exists(ROOT / ".codex" / "commands" / name, f"Codex command: {name}", errors)
+                _check_shortcut_exists(Paths.root / ".codex" / "commands" / name, f"Codex command: {name}", errors)
 
-    for skills_dir in (FW_SKILLS_DIR, PROJECT_SKILLS_DIR):
+    for skills_dir in (Paths.fw_skills, Paths.project_skills):
         if not skills_dir.is_dir():
             continue
         for skill_dir in sorted(skills_dir.iterdir()):
             if skill_dir.is_dir() and (skill_dir / "SKILL.md").is_file():
                 sname = skill_dir.name
                 if "cursor" in tools:
-                    _check_shortcut_exists(ROOT / ".cursor" / "skills" / sname / "SKILL.md", f"Cursor skill: {sname}", errors)
+                    _check_shortcut_exists(Paths.root / ".cursor" / "skills" / sname / "SKILL.md", f"Cursor skill: {sname}", errors)
                 if "claude" in tools:
-                    _check_shortcut_exists(ROOT / ".claude" / "skills" / sname / "SKILL.md", f"Claude Code skill: {sname}", errors)
+                    _check_shortcut_exists(Paths.root / ".claude" / "skills" / sname / "SKILL.md", f"Claude Code skill: {sname}", errors)
                 if "codex" in tools:
-                    _check_shortcut_exists(ROOT / ".agents" / "skills" / sname / "SKILL.md", f"Codex skill: {sname}", errors)
+                    _check_shortcut_exists(Paths.root / ".agents" / "skills" / sname / "SKILL.md", f"Codex skill: {sname}", errors)
 
     return errors
 
@@ -521,24 +538,24 @@ def _gate_7_no_duplication(tools: List[str]) -> List[str]:
 
     _TOOL_DIRS: Dict[str, List[pathlib.Path]] = {
         "cursor": [
-            ROOT / ".cursor" / "rules",
-            ROOT / ".cursor" / "commands",
-            ROOT / ".cursor" / "skills",
+            Paths.root / ".cursor" / "rules",
+            Paths.root / ".cursor" / "commands",
+            Paths.root / ".cursor" / "skills",
         ],
         "claude": [
-            ROOT / ".claude" / "rules",
-            ROOT / ".claude" / "skills",
+            Paths.root / ".claude" / "rules",
+            Paths.root / ".claude" / "skills",
         ],
         "windsurf": [
-            ROOT / ".windsurf" / "rules",
+            Paths.root / ".windsurf" / "rules",
         ],
         "copilot": [
-            ROOT / ".github" / "instructions",
-            ROOT / ".github" / "agents",
+            Paths.root / ".github" / "instructions",
+            Paths.root / ".github" / "agents",
         ],
         "codex": [
-            ROOT / ".codex" / "commands",
-            ROOT / ".agents" / "skills",
+            Paths.root / ".codex" / "commands",
+            Paths.root / ".agents" / "skills",
         ],
     }
 
@@ -548,7 +565,7 @@ def _gate_7_no_duplication(tools: List[str]) -> List[str]:
 
     single_files: List[pathlib.Path] = []
     if "copilot" in tools:
-        single_files.append(ROOT / ".github" / "copilot-instructions.md")
+        single_files.append(Paths.root / ".github" / "copilot-instructions.md")
 
     for d in shortcut_dirs:
         if not d.is_dir():
@@ -560,7 +577,7 @@ def _gate_7_no_duplication(tools: List[str]) -> List[str]:
                 size = f.stat().st_size
                 if size > SHORTCUT_MAX_LEN:
                     errors.append(
-                        f"[G7] Shortcut too large ({size} bytes): {f.relative_to(ROOT)}\n"
+                        f"[G7] Shortcut too large ({size} bytes): {f.relative_to(Paths.root)}\n"
                         f"      → Enriched text shortcut must be <{SHORTCUT_MAX_LEN} bytes"
                     )
         for f in d.rglob("*.mdc"):
@@ -570,7 +587,7 @@ def _gate_7_no_duplication(tools: List[str]) -> List[str]:
                 size = f.stat().st_size
                 if size > SHORTCUT_MAX_LEN:
                     errors.append(
-                        f"[G7] Shortcut too large ({size} bytes): {f.relative_to(ROOT)}\n"
+                        f"[G7] Shortcut too large ({size} bytes): {f.relative_to(Paths.root)}\n"
                         f"      → Enriched text shortcut must be <{SHORTCUT_MAX_LEN} bytes"
                     )
 
@@ -579,7 +596,7 @@ def _gate_7_no_duplication(tools: List[str]) -> List[str]:
             size = f.stat().st_size
             if size > SHORTCUT_MAX_LEN * 3:
                 errors.append(
-                    f"[G7] Aggregated shortcut too large ({size} bytes): {f.relative_to(ROOT)}\n"
+                    f"[G7] Aggregated shortcut too large ({size} bytes): {f.relative_to(Paths.root)}\n"
                     f"      → Should only contain enriched path references"
                 )
 
@@ -608,7 +625,7 @@ def unescape_binding(value: str) -> str:
 
 def discover_profiles() -> List[pathlib.Path]:
     """Discover the single stack-profile.md at repo root."""
-    profile_path = ROOT / "stack-profile.md"
+    profile_path = Paths.root / "stack-profile.md"
     if not profile_path.is_file():
         raise ValueError(
             "No stack-profile.md found at repo root.\n"
@@ -689,12 +706,12 @@ def generate_modes_for_profile(
         raise KeyError(f"Missing binding key: binding.generation.stack_id in {profile_path}")
     stack_id = bindings["generation.stack_id"]
 
-    MODES_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    Paths.modes_output.mkdir(parents=True, exist_ok=True)
 
     generated_mode_names: List[str] = []
 
     for mode in MODE_NAMES:
-        canonical_path = CANONICAL_DIR / f"{mode}.mdc"
+        canonical_path = Paths.canonical_dir / f"{mode}.mdc"
         template = canonical_path.read_text(encoding="utf-8")
 
         context = {}
@@ -708,7 +725,7 @@ def generate_modes_for_profile(
         rendered = strip_template_comments(rendered)
         rendered = inject_generated_header(rendered)
 
-        canonical_output = MODES_OUTPUT_DIR / f"{mode}.mdc"
+        canonical_output = Paths.modes_output / f"{mode}.mdc"
         canonical_output.write_text(rendered, encoding="utf-8")
 
         generated_mode_names.append(mode)
@@ -841,7 +858,7 @@ def generate_base_rule(
     ws_id: str,
     shared_prefix: Optional[str],
 ) -> pathlib.Path:
-    template = extract_template_content(CANONICAL_DIR / "base-rule.md")
+    template = extract_template_content(Paths.canonical_dir / "base-rule.md")
 
     required_keys = (
         "description",
@@ -873,8 +890,8 @@ def generate_base_rule(
         rendered += "\n"
     rendered = inject_generated_header(rendered)
 
-    RULES_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    canonical_path = RULES_OUTPUT_DIR / "base.mdc"
+    Paths.rules_output.mkdir(parents=True, exist_ok=True)
+    canonical_path = Paths.rules_output / "base.mdc"
     canonical_path.write_text(rendered, encoding="utf-8")
 
     return canonical_path
@@ -885,7 +902,7 @@ def generate_output_contract(
     ws_id: str,
     shared_prefix: Optional[str],
 ) -> pathlib.Path:
-    template = extract_template_content(CANONICAL_DIR / "output-contract.md")
+    template = extract_template_content(Paths.canonical_dir / "output-contract.md")
 
     context: Dict[str, str] = {}
     context["description"] = "Output contract: complete file contents + reasoning"
@@ -907,12 +924,12 @@ def generate_output_contract(
         if val:
             context[opt_key] = val
 
-    if not STACK_FRAGMENT_PATH.exists():
+    if not Paths.stack_fragment.exists():
         raise FileNotFoundError(
-            f"Missing stack fragment: {STACK_FRAGMENT_PATH}\n"
+            f"Missing stack fragment: {Paths.stack_fragment}\n"
             f"Create stack-fragment.md at repo root (see aias/contracts/readme-output-contract.md § Fragment Structure Options)"
         )
-    context["build_system_integration"] = STACK_FRAGMENT_PATH.read_text(encoding="utf-8").rstrip("\n")
+    context["build_system_integration"] = Paths.stack_fragment.read_text(encoding="utf-8").rstrip("\n")
 
     project_name = get_rule_binding(
         bindings, ws_id, "output_contract", "file_header_project_name", shared_prefix
@@ -930,8 +947,8 @@ def generate_output_contract(
         rendered += "\n"
     rendered = inject_generated_header(rendered)
 
-    RULES_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    canonical_path = RULES_OUTPUT_DIR / "output-contract.mdc"
+    Paths.rules_output.mkdir(parents=True, exist_ok=True)
+    canonical_path = Paths.rules_output / "output-contract.mdc"
     canonical_path.write_text(rendered, encoding="utf-8")
 
     return canonical_path
@@ -954,8 +971,8 @@ def generate_rules_for_profile(
         canon_oc = generate_output_contract(bindings, ws_id, shared_prefix)
         generated.append(ws_id)
         print(f"  Rules generated: {ws_id}")
-        print(f"    → (canonical) {canon_base.relative_to(ROOT)}")
-        print(f"    → (canonical) {canon_oc.relative_to(ROOT)}")
+        print(f"    → (canonical) {canon_base.relative_to(Paths.root)}")
+        print(f"    → (canonical) {canon_oc.relative_to(Paths.root)}")
     return generated
 
 
@@ -1020,25 +1037,25 @@ def _generate_cursor_shortcuts(generated_modes: List[str]) -> int:
     enabling auto-activation by file pattern (previously omitted in text shortcuts).
     """
     count = 0
-    rules_dir = ROOT / ".cursor" / "rules"
+    rules_dir = Paths.root / ".cursor" / "rules"
     rules_dir.mkdir(parents=True, exist_ok=True)
 
     for rule_name in ("base", "output-contract"):
-        _create_symlink(rules_dir / f"{rule_name}.mdc", RULES_OUTPUT_DIR / f"{rule_name}.mdc")
+        _create_symlink(rules_dir / f"{rule_name}.mdc", Paths.rules_output / f"{rule_name}.mdc")
         count += 1
 
-    ci_source = RULES_OUTPUT_DIR / "continuous-improvement.mdc"
+    ci_source = Paths.rules_output / "continuous-improvement.mdc"
     if ci_source.is_file():
         _create_symlink(rules_dir / "continuous-improvement.mdc", ci_source)
         count += 1
 
     for mode in generated_modes:
-        _create_symlink(rules_dir / f"{mode}.mdc", MODES_OUTPUT_DIR / f"{mode}.mdc")
+        _create_symlink(rules_dir / f"{mode}.mdc", Paths.modes_output / f"{mode}.mdc")
         count += 1
 
-    cmds_dir = ROOT / ".cursor" / "commands"
+    cmds_dir = Paths.root / ".cursor" / "commands"
     cmds_dir.mkdir(parents=True, exist_ok=True)
-    for cmd_dir in (FW_COMMANDS_DIR, PROJECT_COMMANDS_DIR):
+    for cmd_dir in (Paths.fw_commands, Paths.project_commands):
         if not cmd_dir.is_dir():
             continue
         for cmd_file in sorted(cmd_dir.glob("*.md")):
@@ -1054,19 +1071,19 @@ def _generate_claude_shortcuts(
 ) -> int:
     """Generate .claude/rules/ enriched text shortcuts for rules and modes."""
     count = 0
-    rules_dir = ROOT / ".claude" / "rules"
+    rules_dir = Paths.root / ".claude" / "rules"
     rules_dir.mkdir(parents=True, exist_ok=True)
 
     for rule_name in ("base", "output-contract"):
         shortcut_path = rules_dir / f"{rule_name}.md"
-        canonical_path = RULES_OUTPUT_DIR / f"{rule_name}.mdc"
+        canonical_path = Paths.rules_output / f"{rule_name}.mdc"
         desc = _extract_description(canonical_path)
         prefix = f"[{rule_name}] {desc}\n" if desc else ""
         content = f"{prefix}Read and follow the canonical rule at: aias-config/rules/{rule_name}.mdc\n"
         shortcut_path.write_text(content, encoding="utf-8")
         count += 1
 
-    ci_source = RULES_OUTPUT_DIR / "continuous-improvement.mdc"
+    ci_source = Paths.rules_output / "continuous-improvement.mdc"
     if ci_source.is_file():
         shortcut_path = rules_dir / "continuous-improvement.md"
         desc = _extract_description(ci_source)
@@ -1077,7 +1094,7 @@ def _generate_claude_shortcuts(
 
     for mode in generated_modes:
         shortcut_path = rules_dir / f"{mode}.md"
-        canonical_path = MODES_OUTPUT_DIR / f"{mode}.mdc"
+        canonical_path = Paths.modes_output / f"{mode}.mdc"
         canonical_ref = f"aias-config/modes/{mode}.mdc"
         desc = _extract_description(canonical_path)
         desc_line = f"[{mode}] {desc}\n" if desc else ""
@@ -1104,19 +1121,19 @@ def _generate_claude_shortcuts(
 def _generate_windsurf_shortcuts() -> int:
     """Generate .windsurf/rules/ enriched text shortcuts for always-apply rules only."""
     count = 0
-    rules_dir = ROOT / ".windsurf" / "rules"
+    rules_dir = Paths.root / ".windsurf" / "rules"
     rules_dir.mkdir(parents=True, exist_ok=True)
 
     for rule_name in ("base", "output-contract"):
         shortcut_path = rules_dir / f"{rule_name}.md"
-        canonical_path = RULES_OUTPUT_DIR / f"{rule_name}.mdc"
+        canonical_path = Paths.rules_output / f"{rule_name}.mdc"
         desc = _extract_description(canonical_path)
         prefix = f"[{rule_name}] {desc}\n" if desc else ""
         content = f"{prefix}Read and follow the canonical rule at: aias-config/rules/{rule_name}.mdc\n"
         shortcut_path.write_text(content, encoding="utf-8")
         count += 1
 
-    ci_source = RULES_OUTPUT_DIR / "continuous-improvement.mdc"
+    ci_source = Paths.rules_output / "continuous-improvement.mdc"
     if ci_source.is_file():
         shortcut_path = rules_dir / "continuous-improvement.md"
         desc = _extract_description(ci_source)
@@ -1134,15 +1151,15 @@ def _generate_copilot_shortcuts(
 ) -> int:
     """Generate .github/ shortcuts: copilot-instructions.md (enriched text), instructions/ (enriched text), agents/ (symlinks)."""
     count = 0
-    github_dir = ROOT / ".github"
+    github_dir = Paths.root / ".github"
     github_dir.mkdir(parents=True, exist_ok=True)
 
     rule_lines: List[str] = []
     for rule_name in ("base", "output-contract"):
-        desc = _extract_description(RULES_OUTPUT_DIR / f"{rule_name}.mdc")
+        desc = _extract_description(Paths.rules_output / f"{rule_name}.mdc")
         desc_part = f" {desc}" if desc else ""
         rule_lines.append(f"- [{rule_name}]{desc_part} — aias-config/rules/{rule_name}.mdc")
-    ci_source = RULES_OUTPUT_DIR / "continuous-improvement.mdc"
+    ci_source = Paths.rules_output / "continuous-improvement.mdc"
     if ci_source.is_file():
         desc = _extract_description(ci_source)
         desc_part = f" {desc}" if desc else ""
@@ -1158,7 +1175,7 @@ def _generate_copilot_shortcuts(
     instr_dir.mkdir(parents=True, exist_ok=True)
     for mode in generated_modes:
         shortcut_path = instr_dir / f"{mode}.instructions.md"
-        canonical_path = MODES_OUTPUT_DIR / f"{mode}.mdc"
+        canonical_path = Paths.modes_output / f"{mode}.mdc"
         canonical_ref = f"aias-config/modes/{mode}.mdc"
         desc = _extract_description(canonical_path)
         desc_line = f"[{mode}] {desc}\n" if desc else ""
@@ -1178,7 +1195,7 @@ def _generate_copilot_shortcuts(
 
     agents_dir = github_dir / "agents"
     agents_dir.mkdir(parents=True, exist_ok=True)
-    for cmd_dir in (FW_COMMANDS_DIR, PROJECT_COMMANDS_DIR):
+    for cmd_dir in (Paths.fw_commands, Paths.project_commands):
         if not cmd_dir.is_dir():
             continue
         for cmd_file in sorted(cmd_dir.glob("*.md")):
@@ -1192,21 +1209,21 @@ def _generate_codex_shortcuts() -> int:
     """Generate .codex/commands/ (symlinks) and .agents/skills/ (symlinks) for Codex."""
     count = 0
 
-    cmds_dir = ROOT / ".codex" / "commands"
+    cmds_dir = Paths.root / ".codex" / "commands"
     cmds_dir.mkdir(parents=True, exist_ok=True)
-    for cmd_dir in (FW_COMMANDS_DIR, PROJECT_COMMANDS_DIR):
+    for cmd_dir in (Paths.fw_commands, Paths.project_commands):
         if not cmd_dir.is_dir():
             continue
         for cmd_file in sorted(cmd_dir.glob("*.md")):
             _create_symlink(cmds_dir / cmd_file.name, cmd_file)
             count += 1
 
-    for skills_dir in (FW_SKILLS_DIR, PROJECT_SKILLS_DIR):
+    for skills_dir in (Paths.fw_skills, Paths.project_skills):
         if not skills_dir.is_dir():
             continue
         for skill_dir in sorted(skills_dir.iterdir()):
             if skill_dir.is_dir() and (skill_dir / "SKILL.md").is_file():
-                target_dir = ROOT / ".agents" / "skills" / skill_dir.name
+                target_dir = Paths.root / ".agents" / "skills" / skill_dir.name
                 target_dir.mkdir(parents=True, exist_ok=True)
                 _create_symlink(target_dir / "SKILL.md", skill_dir / "SKILL.md")
                 count += 1
@@ -1223,7 +1240,7 @@ def _generate_skill_shortcuts(tools: List[str]) -> Tuple[int, int]:
     claude_count = 0
 
     all_skill_dirs: List[pathlib.Path] = []
-    for skills_dir in (FW_SKILLS_DIR, PROJECT_SKILLS_DIR):
+    for skills_dir in (Paths.fw_skills, Paths.project_skills):
         if skills_dir.is_dir():
             all_skill_dirs.extend(sorted(skills_dir.iterdir()))
     if not all_skill_dirs:
@@ -1234,12 +1251,12 @@ def _generate_skill_shortcuts(tools: List[str]) -> Tuple[int, int]:
             continue
 
         if "cursor" in tools:
-            cursor_link = ROOT / ".cursor" / "skills" / skill_dir.name / "SKILL.md"
+            cursor_link = Paths.root / ".cursor" / "skills" / skill_dir.name / "SKILL.md"
             _create_symlink(cursor_link, skill_dir / "SKILL.md")
             cursor_count += 1
 
         if "claude" in tools:
-            claude_link = ROOT / ".claude" / "skills" / skill_dir.name / "SKILL.md"
+            claude_link = Paths.root / ".claude" / "skills" / skill_dir.name / "SKILL.md"
             _create_symlink(claude_link, skill_dir / "SKILL.md")
             claude_count += 1
 
@@ -1302,11 +1319,11 @@ def main() -> int:
         rule_workspaces.extend(generate_rules_for_profile(profile, bindings))
 
     # --- Transversal rules: copy from .canonical/ to .rules/ ---
-    RULES_OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    Paths.rules_output.mkdir(parents=True, exist_ok=True)
     for tr in TRANSVERSAL_RULES:
-        src = TRANSVERSAL_MODES_DIR / f"{tr}.mdc"
+        src = Paths.canonical_dir / f"{tr}.mdc"
         if src.is_file():
-            dst = RULES_OUTPUT_DIR / f"{tr}.mdc"
+            dst = Paths.rules_output / f"{tr}.mdc"
             dst.write_text(src.read_text(encoding="utf-8"), encoding="utf-8")
 
     print(f"\nMode generation completed for stacks: {', '.join(mode_stacks)} ({len(MODE_NAMES)} modes).")
