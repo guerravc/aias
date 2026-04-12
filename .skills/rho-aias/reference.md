@@ -32,9 +32,9 @@ Each mode declares which artifacts it **requires** (must be present) and which a
 
 | Mode | Required artifacts | Optional artifacts |
 |------|--------------------|--------------------|
-| `@planning` | — | `*.product.md`, `*.issue.md`, `*.fix.md`, `*.assessment.md` |
-| `@product` | — | `*.product.md`, `*.design.md`, `*.plan.md` |
-| `@dev` | `*.plan.md`, `*.design.md` | `*.product.md`, `*.fix.md`, `*.assessment.md`, `*.trace.md` |
+| `@planning` | — | `*.product.md`, `*.issue.md`, `*.fix.md`, `*.assessment.md`, `*.plan.md`, `*.design.md` |
+| `@product` | — | `*.product.md`, `*.design.md`, `*.plan.md`, `*.issue.md`, `*.fix.md`, `*.assessment.md` |
+| `@dev` | `*.plan.md`, `*.design.md` | `*.product.md`, `*.fix.md`, `*.assessment.md`, `*.trace.md`, `*.issue.md` |
 | `@qa` | `*.issue.md` | `*.trace.md`, `*.plan.md` |
 | `@debug` | `*.fix.md`, `*.issue.md` | `*.plan.md` |
 | `@review` | `*.plan.md` | `*.design.md`, `*.product.md` |
@@ -162,8 +162,9 @@ Steps are tracked in `status.md` under `completed_steps` (array) and `current_st
 | `implement` | `/implement` completes all increments | All increments done |
 | `commit` | `/commit` completes | Changes committed |
 | `pr` | `/pr` creates or updates PR | PR URL in context |
+| `report` | `/report` completes | Bug RCA report generated (bugfix profile, optional step) |
 | `charter` | `/charter` completes | `delivery.charter.md` written |
-| `closure` | `/publish`, `/brief`, or `/report` | Task archived per classification |
+| `closure` | `/publish`, `/brief`, or `/report` | Task archived per classification. `/brief` is a lightweight closure that does not produce `delta.publish.md`. |
 
 ---
 
