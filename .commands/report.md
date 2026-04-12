@@ -208,6 +208,12 @@ resolveTrackerProvider():
 <!-- Key evidence backing the RCA decisions -->
 ```
 
+### STATUS UPDATE (Phase 5, when TASK_DIR is set)
+
+- Add `report` to `completed_steps`.
+- Set `current_step` to `closure`.
+- Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification.
+
 ---
 
 ## 7. Non-Goals / Forbidden Actions
