@@ -69,9 +69,9 @@ For trackers that support the six RCA fields:
 - **RCA Determination**: categorical field, write only a valid option id from the tracker catalog.
 - **RCA Introduction Factor**: categorical field, write only a valid option id from the tracker catalog.
 - **RCA Detection Factor**: categorical field, write only a valid option id from the tracker catalog.
-- **RCA Analysis**: textarea field, prefer Markdown when supported; fall back to ADF when required.
-- **RCA Corrective Action**: textarea field, prefer Markdown when supported; fall back to ADF when required.
-- **RCA Preventive Action**: textarea field, prefer Markdown when supported; fall back to ADF when required.
+- **RCA Analysis**: textarea field, SHOULD use Markdown when supported; fall back to ADF when required.
+- **RCA Corrective Action**: textarea field, SHOULD use Markdown when supported; fall back to ADF when required.
+- **RCA Preventive Action**: textarea field, SHOULD use Markdown when supported; fall back to ADF when required.
 
 Field sufficiency rules:
 - Open-text RCA fields may be written only when evidence is sufficient or the user provides explicit text through the Evidence Sufficiency gate flow.
