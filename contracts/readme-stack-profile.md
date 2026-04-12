@@ -1,5 +1,8 @@
 # Stack Profile Contract — Cursor Configuration System (v1.2)
 
+> **Keyword convention**: This contract uses RFC-2119 keywords (MUST, MUST NOT, SHOULD, MAY).
+> See [readme-commands.md](readme-commands.md) § RFC-2119 Keyword Policy for definitions.
+
 This document defines the **canonical contract** for platform stack profiles used by the Phase 2 platform abstraction flow.
 
 It exists to:
@@ -47,7 +50,7 @@ Build system integration content is provided by `<repo_root>/stack-fragment.md` 
 
 ## Mandatory Structure
 
-All stack profiles **must** include the following sections in this order:
+All stack profiles **MUST** include the following sections in this order:
 
 1. `Schema`
 2. `Metadata`
@@ -65,7 +68,7 @@ All stack profiles **must** include the following sections in this order:
 
 ## Minimum Variable Coverage
 
-Each profile must define, at minimum:
+Each profile MUST define, at minimum:
 
 - **Language** (name + version)
 - **UI framework**
@@ -84,7 +87,7 @@ Each profile must define, at minimum:
 
 ## Generation Bindings Contract
 
-`Generation bindings` is mandatory and must use one binding per line with this format:
+`Generation bindings` is mandatory and MUST use one binding per line with this format:
 
 - ``- `binding.<key>`: `<value>` ``
 
@@ -94,7 +97,7 @@ Required binding groups:
    - `binding.generation.stack_id`
    - `binding.generation.mode_output_dir` — **deprecated** (optional, ignored). Mode output directory is fixed at `aias-config/modes/`. If present with value `aias/.modes`, the generator emits a legacy error.
    - `binding.generation.tools` — comma-separated list of target tools for shortcut generation. Valid values: `cursor`, `claude`, `windsurf`, `copilot`, `codex`. Only tools listed here will have shortcuts generated.
-   - `binding.generation.tasks_dir` — base directory for task artifact directories (`<tasks_dir>/<TASK_ID>/`). Must be an absolute path or `~/`-prefixed. Default: `~/.cursor/plans/`.
+   - `binding.generation.tasks_dir` — base directory for task artifact directories (`<tasks_dir>/<TASK_ID>/`). MUST be an absolute path or `~/`-prefixed. Default: `~/.cursor/plans/`.
    - `binding.generation.canonical_mode_output_dir` — canonical flat output for modes (e.g., `aias-config/modes`)
    - `binding.generation.canonical_rule_output_dir` — canonical flat output for rules (e.g., `aias-config/rules`)
 2. **Shared template keys** (minimum)
@@ -131,7 +134,7 @@ Required binding groups:
 `binding.mode.<mode>.globs` format rule:
 
 - Input in stack profile: comma-separated list (CSV) for readability.
-- Output in generated `.mdc`: must be normalized as YAML array under `globs:`.
+- Output in generated `.mdc`: MUST be normalized as YAML array under `globs:`.
 - Contractual output target:
   - `globs:`
   - `  - "*.pattern1"`
@@ -166,7 +169,7 @@ Binding keys are the source of truth for generation. Hardcoding these values in 
 
 ## Rule Bindings
 
-Stack profiles must declare bindings for workspace rule generation (`base.mdc` and `output-contract.mdc`). These bindings complement the existing mode generation bindings.
+Stack profiles MUST declare bindings for workspace rule generation (`base.mdc` and `output-contract.mdc`). These bindings complement the existing mode generation bindings.
 
 ### Base Rule Bindings (`binding.rule.base.*`)
 
@@ -229,9 +232,9 @@ The shared prefix is auto-detected by the generator from keys matching `rule.bas
 - Every declared key must be either:
   - **Consumed** by at least one canonical template section, or
   - Declared in `Reserved keys` with a clear future intent.
-- Canonical templates must not hardcode platform technology outside profile-driven values or documented conditionals.
-- Profile keys should be stable; when renamed, update templates and generation docs in the same change.
-- Every required binding key must be present; missing required bindings are blocking.
+- Canonical templates MUST NOT hardcode platform technology outside profile-driven values or documented conditionals.
+- Profile keys SHOULD be stable; when renamed, update templates and generation docs in the same change.
+- Every required binding key MUST be present; missing required bindings are blocking.
 
 ---
 
