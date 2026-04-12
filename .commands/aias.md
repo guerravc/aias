@@ -240,6 +240,15 @@ Triggered when `[WARN] Referenced files` mentions "Legacy location: aias/.skills
    - Report migration results.
 3. If the user declines: proceed without migration.
 
+### Scenario E — Shortcut integrity failures
+
+Triggered when `[FAIL] Shortcut integrity` appears in health output.
+
+1. Inform the user: "Shortcut integrity check found N issue(s). This means shortcuts may be oversized, missing, or inconsistent with canonical sources."
+2. Offer to execute: `python3 aias/.canonical/generation/aias_cli.py generate --shortcuts`
+3. If the generator exits with code 1 (G6/G7 post-flight errors persist after regeneration), inform the user that deeper issues exist — likely a mismatch between the stack-profile bindings and canonical templates that requires manual review.
+4. If the generator exits with code 0, report success and suggest re-running `/aias health` to verify.
+
 ---
 
 ## Post-Action
