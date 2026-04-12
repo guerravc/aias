@@ -119,7 +119,7 @@ TRACKER SYNC (Phase 6 — after PR creation):
   - Report transition result after the code block.
 
 STATUS UPDATE (Phase 5):
-- Update `status.md`: set `status: in_review`, add `pr` to `completed_steps`, set `current_step` to `closure`.
+- Update `status.md`: set `status: in_review`, add `pr` to `completed_steps`, set `current_step` based on profile: if bugfix → `report`; otherwise → `closure`.
 - Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification (see **rho-aias** skill § Phase 5c).
 
 PUBLISH NUDGE:
