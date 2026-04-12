@@ -202,3 +202,37 @@ When onboarding a new repo:
 - [x] Codex: commands, skills shortcuts generated.
 - [x] No enriched text shortcut exceeds 500 bytes; aggregated files do not exceed 1500 bytes (symlinks are exempt).
 - [x] Gemini: no shortcuts (context only via `GEMINI.md`).
+
+## Testing
+
+### Overview
+
+The generator has an automated test suite (149 tests) covering unit functions, preflight/postflight gates, and full pipeline integration. Tests use **stdlib only** (`unittest`, `tempfile`, `pathlib`) — no external dependencies.
+
+### Test architecture
+
+| File | What it tests | Tests |
+|---|---|---|
+| `tests/test_unit.py` | Pure functions (`render_*`, `load_bindings`, `normalize_globs`, etc.) + minimal I/O functions (`_create_symlink`, `_extract_description`, `discover_profiles`) | ~77 |
+| `tests/test_preflight.py` | Gates G0–G5: infrastructure, profile discovery, mode/rule binding completeness, fragment validation, output directories | ~34 |
+| `tests/test_postflight.py` | Gates G6–G7: shortcut consistency per tool, size limits, symlink exemptions | ~20 |
+| `tests/test_integration.py` | Full pipeline: mode + rule generation, idempotency, shortcuts per tool, multi-workspace last-wins, transversal defaults, shared prefix resolution | ~18 |
+
+Tests use stub fixtures (`tests/fixtures/`) with simplified templates that validate generator **mechanics** without depending on canonical template content.
+
+### Running tests
+
+```bash
+# From the repo root
+python3 -m unittest discover -s aias/.canonical/generation/tests -p "test_*.py" -v
+```
+
+Exit code 0 = all tests pass. No external dependencies required.
+
+### When to run
+
+**Every modification to `generate_modes_and_rules.py` MUST be accompanied by a successful test run before commit.** Tests are a maintainer-facing development safeguard — they are not part of `aias health` or adopter workflows.
+
+### Testability design
+
+The generator uses a `Paths` class with an `init_paths(root)` function that allows tests to redirect all filesystem operations to temporary directories. This avoids modifying the real repo during test execution.

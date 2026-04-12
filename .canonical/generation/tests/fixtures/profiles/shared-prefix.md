@@ -1,0 +1,50 @@
+# Shared Prefix Profile
+
+- `binding.generation.stack_id`: `shared-stack`
+- `binding.generation.mode_output_dir`: `aias-config/modes`
+- `binding.generation.tools`: `cursor`
+- `binding.generation.tasks_dir`: `~/.cursor/plans/`
+- `binding.mode.planning.description`: `Planning mode`
+- `binding.mode.planning.model`: `sonnet-4`
+- `binding.mode.planning.color`: `blue`
+- `binding.mode.planning.globs`: `*.plan.md`
+- `binding.mode.dev.description`: `Dev mode`
+- `binding.mode.dev.model`: `sonnet-4`
+- `binding.mode.dev.color`: `green`
+- `binding.mode.dev.globs`: `*.swift`
+- `binding.mode.qa.description`: `QA mode`
+- `binding.mode.qa.model`: `sonnet-4`
+- `binding.mode.qa.color`: `orange`
+- `binding.mode.qa.globs`: `*Test*.swift`
+- `binding.mode.debug.description`: `Debug mode`
+- `binding.mode.debug.model`: `sonnet-4`
+- `binding.mode.debug.color`: `red`
+- `binding.mode.debug.globs`: `*.swift`
+- `binding.mode.review.description`: `Review mode`
+- `binding.mode.review.model`: `opus-4`
+- `binding.mode.review.color`: `purple`
+- `binding.mode.review.globs`: `*.swift`
+- `binding.mode.product.description`: `Product mode`
+- `binding.mode.product.model`: `opus-4`
+- `binding.mode.product.color`: `teal`
+- `binding.mode.product.globs`: `*.product.md`
+- `binding.mode.integration.description`: `Integration mode`
+- `binding.mode.integration.model`: `sonnet-4`
+- `binding.mode.integration.color`: `cyan`
+- `binding.mode.integration.globs`: `*.swift`
+- `binding.rule.base.ios_shared.description`: `Shared base description`
+- `binding.rule.base.ios_shared.role_specialty`: `Shared specialist.`
+- `binding.rule.base.ios_shared.conversation_language`: `Spanish`
+- `binding.rule.base.ios_shared.engineering_domain_principle`: `SOLID.`
+- `binding.rule.base.ios_shared.security_line`: `OWASP.`
+- `binding.rule.base.ios_shared.performance_line`: `Responsive.`
+- `binding.rule.base.ios_shared.assumptions_domain`: `iOS domain.`
+- `binding.rule.base.ios_shared.limitations_truthfulness_line`: `No hallucination.`
+- `binding.rule.base.ios_shared.platform_limitations`: `iOS 17+`
+- `binding.rule.base.ios_shared.styleguide_paths`: `docs/ios-style.md`
+- `binding.rule.output_contract.ios_shared.environment`: `iOS 17, Xcode 16`
+- `binding.rule.output_contract.ios_shared.documentation_tool`: `DocC`
+- `binding.rule.output_contract.ios_shared.linter`: `SwiftLint`
+- `binding.rule.output_contract.ios_shared.testing`: `XCTest`
+- `binding.rule.base.myapp.description`: `Workspace-specific override`
+- `binding.rule.output_contract.myapp.profile`: `ios-swift`

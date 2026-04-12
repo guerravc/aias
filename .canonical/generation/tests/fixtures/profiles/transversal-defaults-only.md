@@ -1,0 +1,49 @@
+# Transversal Defaults Only Profile
+
+- `binding.generation.stack_id`: `transversal-stack`
+- `binding.generation.mode_output_dir`: `aias-config/modes`
+- `binding.generation.tools`: `cursor`
+- `binding.generation.tasks_dir`: `~/.cursor/plans/`
+- `binding.mode.planning.description`: `Planning mode`
+- `binding.mode.planning.model`: `sonnet-4`
+- `binding.mode.planning.color`: `blue`
+- `binding.mode.planning.globs`: `*.plan.md`
+- `binding.mode.dev.description`: `Dev mode`
+- `binding.mode.dev.model`: `sonnet-4`
+- `binding.mode.dev.color`: `green`
+- `binding.mode.dev.globs`: `*.swift`
+- `binding.mode.qa.description`: `QA mode`
+- `binding.mode.qa.model`: `sonnet-4`
+- `binding.mode.qa.color`: `orange`
+- `binding.mode.qa.globs`: `*Test*.swift`
+- `binding.mode.debug.description`: `Debug mode`
+- `binding.mode.debug.model`: `sonnet-4`
+- `binding.mode.debug.color`: `red`
+- `binding.mode.debug.globs`: `*.swift`
+- `binding.mode.review.description`: `Review mode`
+- `binding.mode.review.model`: `opus-4`
+- `binding.mode.review.color`: `purple`
+- `binding.mode.review.globs`: `*.swift`
+- `binding.mode.product.description`: `Product mode`
+- `binding.mode.product.model`: `opus-4`
+- `binding.mode.product.color`: `teal`
+- `binding.mode.product.globs`: `*.product.md`
+- `binding.mode.integration.description`: `Integration mode`
+- `binding.mode.integration.model`: `sonnet-4`
+- `binding.mode.integration.color`: `cyan`
+- `binding.mode.integration.globs`: `*.swift`
+- `binding.rule.base.myapp.description`: `App rule`
+- `binding.rule.base.myapp.role_specialty`: `Specialist.`
+- `binding.rule.base.myapp.conversation_language`: `English`
+- `binding.rule.base.myapp.engineering_domain_principle`: `SOLID.`
+- `binding.rule.base.myapp.security_line`: `Secure.`
+- `binding.rule.base.myapp.performance_line`: `Fast.`
+- `binding.rule.base.myapp.assumptions_domain`: `Web.`
+- `binding.rule.base.myapp.limitations_truthfulness_line`: `Truthful.`
+- `binding.rule.base.myapp.platform_limitations`: `None.`
+- `binding.rule.base.myapp.styleguide_paths`: `style.md`
+- `binding.rule.output_contract.myapp.environment`: `macOS`
+- `binding.rule.output_contract.myapp.documentation_tool`: `Markdown`
+- `binding.rule.output_contract.myapp.linter`: `ESLint`
+- `binding.rule.output_contract.myapp.testing`: `Jest`
+- `binding.rule.output_contract.myapp.profile`: `web`

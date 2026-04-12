@@ -1,0 +1,17 @@
+<!-- Stub mode template for testing -->
+---
+description: {{description}}
+alwaysApply: false
+model: {{model}}
+color: {{color}}
+globs:
+{{globs_yaml}}
+---
+
+ROLE
+You are a stub planning mode for testing.
+
+{{#if has_tracker}}
+TRACKER INTEGRATION
+Use the configured tracker.
+{{/if}}

@@ -1,0 +1,49 @@
+# Stub Stack Profile
+
+- `binding.generation.stack_id`: `stub-stack`
+- `binding.generation.mode_output_dir`: `aias-config/modes`
+- `binding.generation.tools`: `cursor`
+- `binding.generation.tasks_dir`: `~/.cursor/plans/`
+- `binding.mode.planning.description`: `Planning mode for stub stack`
+- `binding.mode.planning.model`: `sonnet-4`
+- `binding.mode.planning.color`: `blue`
+- `binding.mode.planning.globs`: `*.plan.md, *.md`
+- `binding.mode.dev.description`: `Dev mode for stub stack`
+- `binding.mode.dev.model`: `sonnet-4`
+- `binding.mode.dev.color`: `green`
+- `binding.mode.dev.globs`: `*.swift, *.py`
+- `binding.mode.qa.description`: `QA mode for stub stack`
+- `binding.mode.qa.model`: `sonnet-4`
+- `binding.mode.qa.color`: `orange`
+- `binding.mode.qa.globs`: `*Test*.swift, test_*.py`
+- `binding.mode.debug.description`: `Debug mode for stub stack`
+- `binding.mode.debug.model`: `sonnet-4`
+- `binding.mode.debug.color`: `red`
+- `binding.mode.debug.globs`: `*.swift, *.py`
+- `binding.mode.review.description`: `Review mode for stub stack`
+- `binding.mode.review.model`: `opus-4`
+- `binding.mode.review.color`: `purple`
+- `binding.mode.review.globs`: `*.swift, *.py`
+- `binding.mode.product.description`: `Product mode for stub stack`
+- `binding.mode.product.model`: `opus-4`
+- `binding.mode.product.color`: `teal`
+- `binding.mode.product.globs`: `*.product.md, *.md`
+- `binding.mode.integration.description`: `Integration mode for stub stack`
+- `binding.mode.integration.model`: `sonnet-4`
+- `binding.mode.integration.color`: `cyan`
+- `binding.mode.integration.globs`: `*.swift, *.py`
+- `binding.rule.base.stubapp.description`: `Stub base rule`
+- `binding.rule.base.stubapp.role_specialty`: `You are a stub specialist.`
+- `binding.rule.base.stubapp.conversation_language`: `Spanish`
+- `binding.rule.base.stubapp.engineering_domain_principle`: `Clean code principles.`
+- `binding.rule.base.stubapp.security_line`: `Follow OWASP guidelines.`
+- `binding.rule.base.stubapp.performance_line`: `Optimize for responsiveness.`
+- `binding.rule.base.stubapp.assumptions_domain`: `Stub domain assumptions.`
+- `binding.rule.base.stubapp.limitations_truthfulness_line`: `Do not hallucinate.`
+- `binding.rule.base.stubapp.platform_limitations`: `No platform limitations.`
+- `binding.rule.base.stubapp.styleguide_paths`: `docs/styleguide.md`
+- `binding.rule.output_contract.stubapp.environment`: `macOS 15, Xcode 16`
+- `binding.rule.output_contract.stubapp.documentation_tool`: `DocC`
+- `binding.rule.output_contract.stubapp.linter`: `SwiftLint with strict rules`
+- `binding.rule.output_contract.stubapp.testing`: `XCTest + swift-testing`
+- `binding.rule.output_contract.stubapp.profile`: `ios-swift`
