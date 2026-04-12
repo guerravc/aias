@@ -2,7 +2,7 @@
 
 ## 1. Identity
 
-**Command Type:** Type B — Procedural / Execution
+**Command Type:** Operative — Procedural / Execution
 
 You are validating the **alignment and completeness** of an implementation plan against the DoR/DoD from refinement.
 This command is responsible for analyzing plan artifacts in the task directory, verifying that the technical plan aligns with the DoR/DoD, identifying gaps across completeness dimensions, processing DoR/DoD amendment proposals from `/blueprint`, and reporting the verdict.
@@ -171,12 +171,12 @@ The output must be raw text that identifies gaps across completeness dimensions:
 - Specify what needs to be refined.
 
 **6. Classification Check:**
-- Verify that `classification` in `status.md` is set (`A`, `B`, or `C`). If `null` or missing, report as a gap.
+- Verify that `classification` in `status.md` is set (`minor`, `standard`, or `critical`). If `null` or missing, report as a gap.
 
 **7. Governance Gaps** (primary: `increments.plan.md`, `status.md`)**:**
-- Classification C without a `## Governance` section in `increments.plan.md` → flag as gap ("Type C requires at least one Approval gate").
+- Classification Critical without a `## Governance` section in `increments.plan.md` → flag as gap ("Critical requires at least one Approval gate").
 - `## Governance` section present with gate types outside the taxonomy (Confirmation, Decision, Feedback, Approval, Precondition) → flag as gap ("Unknown gate type").
-- Custom gates that contradict classification baseline (e.g., per-increment Approval gates in a Type A plan) → flag as gap ("Custom gates exceed classification baseline expectations").
+- Custom gates that contradict classification baseline (e.g., per-increment Approval gates in a Minor plan) → flag as gap ("Custom gates exceed classification baseline expectations").
 
 For each dimension:
 - If complete: State "No gaps identified" or "Complete".
