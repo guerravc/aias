@@ -278,8 +278,8 @@ def new_command(name: str) -> None:
         if not confirm(f"  Command '{name}' already exists. Overwrite?"):
             return
 
-    cmd_type = ask_choice("Command type:", ["Type A (chat-only)", "Type B (procedural, writes files)"])
-    type_label = "A" if "A" in cmd_type else "B"
+    cmd_type = ask_choice("Command type:", ["Advisory (chat-only)", "Operative (procedural, writes files)"])
+    type_label = "Advisory" if "Advisory" in cmd_type else "Operative"
 
     identity = ask("Identity (what does this command do?)")
     invocation = ask("Invocation example (e.g. /<name> --flag value)")
@@ -294,7 +294,7 @@ def new_command(name: str) -> None:
         # {name.replace('-', ' ').title()} — v1
 
         ## 1. Identity
-        **Command Type:** Type {type_label}
+        **Command Type:** {type_label}
         {identity}
 
         ## 2. Invocation / Usage
