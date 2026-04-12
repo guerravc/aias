@@ -396,7 +396,7 @@ When in doubt, ask: "Does this teach the agent how to operate with a specific ex
 
 ### System Skill Type
 
-The `rho-aias` skill is a **system skill** — it is referenced by every mode and every artifact-producing or artifact-consuming command. Unlike MCP skills (which interact with external APIs) or tool skills (which provide domain knowledge), a system skill defines the **shared protocol** that all other artifacts follow.
+The `rho-aias` skill is a **system skill** — it is referenced by every mode and every artifact-producing or artifact-consuming command. Unlike MCP skills (which interact with external APIs) or tool skills (which provide domain knowledge), a system skill defines the **shared skill protocol** that all other artifacts follow.
 
 System skills are characterized by:
 - **Universal reference** — every mode and command references them
