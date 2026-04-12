@@ -185,7 +185,7 @@ artifacts:
   analysis.product.md: created
 ```
 
-The `classification` field is `null` until `/blueprint` assigns it (`A`, `B`, or `C`). See SKILL.md for classification criteria.
+The `classification` field is `null` until `/blueprint` assigns it (`minor`, `standard`, or `critical`). See SKILL.md for classification criteria.
 The `refinement_validated` field is `null` initially; set to `true` by `/enrich` after successful publish, `false` if publish was skipped.
 
 ### Governance Resolution (for `/implement`)
@@ -198,8 +198,8 @@ When `/implement` loads artifacts, it resolves effective governance from two sou
 Resolution flowchart:
 - Custom gate at a trigger point → fire custom gate (takes precedence).
 - Else, classification baseline:
-  - **A/B:** Feedback after each increment.
-  - **C:** Approval before Increment 1; Feedback after each.
+  - **Minor/Standard:** Feedback after each increment.
+  - **Critical:** Approval before Increment 1; Feedback after each.
 - Else (legacy — no `classification`): Feedback after each increment.
 
 All interactive gates MUST use the `AskQuestion` tool as defined in `readme-commands.md` § Governance. See the same section for the canonical gate taxonomy, invocation protocol, and anti-bypass rules.
