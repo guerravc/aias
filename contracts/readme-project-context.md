@@ -101,7 +101,7 @@ This section is pre-filled and references the canonical artifact locations:
 ```markdown
 ## Rho AIAS Integration
 
-This project uses [Rho AIAS](https://github.com/org/rho-aias) for AI-assisted development.
+This project uses [Rho AIAS](https://github.com/rho-aias/aias) for AI-assisted development.
 
 - **Rules**: `aias-config/rules/` — Generated behavioral rules (always-apply and output contracts)
 - **Modes**: `aias-config/modes/` — Generated task-specific modes (planning, dev, QA, debug, review, product, integration)
