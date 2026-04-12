@@ -385,7 +385,7 @@ The `binding.rule.output_contract.<ws>.profile` binding in the stack profile ide
 - Behavioral constraints (belongs in `base.mdc`)
 - Mode-specific workflow (belongs in mode rules)
 - Command-specific behavior (belongs in command definitions)
-- Project context (belongs in `AGENTS.md`)
+- Project context (belongs in `AGENTS.md` / `RHOAIAS.md`)
 
 ---
 
