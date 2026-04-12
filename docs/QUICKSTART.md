@@ -101,6 +101,8 @@ Commands define **how to execute** and format output. They structure data from m
 - `/test` — Run project tests (use with `@tooling` or directly)
 - `/commit` — Stage and commit files
 - `/spm` — Manage Swift Package Manager dependencies
+- `/aias` — Framework management (health checks, configuration, scaffolding)
+- `/copyedit` — Technical writing review and refinement
 
 **Usage:**
 ```
@@ -134,7 +136,7 @@ CONTEXT: <background>        (problem description, current state, what was reque
 TASK: <instruction>          (what to do + optional command chaining)
 ```
 
-All fields except MODE and TASK are optional — use only what the task needs. When `TASK ID` is provided and `TASK DIR` is not, the task directory defaults to the task identifier. `TICKET` remains a legacy alias for compatibility.
+All fields except MODE and TASK are optional — use only what the task needs. When `TASK ID` is provided and `TASK DIR` is not, the task directory defaults to the task identifier. `DIR` is an allowed alias for `TASK DIR`. `TICKET` remains a legacy alias for `TASK ID` for compatibility.
 
 ### Fail-Fast Guardrails (Service-Dependent Steps)
 
