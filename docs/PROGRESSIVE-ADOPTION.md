@@ -13,7 +13,7 @@ This guide provides a structured path for adopting Rho AIAS incrementally. You d
 | Component | Items |
 |-----------|-------|
 | **Modes** | `@planning`, `@dev` |
-| **Commands** | `/blueprint`, `/implement`, `/commit` |
+| **Commands** | `/aias`, `/blueprint`, `/implement`, `/commit` |
 | **Providers** | None required |
 
 ### What you configure
