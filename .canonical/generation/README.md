@@ -45,7 +45,7 @@ Before any file is generated, the script runs 6 sequential validation gates that
 
 | Gate | Name | What it checks |
 |---|---|---|
-| **G0** | Infrastructure | Canonical sources (`base-rule.md`, `output-contract.md`) exist and contain a `` ```markdown `` code block. Fragment file exists. All 7 canonical mode templates exist. |
+| **G0** | Infrastructure | Canonical sources (`base-rule.md`, `output-contract.md`) exist and contain a `` ```markdown `` code block. Fragment file exists. All 9 canonical mode templates exist. |
 | **G1** | Profile Discovery | `stack-profile.md` exists at repo root. Profile is readable and parses into non-empty bindings. `generation.stack_id` is present and `generation.mode_output_dir` is set to `aias-config/modes`. |
 | **G2** | Mode Binding Completeness | For every profile × mode, the 4 frontmatter keys (`description`, `model`, `color`, `globs`) are present and non-empty. |
 | **G3** | Rule Binding Completeness | For every discovered workspace: all required base rule keys (9) and output contract keys (4) resolve (workspace → shared → platform fallback). `profile` binding is present. |
@@ -177,7 +177,7 @@ When onboarding a new repo:
 ### Modes
 - [x] Generated files include `GENERATED — DO NOT EDIT`.
 - [x] Frontmatter includes `description`, `alwaysApply`, `model`, `color`, `globs` (array YAML).
-- [x] All 7 mode files exist in `aias-config/modes/`.
+- [x] All 9 mode files exist in `aias-config/modes/`.
 - [x] Product modes include `SCOPE`.
 - [x] No generated mode includes `GENERATION NOTES`.
 
