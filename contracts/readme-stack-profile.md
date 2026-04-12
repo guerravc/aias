@@ -81,7 +81,7 @@ Each profile MUST define, at minimum:
 - **MCP capability declarations**
 - **Relevant globs for generated modes**
 - **Generation routing** (stack identity + output directory + tasks directory)
-- **Mode frontmatter bindings** (`description`, `model`, `color`, `globs`) for all 7 modes
+- **Mode frontmatter bindings** (`description`, `model`, `color`, `globs`) for all 9 modes
 
 ---
 
@@ -254,7 +254,7 @@ When modifying a stack profile contract or profile schema:
 
 A valid stack profile is:
 
-1. **Complete** — covers all variables needed by all 7 generated platform modes
+1. **Complete** — covers all variables needed by all 9 modes (7 core + 2 transversal)
 2. **Deterministic** — keys are unambiguous for generator/template consumption
 3. **Traceable** — key usage is documented (consumed vs reserved)
 4. **Extensible** — supports adding platforms without generator redesign
@@ -272,7 +272,7 @@ Before approving profile changes:
 3. Every key is consumed or reserved
 4. No platform hardcoding leaked into canonical templates
 5. Generated outputs remain contract-compliant and idempotent
-6. `Generation bindings` covers routing + all 7 mode frontmatter bindings
+6. `Generation bindings` covers routing + all 9 mode frontmatter bindings
 
 ---
 
@@ -281,7 +281,7 @@ Before approving profile changes:
 Use this checklist to validate that platform abstraction was implemented correctly end-to-end (not only profile syntax):
 
 - [ ] `stack-profile.md` exists at the repo root and complies with mandatory structure.
-- [ ] `aias/.canonical/` contains exactly 7 templates (`planning`, `dev`, `qa`, `debug`, `review`, `product`, `integration`).
+- [ ] `aias/.canonical/` contains exactly 9 templates (`planning`, `dev`, `qa`, `debug`, `review`, `product`, `integration`, `delivery`, `devops`).
 - [ ] Generator artifacts exist in `aias/.canonical/generation/` (`README.md` + generation mechanism).
 - [ ] Generated outputs exist in canonical directories and include `GENERATED — DO NOT EDIT`.
 - [ ] Generation is idempotent (second run produces no output diffs).
