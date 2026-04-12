@@ -129,6 +129,19 @@ The mapping MUST declare which commands write to which fields:
 
 Commands that only publish comments (e.g., `/brief`) are excluded from the field write preflight.
 
+### status.md Fields Relevant to Tracker Sync
+
+The following `status.md` fields are consumed by tracker sync operations (Phase 6). Implementors SHOULD map these fields to provider-specific equivalents where supported:
+
+| Field | Sync relevance | Typical mapping |
+|---|---|---|
+| `profile` | Determines workflow shape (feature, bugfix, enrichment, delivery) | Issue type or label |
+| `classification` | Plan governance level (minor, standard, critical) | Priority or custom field |
+| `current_step` | Active workflow step | Status or workflow transition |
+| `completed_steps` | Audit trail of completed steps | Comment or custom field |
+| `status` | Task lifecycle state (pending_dor, ready, in_progress, in_review, completed) | Workflow status mapping (see `readme-tracker-status-mapping.md`) |
+| `artifacts` | Sync state per artifact (created, modified, synced) | Attachment or linked page metadata |
+
 ---
 
 ## Format Rules for MCP Writes
