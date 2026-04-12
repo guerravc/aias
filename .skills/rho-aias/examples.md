@@ -388,12 +388,12 @@ artifacts:
   dod.plan.md: synced
 ```
 
-### After `/report` (Minor closure)
+### After `/brief` (Minor closure)
 
 ```yaml
 # status.md
 profile: enrichment
-classification: minor
+classification: null
 task_id: MAX-22222
 started: 2026-01-24
 status: completed
@@ -424,7 +424,7 @@ artifacts:
 ```yaml
 # status.md
 profile: delivery
-classification: standard
+classification: null
 task_id: MAX-33333
 started: 2026-01-25
 status: pending_dor
@@ -443,7 +443,7 @@ artifacts:
 ```yaml
 # status.md
 profile: delivery
-classification: standard
+classification: null
 task_id: MAX-33333
 started: 2026-01-25
 status: completed
