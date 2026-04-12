@@ -232,7 +232,7 @@ ASSESSMENT: feasibility.assessment.md
 TRACE: instrumentation.trace.md
 ```
 
-> This is a subset. See [QUICKSTART.md § Structured Prompt](QUICKSTART.md#structured-prompt-primary-workflow) for the complete field reference including PROFILE, PLAN, FIGMA, CONTEXT, and aliases (DIR, TICKET).
+> This is a subset. See [QUICKSTART.md § Structured Prompt](QUICKSTART.md#structured-prompt-primary-workflow) for the complete field reference including PROFILE, PLAN, FIGMA, CONTEXT, artifact reference fields (ISSUE, FIX, ASSESSMENT, TRACE), and aliases (DIR, TICKET).
 
 ### Flow
 
