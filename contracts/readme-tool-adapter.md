@@ -1,4 +1,7 @@
-# Tool Adapter Contract — Rho AIAS Configuration System
+# Tool Adapter Contract — Rho AIAS Configuration System (v1.0)
+
+> **Keyword convention**: This contract uses RFC-2119 keywords (MUST, MUST NOT, SHOULD, MAY).
+> See [readme-commands.md](readme-commands.md) § RFC-2119 Keyword Policy for definitions.
 
 This document defines the **canonical contract** for tool adapters (shortcut files) in the Rho AIAS configuration system.
 
@@ -231,7 +234,7 @@ Each tool reads `RHOAIAS.md` content directly via filesystem resolution — no L
 
 ## Naming Convention
 
-- The shortcut file must have the **same base name** as the canonical source
+- The shortcut file MUST have the **same base name** as the canonical source
 - Extension matches the tool's expectation (`.mdc` for Cursor, `.md` for all others)
 - For GitHub Copilot modes: `<name>.instructions.md` (tool requirement)
 - For GitHub Copilot commands: `<name>.md` in `.github/agents/`
