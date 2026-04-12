@@ -1,4 +1,4 @@
-# Artifact Contract — Cursor Configuration System (v2)
+# Artifact Contract — Cursor Configuration System (v2.0)
 
 > **Keyword convention**: This contract uses RFC-2119 keywords (MUST, MUST NOT, SHOULD, MAY).
 > See [readme-commands.md](readme-commands.md) § RFC-2119 Keyword Policy for definitions.
@@ -27,7 +27,7 @@ The **`rho-aias` skill** (`aias/.skills/rho-aias/`) is the single source of trut
 |------|-------|
 | Closed artifact catalog (types, suffixes, producers) | `SKILL.md` — ARTIFACT CATALOG |
 | Directory structure and discovery rules | `SKILL.md` — Discovery rules |
-| Loading protocol (7 phases) | `SKILL.md` — LOADING PROTOCOL |
+| Skill loading protocol (7 phases) | `SKILL.md` — LOADING PROTOCOL |
 | Plan Classification (Minor/Standard/Critical) | `SKILL.md` — CORE RULES |
 | Per-mode artifact requirements | `reference.md` — Per-Mode Artifact Requirements |
 | Loading order | `reference.md` — Loading Order |
@@ -175,7 +175,7 @@ An artifact implementation is contract-compliant if:
 
 ## References
 
-- `aias/.skills/rho-aias/SKILL.md` — Artifact catalog, loading protocol, classification, core rules
+- `aias/.skills/rho-aias/SKILL.md` — Artifact catalog, skill loading protocol, classification, core rules
 - `aias/.skills/rho-aias/reference.md` — Per-mode requirements, profiles, step definitions, status.md format
 - `aias/.skills/rho-aias/examples.md` — Directory states, status.md evolution examples
 - `aias/contracts/readme-tracker-status-mapping.md` — Canonical tracker status mapping contract
