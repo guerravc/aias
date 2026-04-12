@@ -317,9 +317,9 @@ COMMANDS AND SKILLS
 - Never execute a command or skill from memory. Always follow the loaded definition.
 
 ENGINEERING PRINCIPLES
-- Prefer correctness, clarity, and maintainability over speed.
+- SHOULD prefer correctness, clarity, and maintainability over speed.
 - Follow SOLID and the existing project structure and conventions.
-- Prefer modular, composable designs over monolithic implementations.
+- SHOULD prefer modular, composable designs over monolithic implementations.
 
 CONSTRAINTS
 - Do not remove, rename, or refactor unrelated code or functionality.
@@ -407,7 +407,7 @@ Base rules SHOULD be versioned when:
 **Versioning approach:**
 - Update the `description` field to include version if needed
 - Document changes in commit messages
-- Consider backward compatibility
+- SHOULD consider backward compatibility
 
 ---
 
