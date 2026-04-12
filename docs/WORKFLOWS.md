@@ -35,7 +35,7 @@ Key gates across the workflow:
 - `/report` — Evidence Sufficiency (when RCA fields lack supportable values), Tracker Publish (before publishing RCA)
 - Artifact-producing commands — Artifact Preview (before writing files to TASK_DIR)
 
-See `readme-commands.md` § Governance for the full gate taxonomy and invocation protocol.
+See `readme-commands.md` § Governance for the full gate taxonomy and gate invocation protocol.
 
 ### Two-message pattern (alternative)
 
@@ -54,7 +54,7 @@ Use this when you need maximum control over the reasoning step before committing
 flowchart TD
     Start["Task enters framework"]
 
-    Start --> Entry{"Feature, Bugfix,<br/>or Refactor?"}
+    Start --> Entry{"Feature, Bugfix,<br/>Refactor, Enrichment,<br/>or Delivery?"}
 
     Entry -->|Feature| Product["@product<br/>analysis"]
     Product --> Enrich["/enrich<br/>DoR + DoD + publish<br/>pending_dor → ready"]
@@ -86,6 +86,13 @@ flowchart TD
     Entry -->|Refactor| RefProduct["@product<br/>analysis"]
     RefProduct --> RefEnrich["/enrich<br/>DoR refactor template<br/>pending_dor → ready"]
     RefEnrich --> Planning
+
+    Entry -->|Enrichment| EnrichProduct["@product<br/>analysis"]
+    EnrichProduct --> EnrichOnly["/enrich<br/>DoR + DoD + publish<br/>pending_dor → ready"]
+    EnrichOnly --> EnrichDone["Task complete<br/>(no implementation)"]
+
+    Entry -->|Delivery| DeliveryMode["@delivery<br/>/charter"]
+    DeliveryMode --> DeliveryDone["Charter complete"]
 ```
 
 This map is intentionally high level. The detailed sections below define exact mode boundaries, command sequencing, optional branches, and expected outputs.
