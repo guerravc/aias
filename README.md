@@ -77,12 +77,14 @@ For the full walkthrough, see [docs/QUICKSTART.md](docs/QUICKSTART.md). For a gr
 
 | Tool | Rules | Modes | Commands | Skills | Context |
 |---|---|---|---|---|---|
-| **Cursor** | Full | Full | Full | Full | `AGENTS.md` → `RHOAIAS.md` |
-| **Claude Code** | Full | Partial (`paths:`) | — | Full | `CLAUDE.md` → `RHOAIAS.md` |
-| **Windsurf** | Partial | — | — | — | `AGENTS.md` → `RHOAIAS.md` |
-| **GitHub Copilot** | Full | Partial (`applyTo:`) | Full (agents) | — | `AGENTS.md` → `RHOAIAS.md` |
-| **Codex** | — | — | Full | Full | `codex.md` → `RHOAIAS.md` |
-| **Gemini** | — | — | — | — | `GEMINI.md` → `RHOAIAS.md` |
+| **Cursor** | Full (symlink) | Full (symlink, globs inherited) | Full (symlink) | Full (symlink) | Full (symlink → RHOAIAS.md) |
+| **Claude Code** | Full (enriched text) | Partial (enriched text, paths: scoping) | None | Full (symlink) | Full (symlink → RHOAIAS.md) |
+| **Windsurf** | Partial (enriched text, always-apply only) | None | None | None | Full (symlink → RHOAIAS.md) |
+| **GitHub Copilot** | Full (enriched text) | Partial (enriched text, applyTo: scoping) | Full (symlink) | None | Full (symlink → RHOAIAS.md) |
+| **Codex** | None | None | Full (symlink) | Full (symlink) | Full (symlink → RHOAIAS.md) |
+| **Gemini** | None | None | None | None | Full (symlink → RHOAIAS.md) |
+
+*This table is a fidelity summary only. For complete definitions, shortcut formats, and acceptance criteria, see the **Fidelity Summary** in [contracts/readme-tool-adapter.md](contracts/readme-tool-adapter.md).*
 
 Shortcuts are symlinks or enriched path references with zero content duplication — canonical sources live exclusively in `aias/`. Only tools listed in `binding.generation.tools` (stack profile) have shortcuts generated. See [contracts/readme-tool-adapter.md](contracts/readme-tool-adapter.md) for the full adapter contract.
 
