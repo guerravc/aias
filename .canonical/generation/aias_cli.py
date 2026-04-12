@@ -1014,6 +1014,32 @@ def cmd_health() -> None:
         else:
             results.append(("Shortcuts", "WARN", "; ".join(divergences)))
 
+    # 7b. Shortcut integrity (G6/G7 from generator)
+    if selected_tools and canonical_modes:
+        try:
+            gen_dir = str(CANONICAL_DIR / "generation")
+            if gen_dir not in sys.path:
+                sys.path.insert(0, gen_dir)
+            from generate_modes_and_rules import (
+                _gate_6_shortcut_consistency,
+                _gate_7_no_duplication,
+            )
+            mode_names = [p.stem for p in canonical_modes]
+            g6_errors = _gate_6_shortcut_consistency(mode_names, list(selected_tools))
+            g7_errors = _gate_7_no_duplication(list(selected_tools))
+            integrity_errors = g6_errors + g7_errors
+            if not integrity_errors:
+                results.append(("Shortcut integrity", "OK", "G6/G7 passed"))
+            else:
+                preview = "; ".join(integrity_errors[:3])
+                suffix = f" (+{len(integrity_errors) - 3} more)" if len(integrity_errors) > 3 else ""
+                results.append(("Shortcut integrity", "FAIL",
+                    f"{len(integrity_errors)} issue(s): {preview}{suffix}. Run 'aias generate --shortcuts' to fix"))
+        except ImportError:
+            results.append(("Shortcut integrity", "WARN", "Could not import generator module for G6/G7 checks"))
+    elif not selected_tools:
+        results.append(("Shortcut integrity", "WARN", "Cannot run G6/G7 (no binding.generation.tools)"))
+
     # 8. Context symlinks (scoped by tool selection)
     rhoaias_path = ROOT / "RHOAIAS.md"
     if not selected_tools:
