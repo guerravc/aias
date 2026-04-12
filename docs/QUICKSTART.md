@@ -50,6 +50,8 @@ Key changes in v7.6: `aias/` is now read-only. Generated rules/modes moved from 
 
 ## Core Concepts
 
+> **New to the framework?** You don't need to learn everything at once. See [Progressive Adoption](PROGRESSIVE-ADOPTION.md) for a 3-level path from minimal setup to full governance.
+
 ### Modes (How to Think)
 
 Modes define **how to think** about a task. They generate raw, unstructured data.
@@ -286,6 +288,8 @@ To create or regenerate workspace artifacts, use `aias init` or individual `aias
 ---
 
 ## Example: Your First Feature
+
+> This tutorial corresponds to **Level 1** of the [Progressive Adoption](PROGRESSIVE-ADOPTION.md) model — only `@planning`, `@dev`, `/blueprint`, `/implement`, and `/commit` are needed.
 
 **Step 1: Refine** (product analysis + DoR/DoD)
 ```
