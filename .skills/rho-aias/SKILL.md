@@ -1,13 +1,13 @@
 ---
 name: rho-aias
-description: Canonical protocol for artifact-driven development workflows. Use when the user works on a task that produces or consumes artifacts under <resolved_tasks_dir>/<TASK_ID>/ (default ~/.cursor/plans/) — including planning, implementation, enrichment, publishing, or any command that reads/writes task artifacts.
+description: Canonical skill protocol for artifact-driven development workflows. Use when the user works on a task that produces or consumes artifacts under <resolved_tasks_dir>/<TASK_ID>/ (default ~/.cursor/plans/) — including planning, implementation, enrichment, publishing, or any command that reads/writes task artifacts.
 ---
 
 # Agentic-Driven Development
 
 ## PURPOSE
 
-Teach the agent the canonical protocol for managing task artifacts across the full development lifecycle. This skill defines what artifacts exist, where they live, how they are discovered and loaded, and how the agent must track progress, sync to the resolved knowledge provider, and coordinate with the resolved tracker provider.
+Teach the agent the canonical skill protocol for managing task artifacts across the full development lifecycle. This skill defines what artifacts exist, where they live, how they are discovered and loaded, and how the agent must track progress, sync to the resolved knowledge provider, and coordinate with the resolved tracker provider.
 
 This is a **system skill** — it is referenced by every mode and every artifact-producing or artifact-consuming command. It provides the shared foundation that keeps all workflows consistent.
 
@@ -134,7 +134,7 @@ The `## Governance` section is an optional section inside `increments.plan.md` t
 
 ## LOADING PROTOCOL (Summary)
 
-Every command that interacts with artifacts MUST follow this 7-phase protocol:
+Every command that interacts with artifacts MUST follow this 7-phase skill protocol:
 
 ```
 Phase 0 — DIRECTORY RESOLUTION
