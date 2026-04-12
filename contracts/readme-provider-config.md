@@ -262,10 +262,10 @@ A service config is valid only if all rules below pass:
 
 `skill_binding.skill` is resolvable when at least one location exists:
 
-- `aias/.skills/<skill>/` (framework)
-- `aias-config/skills/<skill>/` (project)
-- `.cursor/skills/<skill>/`
-- `~/.cursor/skills/<skill>/`
+- `aias/.skills/<skill>/` (framework — canonical)
+- `aias-config/skills/<skill>/` (project — canonical)
+- `.cursor/skills/<skill>/` (Cursor-native project path)
+- `~/.cursor/skills/<skill>/` (Cursor-native personal path — not framework-canonical)
 
 If unresolved, consumers MUST abort the dependent operation and request provider configuration correction.
 
