@@ -352,10 +352,30 @@ When receiving corrections or feedback between or during increments:
 - Note the adjustment in the increment completion summary.
 
 **New scope** (work not covered by any existing increment):
-- Pause execution and present options:
-  - **(A) Inline now** — Execute immediately within the current increment. Use for small, self-contained additions that do not require formal planning.
-  - **(B) Defer** — Do not mutate other plan artifacts. Stop or pause execution and instruct the user to take the new scope back to planning (`/blueprint`, `/validate-plan`, or `/consolidate-plan`) so it can be captured outside `/implement`.
-- MUST wait for user choice before proceeding.
+- Pause execution and fire the New Scope gate.
+
+#### Gate: New Scope
+
+**Type:** Decision
+**Fires:** During feedback handling, when the user's feedback introduces work not covered by any existing increment.
+**Skippable:** No.
+
+**Context output:**
+Describe the new scope detected and explain why it falls outside the current plan.
+
+**AskQuestion:**
+- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
+- **Prompt:** "New scope detected outside current plan. How should this be handled?"
+- **Options:**
+  - `inline_now`: "Implement within current increment (small, self-contained additions only)"
+  - `defer`: "Log for separate task and return to planning"
+- **allow_multiple:** false
+
+**On response:**
+- `inline_now` → Execute immediately within the current increment. Use for small, self-contained additions that do not require formal planning.
+- `defer` → Do not mutate other plan artifacts. Stop or pause execution and instruct the user to take the new scope back to planning (`/blueprint`, `/validate-plan`, or `/consolidate-plan`) so it can be captured outside `/implement`.
+
+**Anti-bypass:** Inherits Gate Invocation Protocol. No additional rules.
 
 **Systemic feedback** (reveals a pattern that should persist beyond this plan):
 - Flag it: "This feedback may warrant a rule update — continuous-improvement will handle it."
