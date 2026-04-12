@@ -1,180 +1,180 @@
-# Adopción, feedback y cuantificación de la arquitectura agentic
+# Adoption, Feedback, and Quantification of the Agentic Architecture
 
-Guía estructurada para impulsar el uso de la arquitectura en la empresa, obtener feedback útil más allá de la experiencia propia y cuantificar su impacto de forma práctica.
-
----
-
-## 1. Cómo impulsar la adopción
-
-Objetivo: que más personas usen la arquitectura de forma real, no solo asistan a cursos.
-
-### 1.1 Piloto acotado
-
-- Elegir **un equipo o 2–3 personas** que se comprometan a usarla en un flujo real (un sprint, un epic).
-- Condición: feedback breve al final (qué costó, qué ayudó).
-- Genera casos concretos y evidencia para el resto de la organización.
-
-### 1.2 Reducir fricción al primer uso
-
-- Definir un **primer paso muy claro**: por ejemplo, “para tu próximo ticket: 1) abre un chat con @planning, 2) pega el ticket, 3) cuando tengas el plan, usa /blueprint”.
-- Ofrecer un **quickstart** o **ejemplo ya rellenado** (plan, brief, issue) que se pueda copiar.
-- Priorizar “siguiente paso concreto” sobre más teoría.
-
-### 1.3 Mostrar resultados con datos
-
-- Aunque sea de forma ligera: “en el piloto cerramos N tickets, M PRs, con Z iteraciones de review”.
-- O: “antes tardaba N días en tener un plan listo, ahora 1 sesión”.
-- Ayuda a vender la adopción y a que dirección vea mejora, no solo “otro curso”.
-
-### 1.4 Integrar en rituales existentes
-
-- En **refinement** o **planning**: que el DoR incluya “plan en .plan.md” o “brief con /brief”.
-- En **retro**: una pregunta tipo “¿usaste la arquitectura (modos/comandos) esta iteración?”.
-- Así la arquitectura forma parte del flujo oficial, no queda como algo opcional y aislado.
-
-### 1.5 Punto de contacto claro
-
-- Definir dónde resolver dudas o bloqueos: una persona (ej. tú) o un canal concreto.
-- Objetivo: que sea obvio a quién preguntar y que las respuestas lleguen rápido.
-- Si la gente no sabe por dónde empezar o se atasca sin respuesta, la adopción se frena.
+A structured guide for driving framework adoption in the organization, collecting useful feedback beyond personal experience, and quantifying its impact in a practical way.
 
 ---
 
-## 2. Cómo obtener feedback (más allá de tu experiencia)
+## 1. How to Drive Adoption
 
-Objetivo: que la mejora de la arquitectura se base en señal real de quienes la usan o la prueban.
+Goal: get more people using the architecture in real workflows, not just attending training sessions.
 
-### 2.1 Feedback estructurado después del piloto (o de cada curso práctico)
+### 1.1 Scoped Pilot
 
-- Formato corto: **3–5 preguntas**, por ejemplo:
-  - ¿Qué te costó más?
-  - ¿Qué quitarías o simplificarías?
-  - ¿Qué echaste en falta?
-  - Del 1 al 5, ¿lo usarías en tu próximo ticket?
-- Herramienta: formulario breve o doc compartido; no hace falta nada complejo.
-- Importante: **cerrar el ciclo** — comunicar “con tu feedback cambiamos X” en el siguiente curso o en un canal interno.
+- Choose **one team or 2–3 people** who commit to using the framework in a real flow (one sprint, one epic).
+- Condition: brief feedback at the end (what was hard, what helped).
+- Produces concrete cases and evidence for the rest of the organization.
 
-### 2.2 Office hours o “clínica de arquitectura”
+### 1.2 Reduce First-Use Friction
 
-- **Una hora fija** a la semana o quincenal donde quien use (o pruebe) la arquitectura pueda llevar un caso real.
-- Ejemplos: “no sé cómo encajar este ticket”, “el plan me quedó muy largo”, “no entiendo cuándo usar @dev vs @planning”.
-- Tú resuelves en vivo y **anotas** patrones: qué se repite, qué confunde, qué falta en documentación o en modos.
-- Es feedback muy valioso sin depender de que la gente escriba informes.
+- Define a **very clear first step**: e.g., "for your next ticket: 1) open a chat with @planning, 2) paste the ticket, 3) when you have the plan, use /blueprint".
+- Provide a **quickstart** or **pre-filled example** (plan, brief, issue) that can be copied.
+- Prioritize "concrete next step" over more theory.
 
-### 2.3 Observar uso real
+### 1.3 Show Results with Data
 
-- Cuando haya adopción (piloto u otros): acordar **revisar juntos 1–2 planes y 1–2 flujos** (plan → dev → PR).
-- No hace falta automatización: ver cómo lo usan y dónde se atascan ya da input para mejorar contratos, modos y comandos.
+- Even lightly: "in the pilot we closed N tickets, M PRs, with Z review iterations".
+- Or: "before it took N days to have a plan ready, now 1 session".
+- Helps sell adoption and lets leadership see improvement, not just "another course".
 
-### 2.4 Changelog “qué cambió por tu feedback”
+### 1.4 Integrate into Existing Rituals
 
-- Un doc o sección (ej. en la propuesta) tipo: “v3.1: simplificamos X porque en el piloto vimos que…”.
-- La gente ve que su feedback tiene impacto; tú mantienes un historial de por qué la arquitectura evoluciona.
-- Refuerza adopción y obliga a traducir feedback en cambios concretos.
+- In **refinement** or **planning**: include "plan in .plan.md" or "brief with /brief" in the DoR.
+- In **retro**: add a question like "did you use the architecture (modes/commands) this iteration?".
+- This way the architecture becomes part of the official flow, not something optional and isolated.
 
----
+### 1.5 Clear Point of Contact
 
-## 3. Cuantificación de la arquitectura (seis pilares)
-
-Marco para medir si la arquitectura aporta valor. Las métricas se pueden recoger de forma manual o ligera (p. ej. una vez por sprint o al cierre del piloto). Escala común: **1–10** por pilar (guía orientativa).
-
-### 3.1 Throughput útil (entrega de valor)
-
-**Qué mide:** cuánto trabajo “real” sale por unidad de tiempo.
-
-**Qué recoger:**
-- PRs mergeados por semana que cumplen DoD.
-- Tickets cerrados por semana (opcional: ponderar por tamaño — story points o T-shirt).
-- % de PRs revertidos o que generan hotfix (para no inflar con entregas de baja calidad).
-
-**Escala 1–10 (guía):**
-- 1–3: entregas esporádicas, sin ritmo.
-- 4–6: ritmo estable pero con atasques.
-- 7–10: cadencia consistente y predecible.
+- Define where to resolve questions or blockers: a person (e.g., you) or a specific channel.
+- Goal: make it obvious who to ask and ensure answers arrive quickly.
+- If people don't know where to start or get stuck without a response, adoption stalls.
 
 ---
 
-### 3.2 Lead time end-to-end (idea → producción)
+## 2. How to Collect Feedback (Beyond Your Own Experience)
 
-**Qué mide:** eficiencia del flujo completo, no solo “codificar rápido”.
+Goal: ensure architecture improvements are based on real signal from people who use or try it.
 
-**Qué recoger:**
-- Tiempo desde “ticket listo” hasta “deploy” (mediana o P80).
-- Opcional: desglose por etapas (plan → implementación → review → QA → release).
+### 2.1 Structured Feedback After the Pilot (or After Each Hands-On Session)
 
-**Escala 1–10 (guía):**
-- 1–3: plazos de semanas con mucha varianza.
-- 4–6: plazos de días/semana con varianza moderada.
-- 7–10: plazos en días con P80 bajo y estable.
+- Short format: **3–5 questions**, for example:
+  - What was hardest for you?
+  - What would you remove or simplify?
+  - What did you miss?
+  - On a scale of 1 to 5, would you use it on your next ticket?
+- Tool: a short form or shared doc; nothing complex needed.
+- Important: **close the loop** — communicate "based on your feedback we changed X" in the next session or on an internal channel.
 
----
+### 2.2 Office Hours or "Architecture Clinic"
 
-### 3.3 Calidad y retrabajo (defect escape rate)
+- **A fixed hour** weekly or biweekly where anyone using (or trying) the architecture can bring a real case.
+- Examples: "I don't know how to fit this ticket", "my plan got too long", "I don't understand when to use @dev vs @planning".
+- You solve it live and **note patterns**: what repeats, what confuses, what is missing in documentation or modes.
+- Highly valuable feedback without depending on people writing reports.
 
-**Qué mide:** si la arquitectura y el agente reducen bugs o solo los mueven de sitio.
+### 2.3 Observe Real Usage
 
-**Qué recoger:**
-- Bugs en producción por PR o por release.
-- % de PRs que requieren “follow-up fix” en los 7 días siguientes.
-- Reverts o hotfixes por mes.
+- Once there is adoption (pilot or otherwise): agree to **review together 1–2 plans and 1–2 flows** (plan → dev → PR).
+- No automation needed: seeing how people use it and where they get stuck already provides input for improving contracts, modes, and commands.
 
-**Escala 1–10 (guía):**
-- 1–3: muchos escapes y correcciones reactivas.
-- 4–6: calidad aceptable con picos.
-- 7–10: baja tasa de escapes, correcciones poco frecuentes.
+### 2.4 Changelog: "What Changed Because of Your Feedback"
 
----
-
-### 3.4 Coherencia de decisiones (consistencia / drift)
-
-**Qué mide:** si la arquitectura mantiene estándares o se va desdibujando con el tiempo.
-
-**Qué recoger:**
-- % de PRs que cumplen checklist arquitectónico (linters, convenciones, ADRs).
-- Cantidad de comentarios de “style/architecture” por PR (objetivo: que baje).
-- Violaciones detectadas por tooling (lint, análisis estático).
-
-**Escala 1–10 (guía):**
-- 1–3: cada PR se siente distinto.
-- 4–6: hay estándares pero se rompen a menudo.
-- 7–10: alta consistencia y pocos recordatorios manuales.
+- A doc or section (e.g., in the proposal) like: "v3.1: we simplified X because in the pilot we saw that…".
+- People see their feedback has impact; you maintain a history of why the architecture evolves.
+- Reinforces adoption and forces translating feedback into concrete changes.
 
 ---
 
-### 3.5 Autonomía real (carga human-in-the-loop)
+## 3. Quantification Framework (Six Pillars)
 
-**Qué mide:** cuánto depende del humano frente a cuánto se “auto-sirve” el flujo.
+A framework for measuring whether the architecture delivers value. Metrics can be collected manually or lightly (e.g., once per sprint or at pilot close). Common scale: **1–10** per pillar (guiding reference).
 
-**Qué recoger:**
-- Tiempo humano por PR (planificación + correcciones + guía).
-- Número de iteraciones de ida y vuelta con el agente por tarea.
-- % de tareas donde el flujo “plan → PR listo” se completa con pocas intervenciones (definir N, ej. ≤ 3).
+### 3.1 Useful Throughput (Value Delivery)
 
-**Escala 1–10 (guía):**
-- 1–3: el humano dicta todo.
-- 4–6: el agente avanza pero necesita mucha guía.
-- 7–10: el humano solo valida y decide.
+**What it measures:** how much "real" work ships per unit of time.
 
----
+**What to collect:**
+- PRs merged per week that meet DoD.
+- Tickets closed per week (optional: weight by size — story points or T-shirt).
+- % of PRs reverted or generating hotfixes (to avoid inflating with low-quality deliveries).
 
-### 3.6 Coste y eficiencia (cost efficiency)
-
-**Qué mide:** si la ganancia de velocidad compensa el coste (tiempo, herramientas, tokens si aplica).
-
-**Qué recoger:**
-- Coste por ticket o por PR (si se trackea).
-- Tiempo total de ejecución del agente por tarea (si está disponible).
-- Coste por “merge exitoso” (incluyendo intentos fallidos o reintentos), si aplica.
-
-**Escala 1–10 (guía):**
-- 1–3: caro y poco predecible.
-- 4–6: coste razonable con desperdicio.
-- 7–10: coste estable y desperdicio bajo.
+**Scale 1–10 (guide):**
+- 1–3: sporadic deliveries, no rhythm.
+- 4–6: stable rhythm but with bottlenecks.
+- 7–10: consistent and predictable cadence.
 
 ---
 
-## Uso recomendado del marco de cuantificación
+### 3.2 End-to-End Lead Time (Idea → Production)
 
-- **Piloto:** al cierre, rellenar los seis pilares con los datos que se tengan (aunque sea aproximado). Sirve para comunicar resultados y para decidir qué mejorar.
-- **Seguimiento:** cada sprint o cada 2–4 semanas, revisar al menos 2–3 pilares (p. ej. throughput, calidad, autonomía) para detectar tendencias sin sobrecarga.
-- **Retro y mejora:** usar los pilares como guía en la retro (“¿subimos o bajamos en coherencia? ¿en autonomía?”) y conectar con el changelog de feedback (sección 2.4).
+**What it measures:** efficiency of the complete flow, not just "coding fast".
+
+**What to collect:**
+- Time from "ticket ready" to "deploy" (median or P80).
+- Optional: breakdown by stage (plan → implementation → review → QA → release).
+
+**Scale 1–10 (guide):**
+- 1–3: multi-week timelines with high variance.
+- 4–6: days-to-week timelines with moderate variance.
+- 7–10: day-level timelines with low, stable P80.
+
+---
+
+### 3.3 Quality and Rework (Defect Escape Rate)
+
+**What it measures:** whether the architecture and agent reduce bugs or just move them around.
+
+**What to collect:**
+- Bugs in production per PR or per release.
+- % of PRs requiring a "follow-up fix" within 7 days.
+- Reverts or hotfixes per month.
+
+**Scale 1–10 (guide):**
+- 1–3: many escapes and reactive corrections.
+- 4–6: acceptable quality with spikes.
+- 7–10: low escape rate, infrequent corrections.
+
+---
+
+### 3.4 Decision Coherence (Consistency / Drift)
+
+**What it measures:** whether the architecture maintains standards or gradually erodes over time.
+
+**What to collect:**
+- % of PRs that pass the architectural checklist (linters, conventions, ADRs).
+- Number of "style/architecture" comments per PR (goal: trending down).
+- Violations detected by tooling (lint, static analysis).
+
+**Scale 1–10 (guide):**
+- 1–3: every PR feels different.
+- 4–6: standards exist but are frequently broken.
+- 7–10: high consistency and few manual reminders.
+
+---
+
+### 3.5 Real Autonomy (Human-in-the-Loop Load)
+
+**What it measures:** how much depends on the human vs. how much the flow "self-serves".
+
+**What to collect:**
+- Human time per PR (planning + corrections + guidance).
+- Number of back-and-forth iterations with the agent per task.
+- % of tasks where the "plan → PR ready" flow completes with few interventions (define N, e.g., ≤ 3).
+
+**Scale 1–10 (guide):**
+- 1–3: the human dictates everything.
+- 4–6: the agent progresses but needs heavy guidance.
+- 7–10: the human only validates and decides.
+
+---
+
+### 3.6 Cost and Efficiency (Cost Efficiency)
+
+**What it measures:** whether the speed gains compensate for the cost (time, tools, tokens if applicable).
+
+**What to collect:**
+- Cost per ticket or per PR (if tracked).
+- Total agent execution time per task (if available).
+- Cost per "successful merge" (including failed attempts or retries), if applicable.
+
+**Scale 1–10 (guide):**
+- 1–3: expensive and unpredictable.
+- 4–6: reasonable cost with waste.
+- 7–10: stable cost and low waste.
+
+---
+
+## Recommended Use of the Quantification Framework
+
+- **Pilot:** at close, fill in the six pillars with available data (even if approximate). Useful for communicating results and deciding what to improve.
+- **Tracking:** every sprint or every 2–4 weeks, review at least 2–3 pillars (e.g., throughput, quality, autonomy) to detect trends without overhead.
+- **Retro and improvement:** use the pillars as a guide in the retro ("did we go up or down in coherence? in autonomy?") and connect with the feedback changelog (section 2.4).
