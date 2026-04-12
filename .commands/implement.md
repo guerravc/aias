@@ -87,7 +87,7 @@ Follow the **rho-aias** skill loading protocol (Phases 0–3) to resolve TASK_DI
 ✓ Artifacts loaded from: <resolved_tasks_dir>/<TASK_ID>/
   Profile: <profile>
   Increments: <count>
-  Classification: <A|B|C|unset>
+  Classification: <minor|standard|critical|unset>
   Governance: <custom gates present | no custom gates | no governance section>
   Status: <status from status.md>
   Artifacts: <list of loaded artifacts>
