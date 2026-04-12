@@ -18,7 +18,7 @@ Invocation:
 
 Usage notes:
 - This command is intended to be used within `@dev` mode.
-- It requires plan artifacts in TASK_DIR (`technical.plan.md`, `increments.plan.md`, `dor.plan.md`, `dod.plan.md`, and `specs.design.md` when present). Optionally loads `analysis.product.md` for product context.
+- It requires plan artifacts in TASK_DIR (`technical.plan.md`, `increments.plan.md`, `dor.plan.md`, `dod.plan.md`, and `specs.design.md` when present). MAY load `analysis.product.md` for product context.
 - The command does NOT execute the entire plan autonomously. It executes **one increment at a time** and waits for user feedback before proceeding.
 - `increments.plan.md` is the only plan artifact this command may update. It MUST NOT modify validation todos in `technical.plan.md`.
 - **Review Resolution mode:** When the chat opening message contains a handoff snippet from `/self-review` (with findings such as blocking issues, major risks, or minor improvements), the command enters Review Resolution mode instead of plan-driven execution. See Phase 1-R in Section 6.
