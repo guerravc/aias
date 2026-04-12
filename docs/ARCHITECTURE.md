@@ -112,7 +112,7 @@ Contract: `aias/contracts/readme-skill.md`.
 
 ### Layer 6 — Contracts
 
-Contracts are the single source of truth for every artifact type in the framework. There are 13 contracts in `aias/contracts/`, each governing a specific artifact family:
+Contracts are the single source of truth for every artifact type in the framework. There are 14 contracts in `aias/contracts/`, each governing a specific artifact family:
 
 | Contract | Governs |
 |---|---|
@@ -129,6 +129,7 @@ Contracts are the single source of truth for every artifact type in the framewor
 | `readme-stack-profile.md` | Stack profiles (technology declarations and generation bindings) |
 | `readme-tool-adapter.md` | Tool adapter shortcuts (multi-tool portability) |
 | `readme-project-context.md` | Project context (RHOAIAS.md structure) |
+| `readme-versioning-policy.md` | Contract versioning (Major.Minor scheme, deprecation policy) |
 
 Key principle: **if there is a conflict between implementation and contract, the contract wins**. Contracts change through explicit review, not implementation drift. No mode, command, skill, or rule may introduce behavior that contradicts its governing contract.
 
@@ -225,8 +226,8 @@ TASK: Analyze the requirement. When done, /blueprint.
 Optional fields reference existing artifacts:
 
 ```
-ISSUE: analysis.issue.md
-FIX: proposed.fix.md
+ISSUE: report.issue.md
+FIX: analysis.fix.md
 ASSESSMENT: feasibility.assessment.md
 TRACE: instrumentation.trace.md
 ```
