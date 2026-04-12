@@ -26,6 +26,7 @@ Invocation:
 - `/guide status` — the 6 states of `status.md`, valid transitions, and lifecycle
 - `/guide artifacts` — closed catalog of 12 artifact types + `status.md`
 - `/guide classification` — Plan Classification (Minor/Standard/Critical) criteria, gates, and closure rules
+- `/guide context` — RHOAIAS.md freshness flow: detection, gates, health check, and refresh-context
 - `/guide aias` — overview of the `/aias` command and CLI for artifact creation and project setup
 
 Usage notes:
@@ -104,6 +105,10 @@ Tip: Run `/guide <profile>` for step-by-step instructions.
 
 ## Recommendations
 <2-3 practical tips specific to this profile>
+
+Note: `/blueprint` analyzes whether the task impacts RHOAIAS.md (project context).
+If impact is detected, `/commit` and `/pr` will remind you to update it.
+Run `/guide context` for the full freshness flow.
 ```
 
 ### Subcommand: `commands`
@@ -185,6 +190,41 @@ TASK: <what to do, commands to chain>
 
 ## Closure Rules
 <table: type | publication | approval | closure command>
+```
+
+### Subcommand: `context`
+
+```
+# RHOAIAS.md — Context Freshness
+
+## What is RHOAIAS.md?
+Single source of truth for project context. Created during `aias init`, symlinked by all tool-specific files.
+
+## Freshness Model (three layers)
+
+### Layer 1 — In-workflow (proactive)
+<table: command | action>
+  /blueprint  → Analyzes plan categories vs RHOAIAS.md sections → sets rhoaias_update in status.md
+  /commit     → If rhoaias_update: required → gate (stop/continue) → deferred if continue
+  /pr         → If required or deferred → gate (stop/continue) → skipped if continue
+
+### Layer 2 — Passive detection
+  /aias health → Reports staleness (age + commit count) and unfilled placeholders
+
+### Layer 3 — Manual catch-up
+  /aias refresh-context → Reads knowledge provider (or filesystem/git log), proposes section-level diffs
+
+## rhoaias_update field (status.md)
+<table from reference.md: state | set by | meaning>
+
+## When to update
+- New top-level modules or directories
+- New dependencies or framework upgrades
+- Architecture or convention changes
+- Build/CI pipeline changes
+
+## Tip
+Run `/aias refresh-context` after completing several tasks to catch accumulated drift.
 ```
 
 ---
