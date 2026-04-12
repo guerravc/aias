@@ -201,7 +201,7 @@ For tracker enrichment workflows such as `/enrich`:
 
 - Treat Jira field writes as a **remote representation**, not as the canonical local artifact.
 - `analysis.product.md` remains local and provider-agnostic; provider-specific headers such as `Enhanced by` MUST NOT be written back into local artifacts.
-- For `description`, `Acceptance Criteria`, and `Test Steps`, prefer `contentFormat: "markdown"` when the MCP/instance accepts it reliably.
+- For `description`, `Acceptance Criteria`, and `Test Steps`, SHOULD use `contentFormat: "markdown"` when the MCP/instance accepts it reliably.
 - If a textarea field rejects Markdown or renders the managed block incorrectly, fall back to explicit ADF for that field.
 - When updating enriched text fields, preserve human-authored content outside the Rho AIAS-managed block and replace only the managed block content.
 - `/enrich` MUST NOT write RCA fields or RCA narrative for bug workflows when dedicated RCA fields exist.
@@ -215,7 +215,7 @@ For validated bug RCA publication workflows such as `/report`:
 - If the tracker exposes structured RCA fields, write there first.
 - If equivalent structured RCA fields do not exist, fall back to one structured tracker comment.
 - For categorical RCA fields, use only tracker-supported option ids from runtime metadata.
-- For open-text RCA fields, prefer `contentFormat: "markdown"` when supported; fall back to ADF when required.
+- For open-text RCA fields, SHOULD use `contentFormat: "markdown"` when supported; fall back to ADF when required.
 - If tracker runtime metadata and the project mapping diverge, runtime metadata takes precedence for the remote write. The mapping must then be updated.
 - If evidence is insufficient for a target RCA field, do not invent a value. Defer to the command's evidence sufficiency gate.
 
