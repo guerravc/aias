@@ -92,7 +92,7 @@ Required binding groups:
 
 1. **Routing**
    - `binding.generation.stack_id`
-   - `binding.generation.mode_output_dir` — must be `aias-config/modes` (canonical-only generation target)
+   - `binding.generation.mode_output_dir` — **deprecated** (optional, ignored). Mode output directory is fixed at `aias-config/modes/`. If present with value `aias/.modes`, the generator emits a legacy error.
    - `binding.generation.tools` — comma-separated list of target tools for shortcut generation. Valid values: `cursor`, `claude`, `windsurf`, `copilot`, `codex`. Only tools listed here will have shortcuts generated.
    - `binding.generation.tasks_dir` — base directory for task artifact directories (`<tasks_dir>/<TASK_ID>/`). Must be an absolute path or `~/`-prefixed. Default: `~/.cursor/plans/`.
    - `binding.generation.canonical_mode_output_dir` — canonical flat output for modes (e.g., `aias-config/modes`)
@@ -125,7 +125,8 @@ Required binding groups:
    - `binding.mode.<mode>.model`
    - `binding.mode.<mode>.color`
    - `binding.mode.<mode>.globs`
-   - where `<mode>` is one of: `planning`, `dev`, `qa`, `debug`, `review`, `product`, `integration`
+   - where `<mode>` is one of: `planning`, `dev`, `qa`, `debug`, `review`, `product`, `integration`, `delivery`, `devops`
+   - `delivery` and `devops` bindings are **optional** — when absent, built-in defaults are used (see generator `TRANSVERSAL_MODE_DEFAULTS`). Override only when you need different model, color, or globs for these modes.
 
 `binding.mode.<mode>.globs` format rule:
 
@@ -281,7 +282,7 @@ Use this checklist to validate that platform abstraction was implemented correct
 - [ ] Generated outputs exist in canonical directories and include `GENERATED — DO NOT EDIT`.
 - [ ] Generation is idempotent (second run produces no output diffs).
 - [ ] Mode equivalence is guaranteed by design (canonical templates + stack profile capabilities).
-- [ ] Transversal modes (`delivery`, `devops`) are out-of-scope for template-based generation (they are copied verbatim to `.modes/` and included in shortcut distribution). The `continuous-improvement` rule follows the same copy pattern but targets `.rules/`.
+- [ ] All 9 modes (including `delivery`, `devops`) are template-based. Transversal modes use built-in defaults when stack-profile bindings are absent. The `continuous-improvement` rule is copied verbatim from `.canonical/` to `.rules/`.
 - [ ] No blocking feedback remains open in contracts, templates, or generation axes.
 
 ---
