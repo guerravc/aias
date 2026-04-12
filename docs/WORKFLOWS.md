@@ -28,7 +28,7 @@ Key gates across the workflow:
 - `/blueprint` — Comprehension (skippable with `--fast`), Preview (always fires)
 - `/validate-plan` — Amendment Approval (when DoR/DoD amendments proposed), Validation Result
 - `/consolidate-plan` — Update Approval (technical artifacts), Amendment Approval (DoR/DoD artifacts)
-- `/implement` — Ready, Pre-Implementation Approval (Type C), Inter-Increment Feedback
+- `/implement` — Ready, Pre-Implementation Approval (Critical), Inter-Increment Feedback
 - `/pr` — PR Confirmation (before creating/updating a PR)
 - `/publish` — Publish Confirmation (before publishing)
 - `/commit` — Branch Safeguard (when on main/master/develop)
@@ -733,7 +733,7 @@ Phase 5c behavior:
 
 **Exception:** DoR/DoD artifacts that were locally amended via the Amendment gate (in `/validate-plan` or `/consolidate-plan`) are excluded from Phase 5c until reconciled via `/publish`.
 
-**Classification role:** Plan Classification (A/B/C) is used **only for governance** (gates in `/implement`), not for publishing decisions.
+**Classification role:** Plan Classification (Minor/Standard/Critical) is used **only for governance** (gates in `/implement`), not for publishing decisions.
 
 **`/publish`** reconciles any remaining unpublished artifacts (including locally-amended DoR/DoD), generates Plan Delta, and marks the task as completed.
 
