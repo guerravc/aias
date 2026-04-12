@@ -2,7 +2,7 @@
 
 ## 1. Identity
 
-**Command Type:** Type A — Chat-Only
+**Command Type:** Advisory — Chat-Only
 
 You are generating an **operational guide** for the rho-aias development framework.
 This command reads from the `rho-aias` skill and presents workflow profiles, artifact catalogs, command mappings, status lifecycles, and Structured Prompt examples in an actionable format.
@@ -25,7 +25,7 @@ Invocation:
 - `/guide prompt` — Structured Prompt format with artifact reference fields and 3–4 practical examples
 - `/guide status` — the 6 states of `status.md`, valid transitions, and lifecycle
 - `/guide artifacts` — closed catalog of 12 artifact types + `status.md`
-- `/guide classification` — Plan Classification (A/B/C) criteria, gates, and closure rules
+- `/guide classification` — Plan Classification (Minor/Standard/Critical) criteria, gates, and closure rules
 - `/guide aias` — overview of the `/aias` command and CLI for artifact creation and project setup
 
 Usage notes:
@@ -68,7 +68,7 @@ Rules:
 - For `prompt`: show the Structured Prompt template (including artifact reference fields `ISSUE:`, `FIX:`, `ASSESSMENT:`, `TRACE:`) and 3–4 real-world examples covering different profiles.
 - For `status`: show the 6 states, the transition diagram, and which command triggers each transition.
 - For `artifacts`: show the closed catalog table (12 types) from `SKILL.md`.
-- For `classification`: show the Plan Classification criteria (A/B/C), assignment/escalation rules, and closure requirements from `SKILL.md`.
+- For `classification`: show the Plan Classification criteria (Minor/Standard/Critical), assignment/escalation rules, and closure requirements from `SKILL.md`.
 
 ---
 
@@ -173,7 +173,7 @@ TASK: <what to do, commands to chain>
 ### Subcommand: `classification`
 
 ```
-# Plan Classification (A / B / C)
+# Plan Classification (Minor / Standard / Critical)
 
 ## Criteria
 <table from SKILL.md: type | scope | examples>
@@ -181,7 +181,7 @@ TASK: <what to do, commands to chain>
 ## Assignment and Escalation
 - Assigned by: `/blueprint` in `status.md`
 - Validated by: `/validate-plan`
-- Escalated by: `/charter` (A→B, B→C — never downgrade)
+- Escalated by: `/charter` (minor→standard, standard→critical — never downgrade)
 
 ## Closure Rules
 <table: type | publication | approval | closure command>
