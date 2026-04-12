@@ -79,7 +79,7 @@ Characteristics:
 - May update `status.md` (state mutation)
 - May call external systems (tracker provider, knowledge provider, VCS provider)
 - May execute shell commands (git, xcodebuild, etc.)
-- Must be deterministic and sequential
+- MUST be deterministic and sequential
 
 Typical usage:
 - Message 1: Resolve intent and inputs (optional but recommended)
@@ -187,7 +187,7 @@ The separation enables a reliable **two-message workflow**:
 
 ## Canonical Command Definition Template
 
-All commands **must follow this structure and order**.
+All commands **MUST follow this structure and order**.
 The sections below are mandatory.
 
 Only the **Output Structure** section is expected to vary significantly between commands.
@@ -198,7 +198,7 @@ Only the **Output Structure** section is expected to vary significantly between 
 
 Describe **what this command is** and **what it is responsible for**.
 
-This section **must include** a formal declaration of the command category.
+This section **MUST include** a formal declaration of the command category.
 
 **Required subfield:**
 - `Command Type:` `Advisory` | `Operative`
@@ -221,7 +221,7 @@ May include:
 - Examples
 
 Notes:
-- Even if a command takes no arguments, this section must exist.
+- Even if a command takes no arguments, this section MUST exist.
 - This marks the command as **operational**, not conversational.
 
 ---
@@ -238,7 +238,7 @@ Examples:
 - File contents explicitly provided
 
 Rules:
-- Inputs must be explicit
+- Inputs MUST be explicit
 - No hidden assumptions
 - This section is **critical** for the two-message workflow
 
@@ -254,7 +254,7 @@ Decisions made here:
 - Whether text is allowed outside the block
 
 Rules:
-- This section must be **structurally identical** across all commands
+- This section MUST be **structurally identical** across all commands
 - Only the values change, not the shape
 - This is where consistency is enforced
 
@@ -296,7 +296,7 @@ Notes:
 
 ### 7. Non-Goals / Forbidden Actions
 
-Explicitly list actions the command **must not perform**.
+Explicitly list actions the command **MUST NOT perform**.
 
 Examples:
 - Do not write code
@@ -695,7 +695,7 @@ The `/pr` command includes a Plan Delta section comparing planned artifacts vs a
 
 ### Tracker Sync Convention
 
-Commands that trigger tracker transitions MUST declare the transition in their Output Contract (Section 4) under a "TRACKER SYNC (Phase 6)" subsection. Only four commands trigger transitions: `/enrich`, `/blueprint`, `/pr`, `/commit`. `/blueprint` has an additional bug exception variant that transitions `pending_dor` -> `in_progress` directly when DoR/DoD are generated via bug exception. Transitions must be expressed in canonical status form and resolved through `status_mapping_source` defined in `aias-config/providers/tracker-config.md`. See `aias/contracts/readme-tracker-status-mapping.md` for mapping rules.
+Commands that trigger tracker transitions MUST declare the transition in their Output Contract (Section 4) under a "TRACKER SYNC (Phase 6)" subsection. Only four commands trigger transitions: `/enrich`, `/blueprint`, `/pr`, `/commit`. `/blueprint` has an additional bug exception variant that transitions `pending_dor` -> `in_progress` directly when DoR/DoD are generated via bug exception. Transitions MUST be expressed in canonical status form and resolved through `status_mapping_source` defined in `aias-config/providers/tracker-config.md`. See `aias/contracts/readme-tracker-status-mapping.md` for mapping rules.
 
 ### Skills Reference Convention
 
@@ -745,11 +745,11 @@ Commands that predate this version continue to function. The Governance section 
 
 ## Consistency Rules
 
-- All commands must follow this template **in order**
-- Each command must declare its category in **Identity**
-- Output format decisions must be system-wide, not ad-hoc
-- When in doubt, prefer explicitness over brevity
+- All commands MUST follow this template **in order**
+- Each command MUST declare its category in **Identity**
+- Output format decisions MUST be system-wide, not ad-hoc
+- When in doubt, SHOULD prefer explicitness over brevity
 - Artifact-producing commands MUST follow the **rho-aias** skill loading protocol
-- Commands must declare their skill references in the Identity section
+- Commands MUST declare their skill references in the Identity section
 
 This document is the **source of truth** for command structure.
