@@ -6,13 +6,11 @@ Enable the `/commit` command to resolve the git repository from the **current wo
 
 ## Repository Resolution (Order)
 
-1. **Workspace (preferred)**  
-   - If the current context is a workspace with `folders` and at least one folder is the root of a git repository, use that path(s) as **commit root(s)**.  
+1. **Workspace**  
+   - The current context MUST be a workspace with `folders` where at least one folder is the root of a git repository.  
    - Single folder: that path becomes the `PROJECT_ROOT` for git.  
-   - Multiple folders: default to the **first folder** that is a git root; the workspace MAY indicate which folder to use via a setting (see below).
-
-2. **Fallback: projects.json**  
-   - If there is no workspace, or no workspace folder is a git root, or the user invokes `/commit <projectAlias>`, use `${HOME}/.cursor/projects.json`: resolve `basePath` + `projects.<alias>.repoDir` (or `defaults.project`) to obtain `PROJECT_ROOT`.
+   - Multiple folders: default to the **first folder** that is a git root; the workspace MAY indicate which folder to use via a setting (see below).  
+   - If no workspace folder is a git root, the command MUST STOP.
 
 ## .code-workspace Convention
 
@@ -52,6 +50,5 @@ Example (multi-root: config + app; commit only in app):
 
 ## Summary
 
-- **Agnostic commit:** resolution is **workspace-first** (.code-workspace folders that are git roots), with **fallback** to projects.json.  
-- **Workspace:** optionally use `cursor.commitRoot` to select a folder in multi-root setups; `cursor.projectType` MAY still be used for hints without `/commit` requiring it.  
-- **projects.json:** optional project catalog for tooling scripts; not required for `/commit` when using a workspace.
+- **Agnostic commit:** resolution uses `.code-workspace` folders that are git roots. No external config files are required.  
+- **Workspace:** optionally use `cursor.commitRoot` to select a folder in multi-root setups; `cursor.projectType` MAY still be used for hints without `/commit` requiring it.
