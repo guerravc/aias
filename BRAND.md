@@ -115,7 +115,7 @@ Rho AIAS communicates like a senior engineer explaining a system tested in real 
 **Style guardrails**
 - Avoid startup superlatives ("revolutionary," "game-changing") unless backed by evidence.
 - Avoid generic productivity language detached from architecture.
-- Prefer short, declarative statements that map directly to observable framework behavior.
+- SHOULD use short, declarative statements that map directly to observable framework behavior.
 
 If a statement cannot be tied to an implemented behavior in the system, rewrite it or remove it. Consistency of voice follows from consistency of truth.
 
