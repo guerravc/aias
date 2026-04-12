@@ -42,7 +42,7 @@ Each mode declares which artifacts it **requires** (must be present) and which a
 | `@integration` | `*.plan.md` | — |
 | `@devops` | — | `*.plan.md` |
 
-If a mode is activated and TASK_DIR is set, run Phases 0–3 of the loading protocol automatically. If TASK_DIR is not set, proceed normally without artifact context.
+If a mode is activated and TASK_DIR is set, run Phases 0–3 of the skill loading protocol automatically. If TASK_DIR is not set, proceed normally without artifact context.
 
 ---
 
@@ -405,7 +405,7 @@ TASK: /assessment
 └── delta.publish.md
 ```
 
-Provider-specific hierarchy derivation is owned by the resolved provider adapter (not by this protocol contract). Repeating hierarchy nodes and artifact pages MUST use provider-safe, scope-aware titles to avoid namespace collisions at the provider level (for example, task-scoped artifact titles prefixed with `<TASK_ID>`) — the exact format is defined by the resolved provider adapter.
+Provider-specific hierarchy derivation is owned by the resolved provider adapter (not by this skill protocol contract). Repeating hierarchy nodes and artifact pages MUST use provider-safe, scope-aware titles to avoid namespace collisions at the provider level (for example, task-scoped artifact titles prefixed with `<TASK_ID>`) — the exact format is defined by the resolved provider adapter.
 
 ### Progressive sync (Phase 5c) — Unconditional
 
