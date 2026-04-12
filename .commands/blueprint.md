@@ -120,6 +120,7 @@ Artifacts written to: <absolute_path_to_TASK_DIR>/
   [- specs.design.md]
   [- dor.plan.md (bug exception)]
   [- dod.plan.md (bug exception)]
+RHOAIAS.md impact: <detected (reason) | none | skipped (placeholders/missing)>
 ```
 
 ### TRACKER SYNC (Phase 6 — on start)
@@ -139,8 +140,36 @@ Artifacts written to: <absolute_path_to_TASK_DIR>/
 After writing artifacts:
 1. Update `status.md`: add each artifact to the `artifacts` map with status `created` (new) or `modified` (overwrite).
 2. **Assign Plan Classification**: set `classification` in `status.md` to `minor`, `standard`, or `critical` based on scope, impact, and complexity. See `SKILL.md` Plan Classification for criteria.
-3. Add `blueprint` to `completed_steps`, set `current_step` to `validate`.
-4. Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification. When the bug exception generated `dor.plan.md` and `dod.plan.md`, Phase 5c publishes them automatically alongside `technical.plan.md` and `increments.plan.md`.
+3. **RHOAIAS Impact Analysis**: evaluate whether the planned work will require a `RHOAIAS.md` update. See § RHOAIAS Impact Analysis below.
+4. Add `blueprint` to `completed_steps`, set `current_step` to `validate`.
+5. Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification. When the bug exception generated `dor.plan.md` and `dod.plan.md`, Phase 5c publishes them automatically alongside `technical.plan.md` and `increments.plan.md`.
+
+### RHOAIAS Impact Analysis
+
+After assigning classification, determine whether the task will affect `RHOAIAS.md` sections:
+
+1. If `RHOAIAS.md` does not exist in the project root → set `rhoaias_update: null` in `status.md`, skip analysis.
+2. If `RHOAIAS.md` contains unfilled placeholders (`< ... >` pattern from `aias init` / `new --context`) → fire **Gate: RHOAIAS Onboarding Incomplete**, then set `rhoaias_update: null`, skip impact analysis.
+3. Read `RHOAIAS.md` sections. Compare against the 7 categories collected during planning:
+   - **Project Structure** — does the plan create new top-level directories or modules not documented in `RHOAIAS.md`?
+   - **Key Technologies** — does the plan introduce new dependencies, frameworks, or language version changes?
+   - **Conventions** — does the plan change architecture patterns, DI approach, or testing strategy?
+   - **Build and Test** — does the plan add new test targets or modify build/CI configuration?
+4. If structural impact is detected in any section → set `rhoaias_update: required`.
+5. If no impact detected → set `rhoaias_update: null`.
+
+Report the result in the End-of-Response Confirmation.
+
+#### Gate: RHOAIAS Onboarding Incomplete
+
+**Type:** Advisory
+**Fires:** When `RHOAIAS.md` exists but contains unfilled placeholders.
+**Skippable:** Yes (informational only, does not block planning).
+
+**Context output:**
+"RHOAIAS.md contains unfilled placeholder sections from initial generation. Project context is incomplete — agent context quality will be degraded across all modes and commands. Use an agent conversation to fill `RHOAIAS.md` by reading the project's skills, contracts, and codebase structure."
+
+**No AskQuestion required** — this is an advisory message appended to the End-of-Response Confirmation. It does not block or require user input.
 
 Classification is used **only for governance** (gates in `/implement`), not for publishing decisions:
 - **Minor:** No additional governance gates in `/implement`.
