@@ -8,7 +8,7 @@ Rho AIAS is a contract-driven framework. Every artifact type — modes, commands
 
 Contracts are the canonical standards that govern every artifact type in Rho AIAS. They define structure, required fields, behavioral constraints, and quality criteria. If there is a conflict between an implementation and its governing contract, **the contract wins**.
 
-All contracts live in `aias/contracts/` (13 contracts):
+All contracts live in `aias/contracts/` (14 contracts):
 
 | Contract | Purpose |
 |---|---|
@@ -25,6 +25,7 @@ All contracts live in `aias/contracts/` (13 contracts):
 | `readme-stack-profile.md` | Stack profile structure and rule bindings |
 | `readme-tool-adapter.md` | Tool adapter shortcut format and fidelity matrix |
 | `readme-project-context.md` | Project context (`RHOAIAS.md`) single source of truth |
+| `readme-versioning-policy.md` | Contract versioning scheme, deprecation policy, version registry |
 
 Before creating or modifying any artifact, read the governing contract first.
 
@@ -35,9 +36,18 @@ Before creating or modifying any artifact, read the governing contract first.
 Release metadata is versioned documentation, not runtime agent context.
 
 - `aias/CHANGELOG.md` is the source of truth for the current framework version, versioning scheme, and release history.
-- `AGENTS.md` must not keep the detailed release history; it should only point to `aias/CHANGELOG.md`.
+- `AGENTS.md` MUST NOT keep the detailed release history; it SHOULD only point to `aias/CHANGELOG.md`.
 - When bumping the framework version, update `aias/CHANGELOG.md` first.
 - If a release changes architecture, workflows, or maintainer expectations, review references in `aias/README.md` and `aias/docs/ARCHITECTURE.md` as part of the same change.
+
+### Contract Versioning
+
+Individual contracts follow a **Major.Minor** versioning scheme independent of the framework version. See `aias/contracts/readme-versioning-policy.md` for:
+- When to bump contract versions (major vs minor)
+- Deprecation policy (minimum one major framework version coexistence)
+- Backward compatibility rules
+
+When modifying a contract, include the version bump in the same change. When submitting a PR that modifies a contract, reference it as: *"Complies with `readme-<name>.md` v<X.Y>"*.
 
 ---
 
@@ -178,7 +188,7 @@ When submitting a pull request:
 - **Reference the governing contract** in the PR description (e.g., "Complies with `readme-skill.md` v1.x").
 - **Include evidence of contract compliance** — quote the relevant contract sections or provide a compliance checklist.
 - **Verify idempotency** — run the generator before and after your changes; confirm zero diffs on the second run.
-- **If modifying a contract**, explain the downstream impact on existing artifacts (modes, commands, skills, rules, shortcuts) and confirm all affected artifacts have been updated.
+- **If modifying a contract**, explain the downstream impact on existing artifacts (modes, commands, skills, rules, shortcuts) and confirm all affected artifacts have been updated. Bump the contract version per `readme-versioning-policy.md`.
 
 ---
 
