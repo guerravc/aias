@@ -18,7 +18,7 @@ Invocation:
 Usage notes:
 - This command is intended to be used within `@delivery` mode.
 - It can work **with plans** (full charter: viability, effort, dependencies, timeline) or **without plans** (preliminary triage: rough scope, viability, key questions to resolve).
-- The output will be saved to a `.charter.md` file.
+- The output will be saved to a `delivery.charter.md` file.
 - The primary input is `@delivery`'s evaluation of plan artifacts, tracker tickets, or both.
 
 ---
