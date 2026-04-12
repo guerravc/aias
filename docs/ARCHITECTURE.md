@@ -27,7 +27,7 @@ Project context is the first layer because everything downstream depends on it. 
 Two files carry this responsibility:
 
 - **`AGENTS.md`** — The IDE-native context file (Cursor, Claude Code, Windsurf). Declares project structure, conventions, key technologies, and related documentation. Read automatically by the agent at session start.
-- **`RHOAIAS.md`** — The framework-specific project context file. Declares stack, repositories, plans base directory, service bindings, and team conventions. Consumed by the `rho-aias` system skill during the loading protocol.
+- **`RHOAIAS.md`** — The framework-specific project context file. Declares stack, repositories, plans base directory, service bindings, and team conventions. Consumed by the `rho-aias` system skill during the skill loading protocol.
 
 Release metadata is intentionally kept outside this layer: `aias/CHANGELOG.md` is the versioned source of truth for framework version and release history, while `AGENTS.md` remains focused on operational context for the agent.
 
@@ -41,7 +41,7 @@ Base rules define universal agent behavior: language of response, coding standar
 
 Base rules are split into two categories:
 
-- **Invariant sections** — Behavior that is identical across all workspaces (e.g., language constraints, artifact protocol references). Defined in the canonical source `aias/.canonical/base-rule.md`.
+- **Invariant sections** — Behavior that is identical across all workspaces (e.g., language constraints, artifact skill protocol references). Defined in the canonical source `aias/.canonical/base-rule.md`.
 - **Parametrizable sections** — Behavior that varies by stack profile (e.g., naming conventions, framework-specific patterns). Injected during generation from the stack profile bindings.
 
 The generated output lives at `aias-config/rules/base.mdc` in each workspace.
@@ -102,7 +102,7 @@ Two skill categories:
 
 - **MCP skills** — Wrap Model Context Protocol servers for external service interaction. Each skill is single-domain, stateless, and provider-specific. Current MCP skills: `atlassian-mcp`, `figma-mcp`, `github-mcp`, `xcode-mcp`.
 - **Non-MCP skills** — Encode reusable reasoning patterns without external service dependencies. Current non-MCP skills: `technical-writing` (6 writing patterns), `incremental-decomposition` (6 decomposition rules).
-- **System skill** — `rho-aias` is the framework's own skill. It defines the artifact catalog, loading protocol (7 phases), status lifecycle, workflow profiles, and sync behavior.
+- **System skill** — `rho-aias` is the framework's own skill. It defines the artifact catalog, skill loading protocol (7 phases), status lifecycle, workflow profiles, and sync behavior.
 
 Skills live in `aias/.skills/`. They are consumed by modes and commands but never invoked directly by the user.
 
@@ -232,6 +232,8 @@ ASSESSMENT: feasibility.assessment.md
 TRACE: instrumentation.trace.md
 ```
 
+> This is a subset. See [QUICKSTART.md § Structured Prompt](QUICKSTART.md#structured-prompt-primary-workflow) for the complete field reference including PROFILE, PLAN, FIGMA, CONTEXT, and aliases (DIR, TICKET).
+
 ### Flow
 
 ```
@@ -262,7 +264,7 @@ Since each mode operates in its own chat session, handoffs between modes happen 
 
 1. `@product` produces `analysis.product.md`, `dor.plan.md`, `dod.plan.md` via `/enrich`
 2. `@planning` produces `technical.plan.md`, `increments.plan.md` via `/blueprint` (consuming DoR/DoD from step 1)
-3. A new chat in `@dev` loads the plan artifact during the loading protocol
+3. A new chat in `@dev` loads the plan artifact during the skill loading protocol
 4. `@dev` executes `/implement` against the loaded plan
 5. A new chat in `@review` loads the implementation artifacts for `/self-review` or PR context for `/peer-review`
 6. If needed, `/handoff` can generate an operational snippet to open the next chat with explicit mode / command / constraints
