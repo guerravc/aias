@@ -71,7 +71,7 @@ python3 aias/.canonical/generation/aias_cli.py init
 
 `aias init` walks you through creating your project context (`RHOAIAS.md`), stack profile, service configuration, and editor shortcuts. From there, you can plan, implement, review, and ship — all through structured commands.
 
-For the full walkthrough, see [docs/QUICKSTART.md](docs/QUICKSTART.md).
+For the full walkthrough, see [docs/QUICKSTART.md](docs/QUICKSTART.md). For a gradual adoption path, see [docs/PROGRESSIVE-ADOPTION.md](docs/PROGRESSIVE-ADOPTION.md).
 
 ## Multi-Tool Portability
 
