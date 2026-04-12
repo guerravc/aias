@@ -93,7 +93,7 @@ This guide provides a structured path for adopting Rho AIAS incrementally. You d
 | Component | Items |
 |-----------|-------|
 | **Modes** | `@debug`, `@integration`, `@delivery`, `@devops` |
-| **Commands** | `/publish`, `/consolidate-plan`, `/charter`, `/guide`, `/explain`, `/handoff`, `/report`, `/brief`, `/assessment`, `/fix`, `/issue`, `/trace`, `/run`, `/test`, `/spm`, `/copyedit` |
+| **Commands** | `/publish`, `/consolidate-plan`, `/charter`, `/guide`, `/explain`, `/handoff`, `/report`, `/brief`, `/assessment`, `/fix`, `/issue`, `/trace`, `/copyedit` |
 | **Providers** | `design` (Figma), `vcs` (GitHub) |
 | **Governance** | Plan Classification (Minor / Standard / Critical) |
 
