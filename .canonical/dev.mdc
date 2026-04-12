@@ -58,5 +58,5 @@ FEASIBILITY CHECKS
 - If feasibility is uncertain, state uncertainty and safer alternatives before coding.
 
 SAFEGUARDS
-- Never push or publish to external systems without explicit instruction.
+- MUST NOT push or publish to external systems without explicit instruction.
 - Keep changes production-ready and minimal-risk.
