@@ -22,7 +22,7 @@ Full interactive onboarding in 6 steps:
 1. **Detection** — checks for existing `RHOAIAS.md`, `stack-profile.md`, `stack-fragment.md`
 2. **Context** — creates `RHOAIAS.md` (project name, platform, description, architecture, technologies)
 3. **Stack profile** — creates `stack-profile.md` (language, build system, UI framework, testing, target tools, tasks directory)
-4. **Stack fragment** — creates `stack-fragment.md` (build system integration type A/B/C)
+4. **Stack fragment** — creates `stack-fragment.md` (build system integration: automatic discovery, manual project file, or hybrid)
 5. **Context symlinks** — creates context symlinks → `RHOAIAS.md`, scoped by tool selection (`AGENTS.md` for cursor/windsurf/copilot, `CLAUDE.md` for claude, `codex.md` for codex)
 6. **Generation** — runs `generate --shortcuts`
 
