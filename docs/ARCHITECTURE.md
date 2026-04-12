@@ -375,19 +375,25 @@ Each contract typically contains:
 
 ### Contract Authority
 
-The authority chain is:
+```mermaid
+flowchart TD
+    Contract["Contract<br/><i>defines the standard</i><br/>aias/contracts/readme-*.md"]
 
-```
-Contract (defines the standard)
-    |
-    v
-Canonical source (implements the standard)
-    |
-    v
-Generated output (derived from canonical source)
-    |
-    v
-Tool shortcut (references generated output)
+    Contract -->|"governs"| Canonical
+
+    Canonical["Canonical Source<br/><i>implements the standard</i><br/>aias/.canonical/*.mdc, *.md"]
+
+    Canonical -->|"generates"| Output
+
+    Output["Generated Output<br/><i>derived from canonical source</i><br/>aias-config/modes/, aias-config/rules/"]
+
+    Output -->|"references"| Shortcut
+
+    Shortcut["Tool Shortcut<br/><i>symlink or enriched path</i><br/>.cursor/, .claude/, .agents/, .github/"]
+
+    Drift["Drift detected"] -.->|"correction flows<br/>upward to match<br/>the contract"| Contract
+
+    style Drift fill:#fee,stroke:#c33
 ```
 
 Changes flow top-down. A generated file never overrides its canonical source, and a canonical source never contradicts its contract. When drift is detected, the implementation is corrected to match the contract — not the other way around.
