@@ -1,4 +1,7 @@
-# Mode Rule Contract — Cursor Rules System
+# Mode Rule Contract — Cursor Rules System (v1.0)
+
+> **Keyword convention**: This contract uses RFC-2119 keywords (MUST, MUST NOT, SHOULD, MAY).
+> See [readme-commands.md](readme-commands.md) § RFC-2119 Keyword Policy for definitions.
 
 This document defines the **canonical contract** for mode rules (`.cursor/rules/*.mdc` files with `alwaysApply: false`) in the Cursor configuration system.
 
@@ -40,11 +43,11 @@ A **mode rule** is a Cursor rule file (`.mdc` format) that defines **task-specif
 
 ### Design Principles
 
-Mode rules should follow these design principles:
+Mode rules SHOULD follow these design principles:
 
 **Brevedad (Brevity)**
 - Target length: **30–80 lines** (excluding frontmatter)
-- Every line must add value
+- Every line MUST add value
 - Remove redundant or obvious statements
 - If a mode exceeds 80 lines, consider splitting it or moving detailed procedures to commands
 
@@ -58,7 +61,7 @@ Mode rules should follow these design principles:
 - Avoid details that change frequently (tool versions, specific APIs, implementation details)
 - Focus on principles that remain constant over time
 - Leave procedural details, templates, and specific workflows to commands
-- Mode rules should change rarely; commands can evolve more frequently
+- Mode rules SHOULD change rarely; commands can evolve more frequently
 
 **Separation of Concerns**
 - **Modes:** Define *how to think* and *what principles to apply*
@@ -123,7 +126,7 @@ Cursor supports three types of rules for mode rules (all use `alwaysApply: false
 **Description:** When Agent decides it's relevant based on description.
 
 **Use when:**
-- The rule should activate automatically when the context matches
+- The rule SHOULD activate automatically when the context matches
 - The description clearly indicates when the rule is relevant
 - You want Cursor to intelligently apply the rule based on conversation context
 
@@ -144,7 +147,7 @@ alwaysApply: false
 **Description:** When file matches a specified pattern.
 
 **Use when:**
-- The rule should only apply when working with specific file types or paths
+- The rule SHOULD only apply when working with specific file types or paths
 - You want file-type-specific behavior (e.g., different rules for `.swift` vs `.md` files)
 
 **Example:**
@@ -166,7 +169,7 @@ globs: ["**/*.swift"]
 
 **Use when:**
 - Creating mode rules that users explicitly activate
-- Defining workflows that should be invoked intentionally
+- Defining workflows that SHOULD be invoked intentionally
 - Most common type for mode rules
 
 **Example:**
@@ -183,7 +186,7 @@ alwaysApply: false
 
 ## Contract Structure for Mode Rules
 
-All mode rules **must follow this structure and order**.
+All mode rules **MUST follow this structure and order**.
 
 ### 1. Frontmatter (Required)
 
@@ -196,7 +199,7 @@ alwaysApply: false
 
 **Required fields:**
 - `description`: Clear description that helps Cursor understand when to apply (for intelligent application) or helps users understand the mode's purpose
-- `alwaysApply: false`: Must be explicitly set to `false` for mode rules
+- `alwaysApply: false`: MUST be explicitly set to `false` for mode rules
 
 **Optional fields:**
 - `globs`: Array of file patterns where this rule applies (for file-specific rules)
@@ -213,10 +216,10 @@ alwaysApply: false
 
 Define the AI's role when this mode is active.
 
-**Must include:**
+**MUST include:**
 - Primary role for this specific mode
 - Key focus areas or expertise for this task type
-- What perspective the AI should take
+- What perspective the AI SHOULD take
 
 **Example:**
 ```
@@ -230,7 +233,7 @@ Act as a senior iOS technical lead. Your job is to turn vague or incomplete requ
 
 Define what this mode does and does not do.
 
-**Must include:**
+**MUST include:**
 - What the mode is responsible for
 - Explicit "do not" statements for out-of-scope behavior
 - Boundaries and limitations
@@ -465,7 +468,7 @@ You are a helpful assistant.
 ROLE
 You are a senior iOS developer who can plan, code, debug, review, and test.
 ```
-**Problem:** Tries to cover too many tasks. Should be split into multiple focused modes.
+**Problem:** Tries to cover too many tasks. SHOULD be split into multiple focused modes.
 
 ### ❌ Missing Scope
 ```markdown
@@ -480,7 +483,7 @@ OUTPUT FORMAT
 1) Problem statement
 2) Solution
 ```
-**Problem:** The workspace's `output-contract.mdc` already defines output format. Modes should focus on behavior, not structure.
+**Problem:** The workspace's `output-contract.mdc` already defines output format. Modes SHOULD focus on behavior, not structure.
 
 ### ❌ Base Rule Content
 ```markdown
@@ -497,7 +500,7 @@ LANGUAGE
 **Note:** Mode rules always use `alwaysApply: false`. For `alwaysApply: true` rules, see `readme-base-rule.md`.
 
 ### Use Apply Intelligently (`alwaysApply: false` + descriptive `description`)
-- Rules that should activate automatically when context matches
+- Rules that SHOULD activate automatically when context matches
 - Domain-specific knowledge that's relevant in certain conversations
 - Best practices that apply situationally
 
@@ -516,7 +519,7 @@ LANGUAGE
 
 ## Versioning
 
-Mode rules should be versioned when:
+Mode rules SHOULD be versioned when:
 - Behavioral changes are made
 - Workflow steps change significantly
 - Scope or role definition changes
@@ -563,11 +566,11 @@ All modes that interact with task artifacts MUST include an ARTIFACT LOADING sec
 
 ### `globs` Frontmatter Convention
 
-Modes SHOULD declare relevant file globs in the `globs` frontmatter field. This enables Cursor to suggest the mode when the user opens matching files. Globs should include both artifact suffixes (e.g., `*.plan.md`, `*.issue.md`) and technology file extensions (e.g., `*.swift`, `*.kt`).
+Modes SHOULD declare relevant file globs in the `globs` frontmatter field. This enables Cursor to suggest the mode when the user opens matching files. Globs SHOULD include both artifact suffixes (e.g., `*.plan.md`, `*.issue.md`) and technology file extensions (e.g., `*.swift`, `*.kt`).
 
 ### Workflow Profile Awareness
 
-Modes that load artifacts should be aware of the current workflow profile (`feature`, `bugfix`, `refactor`, `enrichment`) to set appropriate expectations about which artifacts exist.
+Modes that load artifacts SHOULD be aware of the current workflow profile (`feature`, `bugfix`, `refactor`, `enrichment`) to set appropriate expectations about which artifacts exist.
 
 ---
 
