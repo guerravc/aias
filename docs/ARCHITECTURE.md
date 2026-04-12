@@ -305,7 +305,7 @@ The generation pipeline transforms canonical sources into workspace-specific mod
 
 ### Inputs
 
-- **Canonical sources** (`aias/.canonical/`): 7 mode templates (`.mdc`), 2 transversal modes, `base-rule.md`, `output-contract.md`
+- **Canonical sources** (`aias/.canonical/`): 7 mode templates (`.mdc`), 2 transversal modes, `base-rule.md`, `output-contract.md`, `continuous-improvement.mdc`
 - **Stack profile** (`stack-profile.md` at repo root): declares technology stack, capabilities, and generation bindings (`binding.rule.base.*`, `binding.rule.output_contract.*`, `binding.mode.*`)
 - **Stack fragment** (`stack-fragment.md` at repo root): build system integration content injected into the output contract rule
 
@@ -510,3 +510,5 @@ For the complete resilience model, including failure scenarios and recovery proc
 - [Service Abstraction](SERVICE-ABSTRACTION.md) — Service layer details and coverage
 - [Commit and Workspace](COMMIT-AND-WORKSPACE.md) — How `/commit` resolves the repository
 - [Adoption, Feedback, and Metrics](ADOPTION-FEEDBACK-AND-METRICS.md) — Quantification and feedback loops
+- [Progressive Adoption](PROGRESSIVE-ADOPTION.md) — Cognitive load reduction and gradual onboarding
+- [Retention Advisory](RETENTION-ADVISORY.md) — Artifact retention best practices for task directories
