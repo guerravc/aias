@@ -122,7 +122,7 @@ Artifacts written to: <absolute_path_to_TASK_DIR>/
   [- dod.plan.md (bug exception)]
 ```
 
-### TRACKER SYNC (Phase 0 — on start)
+### TRACKER SYNC (Phase 6 — on start)
 
 - When `task_id` in `status.md` is valid for the resolved tracker provider AND DoR/DoD are verified (exist or bug exception applies):
   1. Resolve tracker provider from `aias-config/providers/tracker-config.md`.
