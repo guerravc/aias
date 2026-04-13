@@ -106,6 +106,13 @@ Generate `delta.publish.md` comparing planned artifacts vs actual implementation
 - **Modified during implementation:** Increments that diverged from the plan.
 - **Unplanned additions:** Work done that was not in the original plan.
 - **Deferred or dropped:** Planned work not completed.
+- **RHOAIAS.md Context Sync:** Read `rhoaias_update` from `status.md` and include in the delta:
+  ```
+  ## RHOAIAS.md Context Sync
+  - Status: updated | deferred | skipped | not required
+  - Source: status.md field rhoaias_update
+  ```
+  Mapping: `done` → "updated", `deferred` → "deferred", `skipped` → "skipped", `null`/absent → "not required". This section enables `/aias refresh-context` to locate tasks that deferred or skipped context updates.
 
 Write `delta.publish.md` to TASK_DIR and publish it as a child artifact/page in the resolved knowledge provider.
 
@@ -187,6 +194,7 @@ Follow the **rho-aias** skill loading protocol to resolve TASK_DIR and load all 
 - All artifacts marked `synced`.
 - Add `closure` to `completed_steps`.
 - `status.md` set to `completed`.
+- Append entry to `command_log` per Command Log rules in `reference.md`.
 - No further Phase 5c sync needed (already done in Step 1).
 
 ### Phase 6 — Tracker Boundary (No Transition)
