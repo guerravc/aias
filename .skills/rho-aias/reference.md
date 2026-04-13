@@ -185,6 +185,10 @@ published: null
 completed: null
 artifacts:
   analysis.product.md: created
+command_log:
+  - command: /enrich
+    started_at: 2026-01-25T14:30:12Z
+    ended_at: 2026-01-25T14:35:47Z
 ```
 
 The `classification` field is `null` until `/blueprint` assigns it (`minor`, `standard`, or `critical`). See SKILL.md for classification criteria.
@@ -203,6 +207,35 @@ The `rhoaias_update` field tracks whether `RHOAIAS.md` needs updating for the cu
 | `skipped` | `/pr` gate | User consciously chose not to update |
 
 **Backward compatibility:** If the field is absent in an existing `status.md`, all commands MUST treat it as `null`. This field is not relevant to tracker sync and does not require an entry in `readme-tracker-field-mapping.md`.
+
+### Command Log (Execution Telemetry)
+
+The `command_log` field is an append-only list that records each command execution with timestamps:
+
+```yaml
+command_log:
+  - command: /enrich
+    started_at: 2026-01-25T14:30:12Z
+    ended_at: 2026-01-25T14:35:47Z
+  - command: /blueprint
+    started_at: 2026-01-25T15:00:03Z
+    ended_at: 2026-01-25T15:12:21Z
+```
+
+**Writing rules:**
+
+1. Every command that writes to `status.md` MUST append an entry to `command_log`.
+2. **Timestamp acquisition:** The agent MUST obtain timestamps via a system tool (`date -u +%Y-%m-%dT%H:%M:%SZ` or equivalent). If the environment does not permit shell access, use the date/time provided by the system context. MUST NOT invent or estimate timestamps — if a reliable timestamp cannot be obtained, write `started_at: null` and document the limitation.
+3. **Single-write mechanic:** At command start, the agent obtains and retains the UTC timestamp internally (`started_at`). When writing/updating `status.md` (Phase 0, FILE OUTPUT, or Phase 5 depending on the command), the agent obtains a second timestamp and writes the complete entry with both `started_at` (retained value) and `ended_at` (current timestamp). This is one physical write operation.
+4. **Format:** ISO 8601 UTC (`YYYY-MM-DDTHH:MM:SSZ`).
+5. **Without TASK_DIR:** When `/commit`, `/pr`, or `/trace` execute without a resolved `TASK_DIR` (vibe coding / chat-only mode), the `command_log` entry is omitted. Those requests remain "unattributed" in CSV cost correlation.
+6. **Re-execution:** Duplicate entries for the same command are expected when commands are re-executed (e.g., validate-consolidate-validate loops). Each execution appends independently.
+
+**Delineation with `completed_steps`:** `completed_steps` tracks workflow progression (which milestones are done). `command_log` tracks execution telemetry (when each command ran and how long it took). Both MUST be maintained independently — they serve different consumers (workflow engine vs cost attribution).
+
+**Backward compatibility:** If `command_log` is absent in an existing `status.md`, treat it as an empty list. Its absence does not impact any existing workflow logic.
+
+**Tracker mapping:** N/A — local-only field, not synced to any tracker provider.
 
 ### Governance Resolution (for `/implement`)
 
