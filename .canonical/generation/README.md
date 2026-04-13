@@ -46,7 +46,7 @@ Before any file is generated, the script runs 6 sequential validation gates that
 | Gate | Name | What it checks |
 |---|---|---|
 | **G0** | Infrastructure | Canonical sources (`base-rule.md`, `output-contract.md`) exist and contain a `` ```markdown `` code block. Fragment file exists. All 9 canonical mode templates exist. |
-| **G1** | Profile Discovery | `stack-profile.md` exists at repo root. Profile is readable and parses into non-empty bindings. `generation.stack_id` is present and `generation.mode_output_dir` is set to `aias-config/modes`. |
+| **G1** | Profile Discovery | `stack-profile.md` exists at repo root. Profile is readable and parses into non-empty bindings. `generation.stack_id` is present. `canonical_mode_output_dir` and `canonical_rule_output_dir` are present and set to `aias-config/modes` and `aias-config/rules` respectively. Deprecated `mode_output_dir` emits warning if present. |
 | **G2** | Mode Binding Completeness | For every profile × mode, the 4 frontmatter keys (`description`, `model`, `color`, `globs`) are present and non-empty. |
 | **G3** | Rule Binding Completeness | For every discovered workspace: all required base rule keys (10) and output contract keys (4) resolve (workspace → shared → platform fallback). `profile` binding is present. |
 | **G4** | Fragment Validation | `stack-fragment.md` exists at repo root, is non-empty, and contains at least one UPPERCASE section header. |
