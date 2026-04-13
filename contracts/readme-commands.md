@@ -108,7 +108,7 @@ Understanding when to use a mode rule vs a command is critical for maintaining a
 - Structured output generation (Advisory)
 
 ✅ **Procedural details:**
-- "Generate a brief with these exact sections: Problem, Approach, Risks, DoD"
+- "Analyze task completeness and generate artifacts with these exact sections"
 - "Format the output as rendered Markdown with this structure"
 - "Execute this script with these parameters"
 - "Stage files matching these patterns and commit with this message format"
@@ -137,7 +137,7 @@ The separation enables a reliable **two-message workflow**:
 - Mode focuses on principles and thinking, not structure
 
 **Message 2: Execution (Command)**
-- User invokes a command (e.g., `/brief`, `/report`, `/commit`)
+- User invokes a command (e.g., `/enrich`, `/report`, `/commit`)
 - Command structures the raw data from Message 1
 - Command applies templates, formats, and procedures
 
@@ -474,7 +474,7 @@ Every gate defined in a command MUST use this template structure:
 | **MAY** | Optional, at implementer's discretion | Permitted but not required behavior | Expected behavior (use SHOULD) |
 
 **Application scope:**
-- All 22 commands MUST use RFC-2119 keywords for enforcement language.
+- All 21 commands MUST use RFC-2119 keywords for enforcement language.
 - All 9 canonical modes MUST use RFC-2119 keywords to replace suggestive language ("prefer", "consider", "propose", "optionally"). Each replacement requires per-instance judgment — not mechanical substitution.
 
 #### Mode Enforcement Mapping
@@ -492,7 +492,7 @@ Suggestive language in canonical modes MUST be replaced with RFC-2119 keywords:
 
 ### Command Gate Requirements
 
-All 22 commands are categorized by implementation priority for gate standardization.
+All 21 commands are categorized by implementation priority for gate standardization.
 
 #### P0 — Core (deep redesign)
 
@@ -513,7 +513,7 @@ All 22 commands are categorized by implementation priority for gate standardizat
 | Command | Required Gates | Notes |
 |---|---|---|
 | `/commit` | Branch Safeguard (Confirmation) — migrate existing text-based warning on main/master/develop. Commit Plan Confirmation (Confirmation) — show files and messages before execution. | Existing text-based gate. |
-| `/enrich` | Classification Comprehension (Confirmation) when tracker signals conflict with user declaration or classification is ambiguous. Tracker Write (Confirmation) before remote enrichment write. | Existing text-based tracker write gate plus new classification gate. |
+| `/enrich` | Classification Comprehension (Confirmation) when tracker signals conflict with user declaration or classification is ambiguous. DoR Readiness Check (Confirmation) before writing DoR/DoD artifacts. | Existing text-based gates (classification + readiness). |
 | `/consolidate-plan` | Artifact Update (Confirmation) — migrate existing text-based update instruction. | Existing text-based gate. |
 | `/copyedit` | Target Confirmation (Confirmation) — migrate existing implicit path confirmation. | Implicit gate. |
 
@@ -522,13 +522,13 @@ All 22 commands are categorized by implementation priority for gate standardizat
 | Command | Required Gates | Notes |
 |---|---|---|
 | `/assessment` | Artifact Preview (Confirmation) before writing `feasibility.assessment.md`. | Coexists with END-OF-RESPONSE CONFIRMATION. |
-| `/brief` | Tracker Publish (Confirmation) when user requests publish to tracker. Chat-only output needs no gate. | Gate only on external write. |
+| `/enrich` | Brief Comment Preview (Confirmation) before posting enrichment brief to Jira. Tracker Write Preview (Confirmation, optional) only when user requests field write. | Gate on external writes (comment + optional fields). |
 | `/report` | Evidence Sufficiency (Confirmation) when RCA fields lack enough evidence for publish. Tracker Publish (Confirmation) when user requests publish to tracker. Chat-only output needs no gate. | External write with evidence gate before publish when needed. |
 | `/charter` | Artifact Preview (Confirmation) before writing `delivery.charter.md`. | Coexists with END-OF-RESPONSE CONFIRMATION. |
 | `/issue` | Artifact Preview (Confirmation) before writing `report.issue.md`. | Coexists with END-OF-RESPONSE CONFIRMATION. |
 | `/fix` | Artifact Preview (Confirmation) before writing `analysis.fix.md`. | Coexists with END-OF-RESPONSE CONFIRMATION. |
 | `/trace` | Artifact Preview (Confirmation) before writing `instrumentation.trace.md` (when TASK_DIR is set). | File write is conditional. |
-| `/validate-plan` | Governance validation gaps check. | No tracker transition (ownership moved to `/enrich`). |
+| `/validate-plan` | Governance validation gaps check. | No tracker transition. |
 
 #### Sweep-only — RFC-2119 language standardization (no new gates)
 
@@ -712,7 +712,7 @@ Commands that reference skills MUST declare them in the Identity section (Sectio
 ### Plan Classification
 
 `/blueprint` MUST assign a Plan Classification (`minor`, `standard`, or `critical`) in `status.md`. `/validate-plan` MUST verify the classification is present. `/charter` MAY escalate the classification (minor→standard, standard→critical) but MUST NOT downgrade it. Classification determines closure requirements:
-- **Minor:** `/report` or `/brief` to the resolved tracker provider
+- **Minor:** `/report` or `/publish` to the resolved tracker/knowledge provider
 - **Standard/Critical:** `/publish` to the resolved knowledge provider
 
 ### Structured Prompt — Artifact Reference Fields
