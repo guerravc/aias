@@ -24,7 +24,6 @@ For tracker transitions, the active provider must also expose a valid `status_ma
 | Surface | Category-driven resolution | Failure policy |
 |---|---|---|
 | `aias-config/providers/*.md` | yes | fail-fast contract sections |
-| `aias/.commands/brief.md` | yes | abort on missing/invalid tracker config |
 | `aias/.commands/report.md` | yes | abort on missing/invalid tracker config |
 | `aias/.commands/publish.md` | yes | abort on missing/invalid knowledge/tracker config |
 | `aias/.commands/pr.md` | yes | abort on missing/invalid vcs/tracker/knowledge config |
