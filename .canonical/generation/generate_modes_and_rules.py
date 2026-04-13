@@ -256,17 +256,31 @@ def _gate_1_profile_discovery(
                 f"      → Add: - `binding.generation.stack_id`: `<id>`"
             )
         if "generation.mode_output_dir" in bindings:
-            val = bindings["generation.mode_output_dir"].strip()
-            if val == "aias/.modes":
+            errors.append(
+                f"[G1] Deprecated binding.generation.mode_output_dir in {profile.relative_to(Paths.root)}\n"
+                f"      → Remove it and use binding.generation.canonical_mode_output_dir instead"
+            )
+        for _canon_key, _canon_expected, _canon_legacy in [
+            ("generation.canonical_mode_output_dir", "aias-config/modes", "aias/.modes"),
+            ("generation.canonical_rule_output_dir", "aias-config/rules", "aias/.rules"),
+        ]:
+            if _canon_key not in bindings:
                 errors.append(
-                    f"[G1] Legacy binding.generation.mode_output_dir = 'aias/.modes' in {profile.relative_to(Paths.root)}\n"
-                    f"      → Update to: `aias-config/modes` (aias/.modes is deprecated since v7.6)"
+                    f"[G1] Missing binding.{_canon_key} in {profile.relative_to(Paths.root)}\n"
+                    f"      → Add: - `binding.{_canon_key}`: `{_canon_expected}`"
                 )
-            elif val != "aias-config/modes":
-                errors.append(
-                    f"[G1] Invalid binding.generation.mode_output_dir in {profile.relative_to(Paths.root)}\n"
-                    f"      → Must be: `aias-config/modes` (fixed output directory)"
-                )
+            else:
+                _canon_val = bindings[_canon_key].strip()
+                if _canon_val == _canon_legacy:
+                    errors.append(
+                        f"[G1] Legacy binding.{_canon_key} = '{_canon_legacy}' in {profile.relative_to(Paths.root)}\n"
+                        f"      → Update to: `{_canon_expected}`"
+                    )
+                elif _canon_val != _canon_expected:
+                    errors.append(
+                        f"[G1] Invalid binding.{_canon_key} in {profile.relative_to(Paths.root)}\n"
+                        f"      → Must be: `{_canon_expected}`"
+                    )
         if "generation.tools" not in bindings:
             errors.append(
                 f"[G1] Missing binding.generation.tools in {profile.relative_to(Paths.root)}\n"
