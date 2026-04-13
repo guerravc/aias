@@ -17,7 +17,7 @@ Goal: get more people using the architecture in real workflows, not just attendi
 ### 1.2 Reduce First-Use Friction
 
 - Define a **very clear first step**: e.g., "for your next ticket: 1) open a chat with @planning, 2) paste the ticket, 3) when you have the plan, use /blueprint".
-- Provide a **quickstart** or **pre-filled example** (plan, brief, issue) that can be copied.
+- Provide a **quickstart** or **pre-filled example** (plan, enrichment, issue) that can be copied.
 - Prioritize "concrete next step" over more theory.
 
 ### 1.3 Show Results with Data
@@ -28,7 +28,7 @@ Goal: get more people using the architecture in real workflows, not just attendi
 
 ### 1.4 Integrate into Existing Rituals
 
-- In **refinement** or **planning**: include "plan in .plan.md" or "brief with /brief" in the DoR.
+- In **refinement** or **planning**: include "plan in .plan.md" or "enrich with /enrich" in the DoR.
 - In **retro**: add a question like "did you use the architecture (modes/commands) this iteration?".
 - This way the architecture becomes part of the official flow, not something optional and isolated.
 
