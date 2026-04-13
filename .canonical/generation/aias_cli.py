@@ -956,6 +956,9 @@ def cmd_health() -> None:
                         f"({commits_since} commits since)"))
             except Exception:
                 pass
+        results.append(("RHOAIAS.md context sync", "INFO",
+            "Run `/aias refresh-context` to check for pending "
+            "context updates from published deltas"))
     else:
         results.append(("RHOAIAS.md", "FAIL", "Not found"))
 
