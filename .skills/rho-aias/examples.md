@@ -33,6 +33,10 @@ artifacts:
   analysis.product.md: synced
   dor.plan.md: synced
   dod.plan.md: synced
+command_log:
+  - command: /enrich
+    started_at: 2026-01-20T14:30:00Z
+    ended_at: 2026-01-20T14:35:47Z
 ```
 
 ### After `/blueprint`
@@ -69,6 +73,13 @@ artifacts:
   technical.plan.md: synced
   increments.plan.md: synced
   specs.design.md: synced
+command_log:
+  - command: /enrich
+    started_at: 2026-01-20T14:30:00Z
+    ended_at: 2026-01-20T14:35:47Z
+  - command: /blueprint
+    started_at: 2026-01-20T15:00:03Z
+    ended_at: 2026-01-20T15:12:21Z
 ```
 
 ### After `/validate-plan` (passes)
@@ -93,6 +104,16 @@ artifacts:
   technical.plan.md: synced
   increments.plan.md: synced
   specs.design.md: synced
+command_log:
+  - command: /enrich
+    started_at: 2026-01-20T14:30:00Z
+    ended_at: 2026-01-20T14:35:47Z
+  - command: /blueprint
+    started_at: 2026-01-20T15:00:03Z
+    ended_at: 2026-01-20T15:12:21Z
+  - command: /validate-plan
+    started_at: 2026-01-20T15:15:00Z
+    ended_at: 2026-01-20T15:18:30Z
 ```
 
 ### After `/implement` (first increment)
@@ -117,6 +138,19 @@ artifacts:
   technical.plan.md: synced
   increments.plan.md: synced
   specs.design.md: synced
+command_log:
+  - command: /enrich
+    started_at: 2026-01-20T14:30:00Z
+    ended_at: 2026-01-20T14:35:47Z
+  - command: /blueprint
+    started_at: 2026-01-20T15:00:03Z
+    ended_at: 2026-01-20T15:12:21Z
+  - command: /validate-plan
+    started_at: 2026-01-20T15:15:00Z
+    ended_at: 2026-01-20T15:18:30Z
+  - command: /implement
+    started_at: 2026-01-20T16:00:00Z
+    ended_at: 2026-01-20T16:45:33Z
 ```
 
 ### After `/commit` + `/pr`
@@ -141,6 +175,25 @@ artifacts:
   technical.plan.md: synced
   increments.plan.md: synced
   specs.design.md: synced
+command_log:
+  - command: /enrich
+    started_at: 2026-01-20T14:30:00Z
+    ended_at: 2026-01-20T14:35:47Z
+  - command: /blueprint
+    started_at: 2026-01-20T15:00:03Z
+    ended_at: 2026-01-20T15:12:21Z
+  - command: /validate-plan
+    started_at: 2026-01-20T15:15:00Z
+    ended_at: 2026-01-20T15:18:30Z
+  - command: /implement
+    started_at: 2026-01-20T16:00:00Z
+    ended_at: 2026-01-20T16:45:33Z
+  - command: /commit
+    started_at: 2026-01-20T16:46:00Z
+    ended_at: 2026-01-20T16:47:12Z
+  - command: /pr
+    started_at: 2026-01-20T16:48:00Z
+    ended_at: 2026-01-20T16:52:15Z
 ```
 
 ### After `/publish` (Standard closure)
@@ -166,6 +219,28 @@ artifacts:
   increments.plan.md: synced
   specs.design.md: synced
   delta.publish.md: synced
+command_log:
+  - command: /enrich
+    started_at: 2026-01-20T14:30:00Z
+    ended_at: 2026-01-20T14:35:47Z
+  - command: /blueprint
+    started_at: 2026-01-20T15:00:03Z
+    ended_at: 2026-01-20T15:12:21Z
+  - command: /validate-plan
+    started_at: 2026-01-20T15:15:00Z
+    ended_at: 2026-01-20T15:18:30Z
+  - command: /implement
+    started_at: 2026-01-20T16:00:00Z
+    ended_at: 2026-01-20T16:45:33Z
+  - command: /commit
+    started_at: 2026-01-20T16:46:00Z
+    ended_at: 2026-01-20T16:47:12Z
+  - command: /pr
+    started_at: 2026-01-20T16:48:00Z
+    ended_at: 2026-01-20T16:52:15Z
+  - command: /publish
+    started_at: 2026-01-25T10:00:00Z
+    ended_at: 2026-01-25T10:05:30Z
 ```
 
 ---
@@ -195,6 +270,10 @@ published: null
 completed: null
 artifacts:
   report.issue.md: synced
+command_log:
+  - command: /issue
+    started_at: 2026-02-10T09:00:00Z
+    ended_at: 2026-02-10T09:08:45Z
 ```
 
 ### After `/fix` (Chat Debug)
@@ -222,6 +301,13 @@ completed: null
 artifacts:
   report.issue.md: synced
   analysis.fix.md: synced
+command_log:
+  - command: /issue
+    started_at: 2026-02-10T09:00:00Z
+    ended_at: 2026-02-10T09:08:45Z
+  - command: /fix
+    started_at: 2026-02-10T09:15:00Z
+    ended_at: 2026-02-10T09:28:30Z
 ```
 
 ### After `/assessment` (Chat Dev)
@@ -251,6 +337,16 @@ artifacts:
   report.issue.md: synced
   analysis.fix.md: synced
   feasibility.assessment.md: synced
+command_log:
+  - command: /issue
+    started_at: 2026-02-10T09:00:00Z
+    ended_at: 2026-02-10T09:08:45Z
+  - command: /fix
+    started_at: 2026-02-10T09:15:00Z
+    ended_at: 2026-02-10T09:28:30Z
+  - command: /assessment
+    started_at: 2026-02-10T09:30:00Z
+    ended_at: 2026-02-10T09:38:15Z
 ```
 
 ### After `/blueprint` (Chat Planning — bug exception)
@@ -289,6 +385,19 @@ artifacts:
   increments.plan.md: synced
   dor.plan.md: synced
   dod.plan.md: synced
+command_log:
+  - command: /issue
+    started_at: 2026-02-10T09:00:00Z
+    ended_at: 2026-02-10T09:08:45Z
+  - command: /fix
+    started_at: 2026-02-10T09:15:00Z
+    ended_at: 2026-02-10T09:28:30Z
+  - command: /assessment
+    started_at: 2026-02-10T09:30:00Z
+    ended_at: 2026-02-10T09:38:15Z
+  - command: /blueprint
+    started_at: 2026-02-10T10:00:00Z
+    ended_at: 2026-02-10T10:14:20Z
 ```
 
 ---
@@ -322,6 +431,10 @@ artifacts:
   analysis.product.md: synced
   dor.plan.md: synced
   dod.plan.md: synced
+command_log:
+  - command: /enrich
+    started_at: 2026-02-15T10:00:00Z
+    ended_at: 2026-02-15T10:06:22Z
 ```
 
 ### After `/blueprint`
@@ -356,6 +469,13 @@ artifacts:
   dod.plan.md: synced
   technical.plan.md: synced
   increments.plan.md: synced
+command_log:
+  - command: /enrich
+    started_at: 2026-02-15T10:00:00Z
+    ended_at: 2026-02-15T10:06:22Z
+  - command: /blueprint
+    started_at: 2026-02-15T10:30:00Z
+    ended_at: 2026-02-15T10:41:50Z
 ```
 
 ---
@@ -389,6 +509,10 @@ artifacts:
   analysis.product.md: synced
   dor.plan.md: synced
   dod.plan.md: synced
+command_log:
+  - command: /enrich
+    started_at: 2026-03-01T11:00:00Z
+    ended_at: 2026-03-01T11:07:18Z
 ```
 
 ### After `/brief` (Minor closure)
@@ -410,6 +534,13 @@ artifacts:
   analysis.product.md: synced
   dor.plan.md: synced
   dod.plan.md: synced
+command_log:
+  - command: /enrich
+    started_at: 2026-03-01T11:00:00Z
+    ended_at: 2026-03-01T11:07:18Z
+  - command: /brief
+    started_at: 2026-03-01T11:15:00Z
+    ended_at: 2026-03-01T11:17:45Z
 ```
 
 ---
@@ -439,6 +570,10 @@ published: null
 completed: null
 artifacts:
   delivery.charter.md: synced
+command_log:
+  - command: /charter
+    started_at: 2026-03-05T13:00:00Z
+    ended_at: 2026-03-05T13:09:40Z
 ```
 
 ### After `/publish` (Standard closure)
@@ -459,6 +594,13 @@ completed: 2026-01-25
 artifacts:
   delivery.charter.md: synced
   delta.publish.md: synced
+command_log:
+  - command: /charter
+    started_at: 2026-03-05T13:00:00Z
+    ended_at: 2026-03-05T13:09:40Z
+  - command: /publish
+    started_at: 2026-03-05T13:30:00Z
+    ended_at: 2026-03-05T13:35:12Z
 ```
 
 ---
