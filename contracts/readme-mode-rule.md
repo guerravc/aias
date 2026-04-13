@@ -108,9 +108,9 @@ Understanding when to use a mode rule vs a command is critical for maintaining a
 - "Consider technical and functional aspects"
 - "Question assumptions explicitly"
 
-**Command (`/brief`):**
-- "Generate a brief with these exact sections: Problem, Approach, Risks, DoD"
-- "Use this Markdown template"
+**Command (`/enrich`):**
+- "Analyze task completeness, generate artifacts, post enrichment brief"
+- "Use the output contract template"
 - "Structure the output as JSON for processing"
 
 This separation ensures modes remain **stable** (principles don't change) while commands can **evolve** (templates and procedures can improve).
@@ -274,7 +274,7 @@ Define the step-by-step process for this mode.
 
 **When to include:**
 - The mode needs a unique output structure not covered by the workspace contract
-- The mode generates structured data that will be consumed by commands (e.g., raw data for `/brief`, `/report`, `/pr`)
+- The mode generates structured data that will be consumed by commands (e.g., raw data for `/enrich`, `/report`, `/pr`)
 
 **When to omit:**
 - The workspace's `output-contract.mdc` already defines the output format (most common case)
@@ -427,7 +427,7 @@ WORKFLOW
 OUTPUT
 - Provide raw, unstructured information about the plan
 - Focus on collecting all relevant data points
-- Commands (e.g., `/brief`) will structure this information later
+- Commands (e.g., `/enrich`) will structure this information later
 ```
 
 ### Example 2: File-Specific Rule (Apply to Specific Files)
