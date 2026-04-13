@@ -57,7 +57,7 @@ flowchart TD
     Start --> Entry{"Feature, Bugfix,<br/>Refactor, Enrichment,<br/>or Delivery?"}
 
     Entry -->|Feature| Product["@product<br/>analysis"]
-    Product --> Enrich["/enrich<br/>DoR + DoD + publish<br/>pending_dor → ready"]
+    Product --> Enrich["/enrich<br/>DoR + DoD + brief comment + publish"]
     Enrich --> Planning["@planning<br/>/blueprint<br/>ready → in_progress"]
     Planning --> Validate["/validate-plan"]
     Validate --> Amendments{"DoR/DoD<br/>amendments?"}
@@ -84,11 +84,11 @@ flowchart TD
     BugBlueprint --> Validate
 
     Entry -->|Refactor| RefProduct["@product<br/>analysis"]
-    RefProduct --> RefEnrich["/enrich<br/>DoR refactor template<br/>pending_dor → ready"]
+    RefProduct --> RefEnrich["/enrich<br/>DoR refactor template + brief comment"]
     RefEnrich --> Planning
 
     Entry -->|Enrichment| EnrichProduct["@product<br/>analysis"]
-    EnrichProduct --> EnrichOnly["/enrich<br/>DoR + DoD + publish<br/>pending_dor → ready"]
+    EnrichProduct --> EnrichOnly["/enrich<br/>DoR + DoD + brief comment + publish"]
     EnrichOnly --> EnrichDone["Task complete<br/>(no implementation)"]
 
     Entry -->|Delivery| DeliveryMode["@delivery<br/>/charter"]
@@ -689,7 +689,7 @@ Four commands trigger canonical tracker operations. Transitions only fire when `
 
 | Command | Condition | Canonical transition |
 |---------|-----------|----------------------|
-| `/enrich` | Publish to Confluence + Jira successful | `pending_dor` → `ready` |
+| `/enrich` | Brief comment posted + Confluence publish successful | — (no tracker transition; `pending_dor → ready` is manual) |
 | `/blueprint` | Phase 0 starts with DoR/DoD valid (normal path) | `ready` → `in_progress` |
 | `/blueprint` (bug exception) | Phase 0 starts, DoR/DoD generated via bug exception | `pending_dor` → `in_progress` |
 | `/pr` | PR created successfully | `in_progress` → `in_review` |
@@ -830,7 +830,7 @@ For the complete artifact catalog (suffixes, producers, and descriptions), see `
 → `@delivery` + `/charter`
 
 **Need a feature brief?**
-→ `@planning` + `/blueprint` → `/brief`
+→ `@product` + `/enrich` (posts brief comment to Jira)
 
 **Need a bug fix report?**
 → `@debug` → `/report`
