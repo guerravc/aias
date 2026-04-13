@@ -90,7 +90,7 @@ Two command types:
 
 Commands are invoked within a mode context. The mode provides the reasoning; the command provides the structure. A command without a mode is syntax without semantics.
 
-The full command catalog lives in `aias/.commands/`. Current commands: `/aias`, `/assessment`, `/blueprint`, `/brief`, `/charter`, `/commit`, `/consolidate-plan`, `/copyedit`, `/enrich`, `/explain`, `/fix`, `/guide`, `/handoff`, `/implement`, `/issue`, `/peer-review`, `/pr`, `/publish`, `/report`, `/self-review`, `/trace`, `/validate-plan`.
+The full command catalog lives in `aias/.commands/`. Current commands: `/aias`, `/assessment`, `/blueprint`, `/charter`, `/commit`, `/consolidate-plan`, `/copyedit`, `/enrich`, `/explain`, `/fix`, `/guide`, `/handoff`, `/implement`, `/issue`, `/peer-review`, `/pr`, `/publish`, `/report`, `/self-review`, `/trace`, `/validate-plan`.
 
 Contract: `aias/contracts/readme-commands.md`.
 
@@ -424,7 +424,7 @@ Task artifacts go through a lifecycle tracked by `status.md` in the task directo
 | `completed` | All artifacts published | `/publish` completes |
 | `cancelled` | Task abandoned | Manual action only |
 
-Transitions are directional. The typical forward path is: `pending_dor` -> `ready` -> `in_progress` -> `in_review` -> `completed`. For the bugfix flow, `/blueprint` bug exception transitions `pending_dor` -> `in_progress` directly (skipping `ready`). The `cancelled` state is reachable from any state but only through manual intervention.
+Transitions are directional. The typical forward path is: `pending_dor` -> `ready` -> `in_progress` -> `in_review` -> `completed`. The `pending_dor → ready` transition is manual (team responsibility during refinement). For the bugfix flow, `/blueprint` bug exception transitions `pending_dor` -> `in_progress` directly (skipping `ready`). The `cancelled` state is reachable from any state but only through manual intervention.
 
 ### Artifact Sync States
 
@@ -450,7 +450,7 @@ Plans are classified at creation time by `/blueprint` based on complexity:
 | Standard | Medium, multi-increment | Plan + design |
 | Critical | Large, cross-system | Plan + design + charter |
 
-Classification can be escalated by `/charter` but never downgraded. It is used only for governance (gates in `/implement`), not for publishing decisions. When `refinement_validated: true` in `status.md` (set by `/enrich` after team refinement), classification-derived governance gates are relaxed.
+Classification can be escalated by `/charter` but never downgraded. It is used only for governance (gates in `/implement`), not for publishing decisions. When `refinement_validated: true` in `status.md` (set by `/enrich` when brief comment is posted and knowledge publish succeeds), classification-derived governance gates are relaxed.
 
 ---
 
