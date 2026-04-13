@@ -142,7 +142,7 @@ After writing artifacts:
 2. **Assign Plan Classification**: set `classification` in `status.md` to `minor`, `standard`, or `critical` based on scope, impact, and complexity. See `SKILL.md` Plan Classification for criteria.
 3. **RHOAIAS Impact Analysis**: evaluate whether the planned work will require a `RHOAIAS.md` update. See § RHOAIAS Impact Analysis below.
 4. Add `blueprint` to `completed_steps`, set `current_step` to `validate`.
-5. Append entry to `command_log` per Command Log rules in `reference.md`.
+5. Append to `command_log`: `{command: /blueprint, started_at: <UTC>, ended_at: <UTC>}` — obtain timestamps via `date -u +%Y-%m-%dT%H:%M:%SZ`. See `reference.md` § Command Log for full rules.
 6. Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification. When the bug exception generated `dor.plan.md` and `dod.plan.md`, Phase 5c publishes them automatically alongside `technical.plan.md` and `increments.plan.md`.
 
 ### RHOAIAS Impact Analysis
