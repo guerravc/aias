@@ -37,14 +37,13 @@ COMMANDS AND SKILLS
 - Never execute a command or skill from memory. Always follow the loaded definition.
 - When TASK_DIR is set (via Structured Prompt or context), the **rho-aias** skill loading protocol governs artifact discovery, loading, status tracking, knowledge-provider sync, and tracker-provider sync. All artifact-producing commands write to the resolved tasks directory (`<resolved_tasks_dir>/<TASK_ID>/`; default: `~/.cursor/plans/`).
 
-Command catalog (22 commands):
+Command catalog (21 commands):
 
 | Command | Type | Purpose |
 |---------|------|---------|
 | `/aias` | Operative | Framework management (health, configure-providers, scaffolding) |
 | `/assessment` | Operative | Evaluate fix feasibility — bridges `/fix` to `/blueprint` in bugfix flows |
 | `/blueprint` | Operative | Technical planning — produces plan artifacts and assigns classification |
-| `/brief` | Operative | Generate feature brief (lightweight closure) |
 | `/charter` | Operative | Structure delivery data into delivery charter |
 | `/commit` | Operative | Stage and commit files per project conventions |
 | `/consolidate-plan` | Operative | Resolve plan gaps one by one with approval gates |
