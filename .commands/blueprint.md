@@ -177,7 +177,7 @@ Classification is used **only for governance** (gates in `/implement`), not for 
 - **Standard:** MAY generate `## Governance` in `increments.plan.md` if risk warrants it.
 - **Critical:** MUST generate `## Governance` with at least one Approval gate.
 
-When `refinement_validated: true` in `status.md` (set by `/enrich` after team refinement), classification-derived governance gates are relaxed (e.g., Critical does not require Pre-Implementation Approval in `/implement` if team refinement already validated the scope).
+When `refinement_validated: true` in `status.md` (set by `/enrich` when brief comment is posted and knowledge publish succeeds — indicates team has context for refinement), classification-derived governance gates are relaxed (e.g., Critical does not require Pre-Implementation Approval in `/implement` if the team has enrichment context available).
 
 ---
 
@@ -204,9 +204,16 @@ Before collecting any data, verify DoR/DoD precondition and confirm understandin
 
 **Step 1 — DoR/DoD Precondition:**
 
-- If `dor.plan.md` AND `dod.plan.md` exist in TASK_DIR → consume as context, continue.
-- If they do NOT exist BUT `feasibility.assessment.md` exists → **bug exception**: generate DoR/DoD bugfix artifacts derived from `report.issue.md` + `analysis.fix.md` + `feasibility.assessment.md`, then continue.
-- If they do NOT exist AND no assessment exists → **STOP**: "DoR/DoD not found in TASK_DIR. Run `/enrich <TASK_ID>` to define scope and criteria before planning."
+1. If `dor.plan.md` AND `dod.plan.md` exist in TASK_DIR → consume as context, continue.
+2. If they do NOT exist locally → attempt knowledge provider fallback:
+   a. Resolve knowledge provider from `aias-config/providers/knowledge-config.md`. If not configured or resolution fails, fall through silently.
+   b. Navigate the Confluence hierarchy: `<TECH>/<YEAR>/<QUARTER>/<TASK_ID>/`.
+   c. Search descendants for pages titled `<TASK_ID>: dor.plan.md` and `<TASK_ID>: dod.plan.md`.
+   d. If BOTH found: read page content, write to TASK_DIR (create TASK_DIR if needed), set artifact sync status to `synced` in `status.md`, continue.
+   e. If only one found or none → fall through.
+   - This fallback only searches for `dor.plan.md` and `dod.plan.md` — it does not download other artifacts.
+3. If still not found BUT `feasibility.assessment.md` exists → **bug exception**: generate DoR/DoD bugfix artifacts derived from `report.issue.md` + `analysis.fix.md` + `feasibility.assessment.md`, then continue.
+4. If still not found AND no assessment exists → **STOP**: "DoR/DoD not found in TASK_DIR or knowledge provider. Run `/enrich <TASK_ID>` to define scope and criteria before planning."
 
 **Step 2 — DoR/DoD Context Loading:**
 
