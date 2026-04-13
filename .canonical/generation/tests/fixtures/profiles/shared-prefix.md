@@ -1,7 +1,8 @@
 # Shared Prefix Profile
 
 - `binding.generation.stack_id`: `shared-stack`
-- `binding.generation.mode_output_dir`: `aias-config/modes`
+- `binding.generation.canonical_mode_output_dir`: `aias-config/modes`
+- `binding.generation.canonical_rule_output_dir`: `aias-config/rules`
 - `binding.generation.tools`: `cursor`
 - `binding.generation.tasks_dir`: `~/.cursor/plans/`
 - `binding.mode.planning.description`: `Planning mode`
