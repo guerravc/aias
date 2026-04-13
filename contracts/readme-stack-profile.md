@@ -95,11 +95,11 @@ Required binding groups:
 
 1. **Routing**
    - `binding.generation.stack_id`
-   - `binding.generation.mode_output_dir` — **deprecated** (optional, ignored). Mode output directory is fixed at `aias-config/modes/`. If present with value `aias/.modes`, the generator emits a legacy error.
+   - `binding.generation.canonical_mode_output_dir` — **required**. Canonical flat output directory for generated modes. MUST be `aias-config/modes`. Validated by G1 preflight.
+   - `binding.generation.canonical_rule_output_dir` — **required**. Canonical flat output directory for generated rules. MUST be `aias-config/rules`. Validated by G1 preflight.
    - `binding.generation.tools` — comma-separated list of target tools for shortcut generation. Valid values: `cursor`, `claude`, `windsurf`, `copilot`, `codex`. Only tools listed here will have shortcuts generated.
    - `binding.generation.tasks_dir` — base directory for task artifact directories (`<tasks_dir>/<TASK_ID>/`). MUST be an absolute path or `~/`-prefixed. Default: `~/.cursor/plans/`.
-   - `binding.generation.canonical_mode_output_dir` — canonical flat output for modes (e.g., `aias-config/modes`)
-   - `binding.generation.canonical_rule_output_dir` — canonical flat output for rules (e.g., `aias-config/rules`)
+   - `binding.generation.mode_output_dir` — **deprecated** (scheduled for removal in next major version). Use `canonical_mode_output_dir` instead. If present, the generator emits a deprecation warning.
 2. **Shared template keys** (minimum)
    - `binding.platform_role_label`
    - `binding.language`
