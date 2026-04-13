@@ -143,7 +143,8 @@ TRACKER SYNC (Phase 6 — after PR creation):
   - If tracker config is missing, invalid, or unresolvable: abort tracker sync and request provider configuration.
   - Report transition result after the code block.
 
-STATUS UPDATE (Phase 5):
+STATUS UPDATE (Phase 5, when TASK_DIR is set):
+- Append entry to `command_log` per Command Log rules in `reference.md`.
 - Update `status.md`: set `status: in_review`, add `pr` to `completed_steps`, set `current_step` based on profile: if bugfix → `report`; otherwise → `closure`.
 - Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification (see **rho-aias** skill § Phase 5c).
 
