@@ -64,7 +64,7 @@ This guide provides a structured path for adopting Rho AIAS incrementally. You d
 
 - **Refinement workflow:** `/enrich` produces `analysis.product.md`, `dor.plan.md`, `dod.plan.md` — Definition of Ready and Done before planning.
 - **Plan validation:** `/validate-plan` audits your plan against DoR/DoD and flags gaps.
-- **Tracker sync:** Status transitions fire automatically (`pending_dor` → `ready` → `in_progress` → `in_review`).
+- **Tracker sync:** Status transitions fire automatically for planning and review phases (`ready` → `in_progress` → `in_review`). The `pending_dor → ready` transition is manual (team responsibility during refinement).
 - **Knowledge publishing:** Phase 5c publishes artifacts to Confluence after every command.
 - **Code review:** `/self-review` and `/peer-review` provide structured review analysis.
 - **Pull requests:** `/pr` creates PRs with plan delta sections.
@@ -93,7 +93,7 @@ This guide provides a structured path for adopting Rho AIAS incrementally. You d
 | Component | Items |
 |-----------|-------|
 | **Modes** | `@debug`, `@integration`, `@delivery`, `@devops` |
-| **Commands** | `/publish`, `/consolidate-plan`, `/charter`, `/guide`, `/explain`, `/handoff`, `/report`, `/brief`, `/assessment`, `/fix`, `/issue`, `/trace`, `/copyedit` |
+| **Commands** | `/publish`, `/consolidate-plan`, `/charter`, `/guide`, `/explain`, `/handoff`, `/report`, `/assessment`, `/fix`, `/issue`, `/trace`, `/copyedit` |
 | **Providers** | `design` (Figma), `vcs` (GitHub) |
 | **Governance** | Plan Classification (Minor / Standard / Critical) |
 
