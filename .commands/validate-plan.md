@@ -115,7 +115,7 @@ Present validation result in chat:
 **Anti-bypass:** Inherits Gate Invocation Protocol. No additional rules.
 
 STATUS UPDATE (Phase 5)
-- Append entry to `command_log` per Command Log rules in `reference.md`.
+- Append to `command_log`: `{command: /validate-plan, started_at: <UTC>, ended_at: <UTC>}` — obtain timestamps via `date -u +%Y-%m-%dT%H:%M:%SZ`. See `reference.md` § Command Log for full rules.
 - When plan passes and gate confirmed: update `status.md` — add `validate` to `completed_steps`, set `current_step` to `implement`. Do NOT modify the `status` field (it remains `in_progress` as set by `/blueprint`).
 - When amendments are applied locally: mark `dor.plan.md`/`dod.plan.md` as `modified` in `status.md` artifacts map.
 - When gaps exist: set `current_step` to `consolidate` and mark `technical.plan.md` as `modified` in `status.md` if validation todos were written or refreshed.
