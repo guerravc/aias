@@ -606,7 +606,8 @@ def new_stack_profile() -> None:
         < Add binding.* entries below. See aias/contracts/readme-stack-profile.md for required keys. >
 
         - `binding.generation.stack_id`: `< stack-id >`
-        - `binding.generation.mode_output_dir`: `aias-config/modes`
+        - `binding.generation.canonical_mode_output_dir`: `aias-config/modes`
+        - `binding.generation.canonical_rule_output_dir`: `aias-config/rules`
         - `binding.generation.tools`: `{tools_csv}`
         - `binding.generation.tasks_dir`: `{tasks_dir}`
 
@@ -1113,17 +1114,17 @@ def cmd_health() -> None:
     # 9b. Legacy provider location detection
     if LEGACY_PROVIDERS_DIR.is_dir():
         results.append(("Legacy providers", "WARN",
-            "Legacy provider location: aias-providers/. Run /aias health in AI assistant to migrate to aias-config/providers/"))
+            "Legacy provider location: aias-providers/. Run /aias health in AI assistant to migrate and clean up (coexistence period expired in v8.0)"))
 
     # 9c. Legacy generated rules/modes location detection
     legacy_rules = ROOT / "aias" / ".rules"
     legacy_modes = ROOT / "aias" / ".modes"
     if legacy_rules.is_dir() and list(legacy_rules.glob("*.mdc")):
         results.append(("Legacy rules", "WARN",
-            "Legacy generated rules in aias/.rules/. Run aias generate to regenerate in aias-config/rules/"))
+            "Legacy generated rules in aias/.rules/. Run /aias health in AI assistant to regenerate and clean up (coexistence period expired in v8.0)"))
     if legacy_modes.is_dir() and list(legacy_modes.glob("*.mdc")):
         results.append(("Legacy modes", "WARN",
-            "Legacy generated modes in aias/.modes/. Run aias generate to regenerate in aias-config/modes/"))
+            "Legacy generated modes in aias/.modes/. Run /aias health in AI assistant to regenerate and clean up (coexistence period expired in v8.0)"))
 
     # 9d. Legacy shortcut targets
     if selected_tools and "cursor" in selected_tools:
@@ -1136,6 +1137,20 @@ def cmd_health() -> None:
                         results.append(("Legacy shortcuts", "WARN",
                             "Shortcuts point to legacy location. Run aias generate --shortcuts to update"))
                         break
+
+    # 9e. Canonical output bindings
+    for _ck, _ce, _cl in [
+        ("binding.generation.canonical_mode_output_dir", "aias-config/modes", "aias/.modes"),
+        ("binding.generation.canonical_rule_output_dir", "aias-config/rules", "aias/.rules"),
+    ]:
+        _cv = _read_binding_from_profile(_ck)
+        if _cv and _cv in (_cl, _cl.rstrip("/")):
+            results.append(("Legacy canonical bindings", "WARN",
+                f"{_ck} points to legacy '{_cv}'. Expected: '{_ce}'"))
+    _dep_val = _read_binding_from_profile("binding.generation.mode_output_dir")
+    if _dep_val:
+        results.append(("Deprecated binding", "WARN",
+            "binding.generation.mode_output_dir is deprecated. Remove it and use canonical_mode_output_dir."))
 
     # 10. Provider referenced files (resource_files validation)
     CATEGORIES_WITH_RESOURCE_FILES = {"tracker", "knowledge"}
