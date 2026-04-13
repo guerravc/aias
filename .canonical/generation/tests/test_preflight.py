@@ -118,27 +118,79 @@ class TestGate1ProfileDiscovery(_PreflightTestBase):
         errors, _ = gen._gate_1_profile_discovery([p])
         self.assertTrue(any("[G1]" in e and "stack_id" in e for e in errors))
 
-    def test_legacy_mode_output_dir(self):
+    def test_deprecated_mode_output_dir(self):
         p = self.root / "stack-profile.md"
         content = p.read_text(encoding="utf-8")
-        content = content.replace(
-            "- `binding.generation.mode_output_dir`: `aias-config/modes`",
-            "- `binding.generation.mode_output_dir`: `aias/.modes`",
-        )
+        content += "\n- `binding.generation.mode_output_dir`: `aias-config/modes`\n"
         p.write_text(content, encoding="utf-8")
         errors, _ = gen._gate_1_profile_discovery([p])
-        self.assertTrue(any("[G1]" in e and "Legacy" in e for e in errors))
+        self.assertTrue(any("[G1]" in e and "Deprecated" in e for e in errors))
 
-    def test_invalid_mode_output_dir(self):
+    def test_legacy_canonical_mode_output_dir(self):
         p = self.root / "stack-profile.md"
         content = p.read_text(encoding="utf-8")
         content = content.replace(
-            "- `binding.generation.mode_output_dir`: `aias-config/modes`",
-            "- `binding.generation.mode_output_dir`: `invalid/path`",
+            "- `binding.generation.canonical_mode_output_dir`: `aias-config/modes`",
+            "- `binding.generation.canonical_mode_output_dir`: `aias/.modes`",
         )
         p.write_text(content, encoding="utf-8")
         errors, _ = gen._gate_1_profile_discovery([p])
-        self.assertTrue(any("[G1]" in e and "Invalid" in e for e in errors))
+        self.assertTrue(any("[G1]" in e and "Legacy" in e and "canonical_mode_output_dir" in e for e in errors))
+
+    def test_invalid_canonical_mode_output_dir(self):
+        p = self.root / "stack-profile.md"
+        content = p.read_text(encoding="utf-8")
+        content = content.replace(
+            "- `binding.generation.canonical_mode_output_dir`: `aias-config/modes`",
+            "- `binding.generation.canonical_mode_output_dir`: `invalid/path`",
+        )
+        p.write_text(content, encoding="utf-8")
+        errors, _ = gen._gate_1_profile_discovery([p])
+        self.assertTrue(any("[G1]" in e and "Invalid" in e and "canonical_mode_output_dir" in e for e in errors))
+
+    def test_missing_canonical_mode_output_dir(self):
+        p = self.root / "stack-profile.md"
+        content = p.read_text(encoding="utf-8")
+        content = "\n".join(
+            line for line in content.splitlines()
+            if "canonical_mode_output_dir" not in line
+        )
+        p.write_text(content, encoding="utf-8")
+        errors, _ = gen._gate_1_profile_discovery([p])
+        self.assertTrue(any("[G1]" in e and "Missing" in e and "canonical_mode_output_dir" in e for e in errors))
+
+    def test_legacy_canonical_rule_output_dir(self):
+        p = self.root / "stack-profile.md"
+        content = p.read_text(encoding="utf-8")
+        content = content.replace(
+            "- `binding.generation.canonical_rule_output_dir`: `aias-config/rules`",
+            "- `binding.generation.canonical_rule_output_dir`: `aias/.rules`",
+        )
+        p.write_text(content, encoding="utf-8")
+        errors, _ = gen._gate_1_profile_discovery([p])
+        self.assertTrue(any("[G1]" in e and "Legacy" in e and "canonical_rule_output_dir" in e for e in errors))
+
+    def test_invalid_canonical_rule_output_dir(self):
+        p = self.root / "stack-profile.md"
+        content = p.read_text(encoding="utf-8")
+        content = content.replace(
+            "- `binding.generation.canonical_rule_output_dir`: `aias-config/rules`",
+            "- `binding.generation.canonical_rule_output_dir`: `invalid/path`",
+        )
+        p.write_text(content, encoding="utf-8")
+        errors, _ = gen._gate_1_profile_discovery([p])
+        self.assertTrue(any("[G1]" in e and "Invalid" in e and "canonical_rule_output_dir" in e for e in errors))
+
+    def test_missing_canonical_rule_output_dir(self):
+        p = self.root / "stack-profile.md"
+        content = p.read_text(encoding="utf-8")
+        content = "\n".join(
+            line for line in content.splitlines()
+            if "canonical_rule_output_dir" not in line
+        )
+        p.write_text(content, encoding="utf-8")
+        errors, _ = gen._gate_1_profile_discovery([p])
+        self.assertTrue(any("[G1]" in e and "Missing" in e and "canonical_rule_output_dir" in e for e in errors))
 
     def test_missing_tools(self):
         p = self.root / "stack-profile.md"
