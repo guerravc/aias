@@ -193,7 +193,7 @@ Most Confluence and Jira tools accept a `contentFormat` or `responseContentForma
 - **Confluence** (`contentFormat`): `"markdown"` or `"adf"`. Default: ADF. Applies to: `createConfluencePage`, `updateConfluencePage`, `getConfluencePage`, `getPagesInConfluenceSpace`, `createConfluenceInlineComment`, `createConfluenceFooterComment`, `getConfluencePageInlineComments`, `getConfluencePageFooterComments`, `getConfluenceCommentChildren`.
 - **Jira** (`responseContentFormat`): `"markdown"` or `"adf"`. Default: ADF. Applies to: `getJiraIssue`, `createJiraIssue`, `editJiraIssue`, `searchJiraIssuesUsingJql`, `addCommentToJiraIssue`.
 
-For rho-aias publishing workflows, always use `contentFormat: "markdown"` when writing to Confluence (artifacts are Markdown files).
+For rho-aias publishing workflows, always use `contentFormat: "markdown"` when writing to Confluence (artifacts are Markdown files). The only exception is **TOC macro injection**: after each successful artifact publish, the agent reads the page in ADF (`contentFormat: "adf"`), inserts the TOC extension node if missing, and writes back in ADF. This post-publish step is the only case where `contentFormat: "adf"` is used in the publishing flow. See `confluence-config.md` § Table of Contents for the full algorithm.
 
 ### Jira Rich Text Policy for Rho AIAS
 
