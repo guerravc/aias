@@ -1,6 +1,6 @@
 ---
 name: technical-writing
-description: Standardize the quality of written content in technical artifacts (plans, issues, fixes, reports, charters, briefs, PRs, enriched tickets). Use when a command produces a prose artifact that benefits from consistent problem framing, acceptance criteria, root cause descriptions, risk articulation, or increment goal definitions.
+description: Standardize the quality of written content in technical artifacts (plans, issues, fixes, reports, charters, PRs, enriched tickets). Use when a command produces a prose artifact that benefits from consistent problem framing, acceptance criteria, root cause descriptions, risk articulation, or increment goal definitions.
 ---
 
 # Technical Writing
@@ -21,7 +21,7 @@ Use this skill when producing content for any of these patterns:
 - **Increment Goals** — Defining what "done" looks like for a plan increment
 - **Conciseness Rules** — Avoiding filler, redundancy, and vagueness
 
-Commands that reference this skill: `/blueprint`, `/issue`, `/fix`, `/report`, `/brief`, `/charter`, `/enrich`, `/pr`.
+Commands that reference this skill: `/blueprint`, `/issue`, `/fix`, `/report`, `/charter`, `/enrich`, `/pr`.
 
 ---
 
