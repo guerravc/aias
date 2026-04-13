@@ -112,6 +112,18 @@ The config MUST declare operational invariants as an explicit rules list. At min
 
 The config MUST include at least one concrete example showing the full hierarchy for a representative task.
 
+### Table of Contents (Optional)
+
+The publishing config MAY include a **Table of Contents** section. If present, the agent MUST inject a provider-native TOC element into every artifact page after each successful publish. The section MUST define:
+
+- The TOC element payload in the provider's native format (e.g., ADF extension node for Confluence).
+- An idempotent injection algorithm that checks for existing TOC before inserting.
+- The insertion point (e.g., after the first heading node).
+- A body-preservation constraint: the injection MUST NOT re-render, re-convert, or normalize existing page content — only the TOC element is added.
+- Graceful degradation rules: TOC injection failure MUST NOT block command execution or affect artifact sync status.
+
+If this section is absent, the agent MUST NOT inject any TOC element.
+
 ### Phase 5c Integration
 
 Publishing to the resolved knowledge provider is triggered by Phase 5c of the rho-aias skill loading protocol. Phase 5c is **unconditional** — it always publishes regardless of Plan Classification. Every artifact-producing command that writes to TASK_DIR MUST sync non-synced artifacts to the knowledge provider at Phase 5c. The publishing config defined in this contract governs how and where those artifacts are placed in the provider's hierarchy.
@@ -148,6 +160,7 @@ Error response MUST include:
 | Title convention handles collisions | ☐ |
 | Rules section declares all mandatory invariants | ☐ |
 | Example section present | ☐ |
+| Table of Contents section present (optional — if present, algorithm is idempotent and non-blocking) | ☐ |
 
 ---
 
