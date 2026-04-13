@@ -6,7 +6,7 @@
 # Jira Field Mapping — MAX Project (Story + Bug)
 
 Field mapping for the MAX project across the issue types currently used by rho-aias tracker workflows.
-Used by `/enrich`, `/report`, and `/brief` when pushing content to Jira.
+Used by `/enrich` and `/report` when pushing content to Jira.
 
 Important precedence rule:
 - **Runtime metadata first**: when Jira runtime metadata and this document diverge, the agent MUST use runtime metadata for remote writes.
@@ -16,7 +16,7 @@ Important precedence rule:
 
 ## 1. Story Issue Type (`issuetype.id: 10005`)
 
-Story mapping is used primarily by `/enrich` and `/brief`.
+Story mapping is used primarily by `/enrich`.
 
 ### Traceability: Product → Enrich → Jira Field
 
