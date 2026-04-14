@@ -522,7 +522,7 @@ All 21 commands are categorized by implementation priority for gate standardizat
 | Command | Required Gates | Notes |
 |---|---|---|
 | `/assessment` | Artifact Preview (Confirmation) before writing `feasibility.assessment.md`. | Coexists with END-OF-RESPONSE CONFIRMATION. |
-| `/enrich` | Brief Comment Preview (Confirmation) before posting enrichment brief to Jira. Tracker Write Preview (Confirmation, optional) only when user requests field write. | Gate on external writes (comment + optional fields). |
+| `/enrich` | Brief Comment Preview (Confirmation) only when `--brief` flag is present. Tracker Write Preview (Confirmation) only when `--fields` flag is present. Without flags, no external Jira writes occur and these gates do not fire. | Flag-driven external writes. Absence of flags is not a gate bypass — it is a branch not activated (does not violate AB-01). |
 | `/report` | Evidence Sufficiency (Confirmation) when RCA fields lack enough evidence for publish. Tracker Publish (Confirmation) when user requests publish to tracker. Chat-only output needs no gate. | External write with evidence gate before publish when needed. |
 | `/charter` | Artifact Preview (Confirmation) before writing `delivery.charter.md`. | Coexists with END-OF-RESPONSE CONFIRMATION. |
 | `/issue` | Artifact Preview (Confirmation) before writing `report.issue.md`. | Coexists with END-OF-RESPONSE CONFIRMATION. |
@@ -695,7 +695,7 @@ The `/pr` command includes a Plan Delta section comparing planned artifacts vs a
 
 ### Tracker Sync Convention
 
-Commands that trigger tracker transitions MUST declare the transition in their Output Contract (Section 4) under a "TRACKER SYNC (Phase 6)" subsection. Only four commands trigger transitions: `/enrich`, `/blueprint`, `/pr`, `/commit`. `/blueprint` has an additional bug exception variant that transitions `pending_dor` -> `in_progress` directly when DoR/DoD are generated via bug exception. Transitions MUST be expressed in canonical status form and resolved through `status_mapping_source` defined in `aias-config/providers/tracker-config.md`. See `aias/contracts/readme-tracker-status-mapping.md` for mapping rules.
+Commands that trigger tracker transitions MUST declare the transition in their Output Contract (Section 4) under a "TRACKER SYNC (Phase 6)" subsection. Only three commands trigger transitions: `/blueprint`, `/pr`, `/commit`. `/blueprint` has an additional bug exception variant that transitions `pending_dor` -> `in_progress` directly when DoR/DoD are generated via bug exception. Transitions MUST be expressed in canonical status form and resolved through `status_mapping_source` defined in `aias-config/providers/tracker-config.md`. See `aias/contracts/readme-tracker-status-mapping.md` for mapping rules.
 
 ### Skills Reference Convention
 
