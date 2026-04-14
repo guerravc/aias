@@ -123,7 +123,7 @@ The mapping MUST declare which commands write to which fields:
 | `/enrich` | Writes to description, acceptance criteria, test steps, priority, components | Yes — Field Write Plan (Phase 3b) |
 | `/report` | Writes to RCA fields (categorical + open-text) with comment fallback | Yes — SERVICE RESOLUTION + Gate: Tracker Publish |
 
-Commands that only publish comments (e.g., `/enrich` brief comment) are excluded from the field write preflight. `/enrich` field writes are optional and follow the preflight when explicitly requested.
+Commands that only publish comments (e.g., `/enrich --brief` posts a brief comment) are excluded from the field write preflight. `/enrich` field writes are activated by the `--fields` flag and follow the preflight when present.
 
 ### status.md Fields Relevant to Tracker Sync
 
@@ -139,7 +139,7 @@ The following `status.md` fields are consumed by tracker sync operations (Phase 
 | `tracker_status` | N/A — local-only field | Cached provider label mirrored from tracker reads; derived from remote, not a push source |
 | `completed_steps` | Audit trail of completed steps | Comment or custom field |
 | `current_step` | Active workflow step | Status or workflow transition |
-| `refinement_validated` | N/A — local-only field | Local flag set by `/enrich` when brief comment is posted and knowledge publish succeeds; not synced as a dedicated tracker field |
+| `refinement_validated` | N/A — local-only field | Local flag set by `/enrich --brief` when brief comment is posted and knowledge publish succeeds; `false` without `--brief`. Not synced as a dedicated tracker field |
 | `rhoaias_update` | N/A — local-only field | Local RHOAIAS.md freshness tracking; not synced as a dedicated tracker field |
 | `published` | N/A — local-only field | Local closure/publish metadata; not pushed via field mapping |
 | `completed` | N/A — local-only field | Local completion timestamp/metadata; not pushed via field mapping |
