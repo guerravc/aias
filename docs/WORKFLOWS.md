@@ -24,7 +24,7 @@ Commands use a **structured interactive mechanism** for gates. `AskQuestion` is 
 **Gate types:** Confirmation, Decision, Feedback, Approval, Precondition. Each gate follows the Gate Invocation Protocol: Context → Gate → Action.
 
 Key gates across the workflow:
-- `/enrich` — Classification Comprehension (when classification is ambiguous), Tracker Write Preview (before writing to tracker), DoR Readiness Check (before writing DoR/DoD)
+- `/enrich` — Classification Comprehension (when classification is ambiguous), Brief Comment Preview (only with `--brief`), Tracker Write Preview (only with `--fields`), DoR Readiness Check (before writing DoR/DoD)
 - `/blueprint` — Comprehension (skippable with `--fast`), Preview (always fires)
 - `/validate-plan` — Amendment Approval (when DoR/DoD amendments proposed), Validation Result
 - `/consolidate-plan` — Update Approval (technical artifacts), Amendment Approval (DoR/DoD artifacts)
@@ -57,7 +57,7 @@ flowchart TD
     Start --> Entry{"Feature, Bugfix,<br/>Refactor, Enrichment,<br/>or Delivery?"}
 
     Entry -->|Feature| Product["@product<br/>analysis"]
-    Product --> Enrich["/enrich<br/>DoR + DoD + brief comment + publish"]
+    Product --> Enrich["/enrich<br/>DoR + DoD + publish"]
     Enrich --> Planning["@planning<br/>/blueprint<br/>ready → in_progress"]
     Planning --> Validate["/validate-plan"]
     Validate --> Amendments{"DoR/DoD<br/>amendments?"}
@@ -84,11 +84,11 @@ flowchart TD
     BugBlueprint --> Validate
 
     Entry -->|Refactor| RefProduct["@product<br/>analysis"]
-    RefProduct --> RefEnrich["/enrich<br/>DoR refactor template + brief comment"]
+    RefProduct --> RefEnrich["/enrich<br/>DoR refactor template + publish"]
     RefEnrich --> Planning
 
     Entry -->|Enrichment| EnrichProduct["@product<br/>analysis"]
-    EnrichProduct --> EnrichOnly["/enrich<br/>DoR + DoD + brief comment + publish"]
+    EnrichProduct --> EnrichOnly["/enrich<br/>DoR + DoD + publish"]
     EnrichOnly --> EnrichDone["Task complete<br/>(no implementation)"]
 
     Entry -->|Delivery| DeliveryMode["@delivery<br/>/charter"]
@@ -119,9 +119,10 @@ TASK: Analyze with product frameworks (JTBD, 5 Whys, User Journey, MoSCoW).
 - Product analysis (JTBD, 5 Whys, User Journey, MoSCoW) → Gap Summary → Enhanced content
 - `analysis.product.md`, `dor.plan.md`, `dod.plan.md` written to `<resolved_tasks_dir>/<TASK_ID>/`
 - DoR Readiness Check gate with blocking/non-blocking classification
-- Structured fields MAY be written to the resolved tracker provider after user confirmation
 - All artifacts published to knowledge provider (Phase 5c unconditional)
-- Canonical transition **pending_dor → ready** (after successful publish)
+- With `--brief`: enrichment brief posted as Jira comment (team context for refinement)
+- With `--fields`: structured fields written to tracker after confirmation (Description, AC, Test Steps)
+- No tracker status transition (`pending_dor → ready` is manual)
 
 ---
 
@@ -481,16 +482,16 @@ TASK: Analyze with product frameworks (JTBD, 5 Whys, User Journey, MoSCoW).
 - Product analysis (JTBD, 5 Whys, User Journey, MoSCoW) → Gap Summary → Enhanced content
 - `analysis.product.md`, `dor.plan.md`, `dod.plan.md` written to `<resolved_tasks_dir>/<TASK_ID>/`
 - DoR Readiness Check gate with blocking/non-blocking classification
-- Confirmation prompt before writing enriched fields to the resolved tracker provider (`Description`, Acceptance Criteria, Test Steps, priority, components)
-- `Enhanced by` headers are applied only to the remote tracker payload, not to the local artifact
-- Full local analysis stays in `analysis.product.md`; the tracker receives a curated field-by-field representation
 - All artifacts published to knowledge provider (Phase 5c unconditional)
-- Canonical transition `pending_dor → ready` (after successful publish)
+- With `--brief`: enrichment brief posted as Jira comment for team refinement context
+- With `--fields`: structured fields written to tracker (`Description`, AC, Test Steps) — `Enhanced by` headers applied only to remote payload
+- No tracker status transition (`pending_dor → ready` is manual)
 
 **Result:**
-- Tracker ticket enriched with missing product and technical detail through field updates, without local-path comments
 - DoR/DoD artifacts ready for `@planning` + `/blueprint`
-- Enriched artifact can feed into `@planning` + `/blueprint`
+- Knowledge provider has published artifacts
+- With `--brief`: team has brief comment on Jira for refinement context
+- With `--fields`: tracker ticket enriched with curated field representation
 
 ---
 
@@ -685,11 +686,11 @@ For the complete resilience model (local-first guarantees, failure scenarios, re
 
 ## Tracker Sync Milestones
 
-Four commands trigger canonical tracker operations. Transitions only fire when `task_id` in `status.md` is valid for the resolved tracker provider.
+Three commands trigger canonical tracker transitions. `/enrich` publishes artifacts and optionally posts comments/fields but does not transition status. Transitions only fire when `task_id` in `status.md` is valid for the resolved tracker provider.
 
 | Command | Condition | Canonical transition |
 |---------|-----------|----------------------|
-| `/enrich` | Brief comment posted + Confluence publish successful | — (no tracker transition; `pending_dor → ready` is manual) |
+| `/enrich` | Confluence publish successful; brief comment posted if `--brief`; fields written if `--fields` | — (no tracker transition; `pending_dor → ready` is manual) |
 | `/blueprint` | Phase 0 starts with DoR/DoD valid (normal path) | `ready` → `in_progress` |
 | `/blueprint` (bug exception) | Phase 0 starts, DoR/DoD generated via bug exception | `pending_dor` → `in_progress` |
 | `/pr` | PR created successfully | `in_progress` → `in_review` |
@@ -830,7 +831,7 @@ For the complete artifact catalog (suffixes, producers, and descriptions), see `
 → `@delivery` + `/charter`
 
 **Need a product enrichment summary?**
-→ `@product` + `/enrich` (posts enrichment brief as Jira comment)
+→ `@product` + `/enrich --brief` (posts enrichment brief as Jira comment)
 
 **Need a bug fix report?**
 → `@debug` → `/report`
