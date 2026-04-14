@@ -1154,7 +1154,7 @@ def cmd_health() -> None:
 
     # 10. Provider referenced files (resource_files validation)
     CATEGORIES_WITH_RESOURCE_FILES = {"tracker", "knowledge"}
-    LEGACY_PREFIXES = ("aias/.skills/", "aias-providers/")
+    LEGACY_PREFIXES = ("aias-providers/",)
     if PROVIDERS_DIR.is_dir():
         for cfg in sorted(PROVIDERS_DIR.glob("*-config.md")):
             cat = cfg.stem.replace("-config", "")
