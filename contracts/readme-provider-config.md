@@ -296,8 +296,7 @@ If any condition fails, consumers MUST abort dependent publishing operations wit
 When `skill_binding.resource_files` is declared:
 
 - Every `*_source` key value in `providers.<active_provider>` MUST have its path listed in `resource_files`.
-- Every path in `resource_files` MUST point to an existing file.
-- Paths pointing to `aias/.skills/` are valid but legacy (deprecated in v7.5).
+- Every path in `resource_files` MUST point to an existing file under `aias-config/providers/`.
 
 If any condition fails, consumers MUST report the inconsistency and request configuration correction.
 
