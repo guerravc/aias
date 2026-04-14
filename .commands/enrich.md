@@ -4,7 +4,7 @@
 
 **Command Type:** Operative — Procedural / Execution
 
-You are **analyzing, enriching, and refining** a task for autonomous development. This command reads tracker data for the provided task id via the resolved tracker provider, evaluates its completeness against a product and technical checklist, classifies the task shape for description formatting, generates missing content, writes the product analysis to the task directory, and posts an enrichment brief as a Jira comment for team context during refinement. Additionally, it produces **Definition of Ready** (`dor.plan.md`) and **Definition of Done** (`dod.plan.md`) artifacts from a dedicated structuring phase and publishes all artifacts to the knowledge provider. Tracker field writes (Description, AC, Test Steps) are optional and only executed when the user explicitly requests them.
+You are **analyzing, enriching, and refining** a task for autonomous development. This command reads tracker data for the provided task id via the resolved tracker provider, evaluates its completeness against a product and technical checklist, classifies the task shape for description formatting, generates missing content, writes the product analysis to the task directory, and publishes all artifacts to the knowledge provider. Additionally, it produces **Definition of Ready** (`dor.plan.md`) and **Definition of Done** (`dod.plan.md`) artifacts from a dedicated structuring phase. External writes to the tracker are opt-in via flags: `--brief` posts an enrichment brief as a Jira comment for team context during refinement; `--fields` writes structured fields (Description, AC, Test Steps) to the tracker.
 
 The local artifact remains the complete canonical analysis; tracker fields receive a provider-adapted representation for collaboration.
 
@@ -17,15 +17,28 @@ The local artifact remains the complete canonical analysis; tracker fields recei
 Invocation:
 
 - `/enrich <TASK_ID>`
+- `/enrich <TASK_ID> --brief`
+- `/enrich <TASK_ID> --fields`
+- `/enrich <TASK_ID> --brief --fields`
+- `/enrich --brief` (when TASK_ID is provided via Structured Prompt)
+- `/enrich --brief --fields`
+
+Flags:
+
+- `--brief` — Post an enrichment brief as a Jira comment for team context during refinement. Fires the Brief Comment Preview gate. Required for `refinement_validated: true`.
+- `--fields` — Write structured fields (Description, AC, Test Steps) to the tracker. Fires the Tracker Write Preview gate.
+
+Without flags, `/enrich` performs analysis, writes local artifacts, and publishes to the knowledge provider (Confluence). No writes to Jira.
 
 Usage notes:
 
 - `<TASK_ID>` is required (e.g., `MAX-12761`). When the task id maps to a tracker ticket, the resolved tracker provider is used for enrichment. It also sets TASK_DIR to <resolved_tasks_dir>/<TASK_ID>/. (Default: `~/.cursor/plans/`)
 - The enriched output is always written to `analysis.product.md` in TASK_DIR.
 - DoR/DoD artifacts (`dor.plan.md`, `dod.plan.md`) are written to TASK_DIR after the readiness check.
-- An enrichment brief is always posted as a Jira comment (after user confirmation) to provide team context for refinement.
-- Remote enrichment of tracker fields (Description, AC, Test Steps) is optional — only executed when the user explicitly requests it (e.g., "write fields", "update tracker fields", "push fields to Jira").
-- `Enhanced by` headers exist only in the remote push representation. They do NOT appear in `analysis.product.md` or the local preview content.
+- `--brief` posts an enrichment brief as a Jira comment (after user confirmation via gate). Without `--brief`, no Jira comment is posted.
+- `--fields` writes structured tracker fields (Description, AC, Test Steps). Without `--fields`, no tracker fields are modified.
+- The absence of `--brief` or `--fields` is not a gate bypass — it is a branch not activated. The gates only apply when the corresponding flag enables the external write path.
+- `Enhanced by` headers exist only in the remote push representation (`--fields`). They do NOT appear in `analysis.product.md` or the local preview content.
 - This command does NOT transition the tracker status. The `pending_dor → ready` transition is a manual team responsibility during refinement.
 - This command works best after `@product` has provided product analysis (JTBD, 5 Whys, User Journey, MoSCoW), but it can also be used standalone.
 
@@ -79,9 +92,9 @@ Rules:
 
 Write `analysis.product.md` to TASK_DIR with the full enriched content (gap summary, enhanced ticket content, product analysis).
 
-### Brief Comment Output
+### Brief Comment Output (only with `--brief`)
 
-An enrichment brief is always posted as a Jira comment via `addCommentToJiraIssue`. The brief is an executive summary derived from `analysis.product.md` with the following sections:
+When the `--brief` flag is present, an enrichment brief is posted as a Jira comment via `addCommentToJiraIssue`. The brief is an executive summary derived from `analysis.product.md` with the following sections:
 
 | Section | Content | Condition |
 |---------|---------|-----------|
@@ -97,9 +110,9 @@ An enrichment brief is always posted as a Jira comment via `addCommentToJiraIssu
 
 The brief comment MUST NOT include local filesystem paths, machine-specific references, or `Enhanced by` headers.
 
-### Optional: Explicit Tracker Field Write
+### Tracker Field Write (only with `--fields`)
 
-Tracker field writes are **not automatic**. They are executed only when the user explicitly requests them (trigger phrases: "write fields", "update tracker fields", "push fields to Jira").
+Tracker field writes are executed only when the `--fields` flag is present.
 
 When requested, write the following remote enrichment to the resolved tracker provider:
 - **Description**: preserve human content outside the Rho AIAS-owned block; insert or update a curated `Enhanced by` block using only the relevant narrative subset from the analysis.
@@ -158,10 +171,10 @@ Present classification context in chat:
 - `user` → Continue with the user-declared classification
 - `neutral` → Continue with a neutral description format and no specialized template
 
-### Gate: Brief Comment Preview
+### Gate: Brief Comment Preview (only with `--brief`)
 
 **Type:** Confirmation
-**Fires:** Phase 4, after writing local artifacts, before posting the brief comment.
+**Fires:** Only when `--brief` flag is present. After writing local artifacts and publishing to knowledge provider, before posting the brief comment.
 **Skippable:** No.
 
 **Context output:**
@@ -183,10 +196,10 @@ Present the full brief comment in chat for review.
 
 **Anti-bypass:** Inherits Gate Invocation Protocol. No additional rules.
 
-### Gate: Tracker Write Preview (Optional — only when user requests field write)
+### Gate: Tracker Write Preview (only with `--fields`)
 
 **Type:** Confirmation
-**Fires:** Only when user explicitly requests tracker field write, before writing structured fields to the resolved tracker provider.
+**Fires:** Only when `--fields` flag is present, before writing structured fields to the resolved tracker provider.
 **Skippable:** No.
 
 **Context output:**
@@ -206,7 +219,7 @@ Present tracker write preview in chat:
 - **allow_multiple:** false
 
 **On response:**
-- `write` → Execute Phase 3b (Field Write Plan) → write the remote enrichment payload to the resolved tracker provider
+- `write` → Write the remote enrichment payload to the resolved tracker provider (Phase 3b already resolved the field write plan)
 - `skip` → Skip tracker write; local artifacts are still written
 
 **Anti-bypass:** Inherits Gate Invocation Protocol. No additional rules.
@@ -247,26 +260,26 @@ DoR READINESS (<work_type>):
 
 ### End-of-Response Confirmation
 
-After writing all artifacts:
+After all phases complete:
 ```
 Saved artifacts to: <absolute_path>/
   - analysis.product.md
   - dor.plan.md
   - dod.plan.md
-[Brief comment: posted | skipped]
 [Knowledge provider: published | skipped | failed]
-[Tracker fields: updated (<list>) | not requested]
+[Brief comment: posted | skipped | not requested (no --brief)]
+[Tracker fields: updated (<list>) | skipped | not requested (no --fields)]
 ```
 
 ### Status Update (Phase 5)
 
-After writing artifacts:
+After writing local artifacts:
 1. Create TASK_DIR and `status.md` if they do not exist (profile: infer from context, default `feature`; if only enrichment is planned, use `enrichment`).
 2. Add `analysis.product.md`, `dor.plan.md`, and `dod.plan.md` to `artifacts` map with status `created` or `modified`.
 3. Add `refinement` to `completed_steps`. Set `current_step` based on the profile: if `enrichment` → `closure`; otherwise → `blueprint`.
-4. Set `refinement_validated` in `status.md`: `true` if brief comment was posted AND knowledge publish succeeded (team has context for refinement); `false` otherwise.
-5. Append to `command_log`: `{command: /enrich, started_at: <UTC>, ended_at: <UTC>}` — obtain timestamps via `date -u +%Y-%m-%dT%H:%M:%SZ`. See `reference.md` § Command Log for full rules.
-6. Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification.
+4. Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification.
+5. Set `refinement_validated` in `status.md`: `true` if `--brief` was used, brief comment was posted, AND knowledge publish succeeded (team has context for refinement); `false` otherwise. This evaluation happens **after** Phase 5c and after the brief comment (if `--brief`).
+6. Append to `command_log`: `{command: /enrich, started_at: <UTC>, ended_at: <UTC>}` — obtain timestamps via `date -u +%Y-%m-%dT%H:%M:%SZ`. See `reference.md` § Command Log for full rules.
 
 ---
 
@@ -392,9 +405,9 @@ Structure the information collected in Phase 2 and Phase 3 into DoR and DoD arti
 
 After structuring, fire **Gate: DoR Readiness Check**.
 
-### Phase 3b — Field Write Plan (Optional — only when user requests field write)
+### Phase 3b — Field Write Plan (only with `--fields`)
 
-When the user explicitly requests tracker field write, resolve the format for each target field before presenting the write preview:
+When the `--fields` flag is present, resolve the format for each target field before presenting the write preview:
 
 For each field that `/enrich` intends to write:
 
@@ -414,12 +427,10 @@ Include the resolved write plan in the **Gate: Tracker Write Preview** context o
 1. Show in chat: Gap Summary table + Enhanced Ticket content + DoR/DoD summary.
 2. Write `analysis.product.md` to TASK_DIR.
 3. Write `dor.plan.md` and `dod.plan.md` to TASK_DIR.
-4. Generate brief comment from `analysis.product.md` (executive summary — see Brief Comment Output).
-5. Fire **Gate: Brief Comment Preview**.
-6. If confirmed: post brief as comment via `addCommentToJiraIssue`.
-7. Run Phase 5 (status update).
-
-When the user explicitly requests tracker field write, execute Phase 3b (Field Write Plan) → fire **Gate: Tracker Write Preview** → write the remote enrichment payload to the resolved tracker provider.
+4. Run Phase 5 (status update + Phase 5c knowledge publish).
+5. If `--brief`: generate brief comment from `analysis.product.md` (executive summary — see Brief Comment Output) → fire **Gate: Brief Comment Preview** → if confirmed, post brief as comment via `addCommentToJiraIssue` → update `refinement_validated` to `true` in `status.md`.
+6. If `--fields`: execute Phase 3b (Field Write Plan) → fire **Gate: Tracker Write Preview** → write the remote enrichment payload to the resolved tracker provider.
+7. End-of-Response Confirmation.
 
 SERVICE RESOLUTION PSEUDOFLOW:
 
