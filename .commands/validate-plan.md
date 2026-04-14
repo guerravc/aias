@@ -199,5 +199,5 @@ This command must **NOT**:
 - Perform deep analysis beyond identifying missing elements
 - Assume a task directory if none was provided; ask for task ID or path
 - Modify the `status` field in `status.md` (it remains `in_progress` as set by `/blueprint`)
-- Trigger any tracker status transition (tracker transitions are owned by `/enrich`, `/blueprint`, `/pr` (owns `in_progress → in_review`), and `/commit` (verifies `in_review`))
+- Trigger any tracker status transition (tracker transitions are owned by `/blueprint`, `/pr` (owns `in_progress → in_review`), and `/commit` (verifies `in_review`))
 - Publish locally-amended DoR/DoD artifacts via Phase 5c (those are reconciled via `/publish`)
