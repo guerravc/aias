@@ -320,39 +320,7 @@ Triggered when `[WARN] Legacy shortcuts` appears in health output.
 1. This is resolved automatically by Scenario B (re-running `generate --shortcuts`).
 2. New shortcuts will point to `aias-config/` locations.
 
-### Scenario D — Legacy skill path in resource_files (`aias/.skills/` prefix)
-
-Triggered when `[WARN] Referenced files` mentions "Legacy location: aias/.skills/...".
-
-1. Fire the Skill Path Migration gate:
-
-**AskQuestion:**
-- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
-- **Prompt:** "Referenced files use legacy skill path (`aias/.skills/`). Migrate to `aias-config/providers/<provider_id>/`?"
-- **Options:**
-  - `migrate`: "Migrate referenced files to aias-config/providers/"
-  - `skip`: "Skip migration"
-- **allow_multiple:** false
-
-2. If the user selects `migrate`:
-   - Copy referenced files from `aias/.skills/<skill>/` to `aias-config/providers/<provider_id>/`.
-   - Update `resource_files` and `*_source` paths in the corresponding `*-config.md`.
-   - Report migration results.
-   - Fire the Cleanup gate:
-
-**AskQuestion:**
-- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
-- **Prompt:** "Migration complete. Delete migrated files from legacy `aias/.skills/` location? (coexistence period expired in v8.0)"
-- **Options:**
-  - `delete`: "Delete migrated files from aias/.skills/"
-  - `keep`: "Keep legacy files (will continue triggering health warnings)"
-- **allow_multiple:** false
-
-   - If `delete`: remove only the specific files that were migrated from `aias/.skills/<skill>/`. Do NOT delete the entire `aias/.skills/` directory (it contains the active `rho-aias` skill).
-   - If `keep`: warn that the legacy paths will continue triggering health warnings.
-3. If the user selects `skip`: proceed without migration.
-
-### Scenario E — Canonical output binding migration
+### Scenario D — Canonical output binding migration
 
 Triggered when `[WARN] Legacy canonical bindings` or `[WARN] Deprecated binding` appears in health output.
 
@@ -375,7 +343,7 @@ Triggered when `[WARN] Legacy canonical bindings` or `[WARN] Deprecated binding`
    - Report migration results and suggest re-running `/aias health` to verify.
 3. If the user selects `skip`: proceed without migration.
 
-### Scenario F — Shortcut integrity failures
+### Scenario E — Shortcut integrity failures
 
 Triggered when `[FAIL] Shortcut integrity` appears in health output.
 
