@@ -87,7 +87,7 @@ Commands define **how to execute** and format output. They structure data from m
 - `/fix` — Structure debug data into fix analysis (writes to task directory)
 - `/report` — Generate validated bug RCA report and publish RCA fields when requested
 - `/pr` — Generate PR description
-- `/enrich` — Analyze and refine a tracker ticket; produces `analysis.product.md`, `dor.plan.md`, `dod.plan.md`; posts enrichment brief as Jira comment; publishes to knowledge provider (use with `@product` or standalone)
+- `/enrich` — Analyze and refine a tracker ticket; produces `analysis.product.md`, `dor.plan.md`, `dod.plan.md`; publishes to knowledge provider. Optional flags: `--brief` (post enrichment brief as Jira comment), `--fields` (write structured fields to tracker)
 - `/explain` — Concept-focused learning response (use in any mode, natural in `@product`)
 - `/trace` — Generate log instrumentation plan; writes to task directory (use with `@qa` or `@debug`)
 - `/assessment` — Evaluate fix feasibility; bridges `/fix` to `/blueprint` in bugfix flows (use with `@dev`)
@@ -238,7 +238,7 @@ TASK: Review the changes on the current branch. When done, /self-review.
 | `/peer-review` | Review a PR or third-party change | `@review` + PR URL/number | Findings + VCS-ready snippets + general review comment |
 | `/handoff` | Prepare the next chat with explicit context | Current chat context + optional TASK_DIR | Single Markdown handoff snippet |
 | `/pr` | PR description | Implementation context | PR template |
-| `/enrich` | Refine task: product analysis + DoR/DoD + brief comment + publish | Task ID + `@product` context | Task directory + brief comment |
+| `/enrich` | Refine task: product analysis + DoR/DoD + publish | Task ID + `@product` context + optional `--brief`/`--fields` | Task directory (+ brief comment if `--brief`) |
 | `/explain` | Concept learning | Topic or question | Structured explanation (chat) |
 | `/trace` | Log instrumentation plan | `@qa` or `@debug` context | Task directory |
 | `/assessment` | Evaluate fix feasibility | `@dev` + fix + issue | Task directory |
