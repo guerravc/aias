@@ -177,7 +177,7 @@ Classification is used **only for governance** (gates in `/implement`), not for 
 - **Standard:** MAY generate `## Governance` in `increments.plan.md` if risk warrants it.
 - **Critical:** MUST generate `## Governance` with at least one Approval gate.
 
-When `refinement_validated: true` in `status.md` (set by `/enrich` when brief comment is posted and knowledge publish succeeds — indicates team has context for refinement), classification-derived governance gates are relaxed (e.g., Critical does not require Pre-Implementation Approval in `/implement` if the team has enrichment context available).
+When `refinement_validated: true` in `status.md` (set by `/enrich --brief` when brief comment is posted and knowledge publish succeeds — indicates team has context for refinement), classification-derived governance gates are relaxed (e.g., Critical does not require Pre-Implementation Approval in `/implement` if the team has enrichment context available).
 
 ---
 
