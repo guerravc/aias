@@ -102,7 +102,7 @@ STATUS UPDATE (Phase 5 — after commits, when TASK_DIR is set):
 1. Append to `command_log`: `{command: /commit, started_at: <UTC>, ended_at: <UTC>}` — obtain timestamps via `date -u +%Y-%m-%dT%H:%M:%SZ`. See `reference.md` § Command Log for full rules.
 2. Add `commit` to `completed_steps` in `status.md`.
 3. Set `current_step` to `pr`.
-4. Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification.
+4. Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification. After each successful publish, inject TOC per resolved provider config (see **rho-aias** skill § Phase 5c).
 
 TRACKER SYNC (Phase 6 — after commits, execution mode only)
 - After all commits are done, resolve VCS provider from `aias-config/providers/vcs-config.md`.
