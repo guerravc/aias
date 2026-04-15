@@ -277,7 +277,7 @@ After writing local artifacts:
 1. Create TASK_DIR and `status.md` if they do not exist (profile: infer from context, default `feature`; if only enrichment is planned, use `enrichment`).
 2. Add `analysis.product.md`, `dor.plan.md`, and `dod.plan.md` to `artifacts` map with status `created` or `modified`.
 3. Add `refinement` to `completed_steps`. Set `current_step` based on the profile: if `enrichment` → `closure`; otherwise → `blueprint`.
-4. Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification.
+4. Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification. After each successful publish, inject TOC per resolved provider config (see **rho-aias** skill § Phase 5c).
 5. Set `refinement_validated` in `status.md`: `true` if `--brief` was used, brief comment was posted, AND knowledge publish succeeded (team has context for refinement); `false` otherwise. This evaluation happens **after** Phase 5c and after the brief comment (if `--brief`).
 6. Append to `command_log`: `{command: /enrich, started_at: <UTC>, ended_at: <UTC>}` — obtain timestamps via `date -u +%Y-%m-%dT%H:%M:%SZ`. See `reference.md` § Command Log for full rules.
 
@@ -427,7 +427,7 @@ Include the resolved write plan in the **Gate: Tracker Write Preview** context o
 1. Show in chat: Gap Summary table + Enhanced Ticket content + DoR/DoD summary.
 2. Write `analysis.product.md` to TASK_DIR.
 3. Write `dor.plan.md` and `dod.plan.md` to TASK_DIR.
-4. Run Phase 5 (status update + Phase 5c knowledge publish).
+4. Run Phase 5 (status update + Phase 5c knowledge publish). After each successful publish, inject TOC per resolved provider config (see **rho-aias** skill § Phase 5c).
 5. If `--brief`: generate brief comment from `analysis.product.md` (executive summary — see Brief Comment Output) → fire **Gate: Brief Comment Preview** → if confirmed, post brief as comment via `addCommentToJiraIssue` → update `refinement_validated` to `true` in `status.md`.
 6. If `--fields`: execute Phase 3b (Field Write Plan) → fire **Gate: Tracker Write Preview** → write the remote enrichment payload to the resolved tracker provider.
 7. End-of-Response Confirmation.
