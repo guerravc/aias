@@ -175,6 +175,12 @@ Phase 5 — STATUS UPDATE + ARTIFACT TRACKING + KNOWLEDGE SYNC
       Idempotent: re-publishing updates existing pages, never duplicates.
       If provider is unavailable at runtime: abort dependent sync operation
       and report provider unavailability.
+      After each successful artifact publish, check the resolved knowledge
+      provider config for a Table of Contents section. If present, inject
+      a provider-native TOC element per the algorithm defined in that
+      config (read page in native format, insert TOC node, update page).
+      This is a MANDATORY post-publish step when the config section exists
+      — not optional. TOC injection failure is non-blocking.
   5d. Completion check
 
 Phase 6 — TRACKER SYNC
