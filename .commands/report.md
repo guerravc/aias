@@ -212,7 +212,7 @@ resolveTrackerProvider():
 
 - Add `report` to `completed_steps`.
 - Set `current_step` to `closure`.
-- Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification.
+- Run Phase 5c: sync non-synced artifacts to resolved knowledge provider. Phase 5c always publishes — it is NOT conditioned by plan classification. After each successful publish, inject TOC per resolved provider config (see **rho-aias** skill § Phase 5c).
 
 ---
 
