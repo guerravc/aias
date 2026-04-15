@@ -108,7 +108,7 @@ The config MUST declare operational invariants as an explicit rules list. At min
 
 The config MUST include at least one concrete example showing the full hierarchy for a representative task.
 
-### Table of Contents (Optional)
+### Table of Contents (Optional Section — Mandatory Execution When Present)
 
 The publishing config MAY include a **Table of Contents** section. If present, the agent MUST inject a provider-native TOC element into every artifact page after each successful publish. The section MUST define:
 
@@ -156,7 +156,7 @@ Error response MUST include:
 | Title convention handles collisions | ☐ |
 | Rules section declares all mandatory invariants | ☐ |
 | Example section present | ☐ |
-| Table of Contents section present (optional — if present, algorithm is idempotent and non-blocking) | ☐ |
+| Table of Contents section present (section is optional; when present, TOC injection is mandatory after each publish — idempotent and non-blocking) | ☐ |
 
 ---
 
