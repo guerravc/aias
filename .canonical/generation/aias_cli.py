@@ -40,6 +40,26 @@ GENERATOR = CANONICAL_DIR / "generation" / "generate_modes_and_rules.py"
 KEBAB_RE = re.compile(r"^[a-z][a-z0-9]*(-[a-z0-9]+)*$")
 PROVIDER_CATEGORIES = ("knowledge", "tracker", "design", "vcs")
 
+HEADING_PAREN_RE = re.compile(r"\s*\(.*\)\s*$")
+
+EXPECTED_SECTIONS: Dict[str, Dict[str, List[str]]] = {
+    "confluence-config.md": {
+        "mandatory": ["Space", "Publishing Hierarchy", "TECH Resolution",
+                       "Date Resolution", "Navigation Algorithm", "Rules", "Example"],
+        "optional": ["Table of Contents"],
+    },
+    "jira-field-mapping.md": {
+        "mandatory": ["Precedence Rule", "Format Rules"],
+        "optional": [],
+    },
+    "tracker-status-mapping.md": {
+        "mandatory": ["Purpose", "Provider", "Canonical Status Catalog",
+                       "Canonical -> Provider Mapping", "Command Triggers",
+                       "Boundary Rules", "Resolution Rules"],
+        "optional": [],
+    },
+}
+
 SUPPORTED_TOOLS = ("cursor", "claude", "windsurf", "copilot", "codex")
 
 TOOL_CONTEXT_MAP: Dict[str, Tuple[str, ...]] = {
@@ -155,6 +175,37 @@ def existing_names(directory: pathlib.Path, suffix: str = ".mdc") -> List[str]:
     if not directory.is_dir():
         return []
     return sorted(p.stem for p in directory.glob(f"*{suffix}") if p.is_file())
+
+
+def _validate_sections(
+    content: str,
+    mandatory: List[str],
+    optional: List[str],
+    filename: str = "",
+) -> Tuple[List[str], List[Tuple[str, str]]]:
+    """Validate that ``## ``-level headings in *content* satisfy *mandatory* and *optional*.
+
+    Returns ``(missing_mandatory, inconsistencies)`` where *inconsistencies*
+    are ``(kind, detail)`` tuples.  The function is pure — no filesystem access.
+    """
+    found: List[str] = []
+    for line in content.splitlines():
+        if line.startswith("## "):
+            raw = line[3:].strip()
+            normalized = HEADING_PAREN_RE.sub("", raw).strip()
+            found.append(normalized)
+
+    missing = [s for s in mandatory if s not in found]
+
+    inconsistencies: List[Tuple[str, str]] = []
+    if filename == "confluence-config.md":
+        has_toc_ref = "injectTocIfMissing" in content
+        has_toc_section = "Table of Contents" in found
+        if has_toc_ref and not has_toc_section:
+            inconsistencies.append(
+                ("cross-reference",
+                 "Navigation/Rules reference injectTocIfMissing but ## Table of Contents section is absent"))
+    return missing, inconsistencies
 
 
 # ---------------------------------------------------------------------------
@@ -1195,6 +1246,33 @@ def cmd_health() -> None:
                     else:
                         results.append((check_name, "FAIL",
                             f"Missing: {rf}. Run /aias configure-providers to generate missing files"))
+
+    # 10b. Section validation for referenced files
+    if PROVIDERS_DIR.is_dir():
+        for provider_dir in sorted(PROVIDERS_DIR.iterdir()):
+            if not provider_dir.is_dir():
+                continue
+            for ref_file in sorted(provider_dir.glob("*.md")):
+                schema = EXPECTED_SECTIONS.get(ref_file.name)
+                if not schema:
+                    continue
+                ref_content = ref_file.read_text(encoding="utf-8", errors="replace")
+                missing, inconsistencies = _validate_sections(
+                    ref_content,
+                    schema["mandatory"],
+                    schema["optional"],
+                    filename=ref_file.name,
+                )
+                sec_check = f"Sections ({ref_file.name})"
+                if missing:
+                    results.append((sec_check, "FAIL",
+                        f"Missing mandatory section(s): {', '.join(missing)}. "
+                        f"Run /aias health in AI assistant to repair (Scenario F)"))
+                elif inconsistencies:
+                    for kind, detail in inconsistencies:
+                        results.append((sec_check, "WARN", f"{kind}: {detail}"))
+                else:
+                    results.append((sec_check, "OK", "All mandatory sections present"))
 
     # 11. Tasks directory
     tasks_dir_raw = _read_tasks_dir_from_profile()
