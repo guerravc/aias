@@ -10,6 +10,7 @@ import unittest
 
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parents[1]))
 import generate_modes_and_rules as gen
+import aias_cli
 
 
 # ---------------------------------------------------------------------------
@@ -538,6 +539,85 @@ class TestDiscoverProfiles(unittest.TestCase):
     def test_profile_missing_raises(self):
         with self.assertRaises(ValueError):
             gen.discover_profiles()
+
+
+# ---------------------------------------------------------------------------
+# _validate_sections (aias_cli)
+# ---------------------------------------------------------------------------
+
+class TestValidateSections(unittest.TestCase):
+    """Tests for aias_cli._validate_sections (pure, no filesystem)."""
+
+    CONFLUENCE_MANDATORY = aias_cli.EXPECTED_SECTIONS["confluence-config.md"]["mandatory"]
+    CONFLUENCE_OPTIONAL = aias_cli.EXPECTED_SECTIONS["confluence-config.md"]["optional"]
+
+    def _make_content(self, headings, body=""):
+        return "\n".join(f"## {h}" for h in headings) + "\n" + body
+
+    def test_all_mandatory_present(self):
+        content = self._make_content(self.CONFLUENCE_MANDATORY)
+        missing, inconsistencies = aias_cli._validate_sections(
+            content, self.CONFLUENCE_MANDATORY, self.CONFLUENCE_OPTIONAL,
+            filename="confluence-config.md")
+        self.assertEqual(missing, [])
+        self.assertEqual(inconsistencies, [])
+
+    def test_missing_mandatory_section(self):
+        headings = [h for h in self.CONFLUENCE_MANDATORY if h != "Rules"]
+        content = self._make_content(headings)
+        missing, _ = aias_cli._validate_sections(
+            content, self.CONFLUENCE_MANDATORY, self.CONFLUENCE_OPTIONAL,
+            filename="confluence-config.md")
+        self.assertEqual(missing, ["Rules"])
+
+    def test_heading_normalization(self):
+        headings = [
+            "Space", "Publishing Hierarchy", "TECH Resolution (priority order)",
+            "Date Resolution", "Navigation Algorithm (find-or-create)",
+            "Rules", "Example",
+        ]
+        content = self._make_content(headings)
+        missing, _ = aias_cli._validate_sections(
+            content, self.CONFLUENCE_MANDATORY, self.CONFLUENCE_OPTIONAL,
+            filename="confluence-config.md")
+        self.assertEqual(missing, [])
+
+    def test_optional_section_absent_no_error(self):
+        content = self._make_content(self.CONFLUENCE_MANDATORY)
+        missing, inconsistencies = aias_cli._validate_sections(
+            content, self.CONFLUENCE_MANDATORY, self.CONFLUENCE_OPTIONAL,
+            filename="confluence-config.md")
+        self.assertEqual(missing, [])
+        self.assertEqual(inconsistencies, [])
+
+    def test_toc_cross_reference_inconsistency(self):
+        content = self._make_content(
+            self.CONFLUENCE_MANDATORY,
+            body="call injectTocIfMissing(cloudId, pageId)")
+        missing, inconsistencies = aias_cli._validate_sections(
+            content, self.CONFLUENCE_MANDATORY, self.CONFLUENCE_OPTIONAL,
+            filename="confluence-config.md")
+        self.assertEqual(missing, [])
+        self.assertEqual(len(inconsistencies), 1)
+        self.assertEqual(inconsistencies[0][0], "cross-reference")
+
+    def test_toc_present_no_inconsistency(self):
+        headings = self.CONFLUENCE_MANDATORY + ["Table of Contents"]
+        content = self._make_content(
+            headings, body="call injectTocIfMissing(cloudId, pageId)")
+        missing, inconsistencies = aias_cli._validate_sections(
+            content, self.CONFLUENCE_MANDATORY, self.CONFLUENCE_OPTIONAL,
+            filename="confluence-config.md")
+        self.assertEqual(missing, [])
+        self.assertEqual(inconsistencies, [])
+
+    def test_all_three_file_types(self):
+        for fname, schema in aias_cli.EXPECTED_SECTIONS.items():
+            content = self._make_content(schema["mandatory"])
+            missing, inconsistencies = aias_cli._validate_sections(
+                content, schema["mandatory"], schema["optional"], filename=fname)
+            self.assertEqual(missing, [], f"Unexpected missing for {fname}")
+            self.assertEqual(inconsistencies, [], f"Unexpected inconsistency for {fname}")
 
 
 if __name__ == "__main__":
