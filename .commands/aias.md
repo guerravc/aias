@@ -244,22 +244,46 @@ This is an **AI agent command** (not a CLI subcommand). It uses MCP discovery to
 3. **MCP availability check**: Attempt to connect to the MCP server declared in the selected provider config.
 4. **Discovery mode** (MCP available):
    - For `tracker`: read sample tickets, discover field schemas via `getJiraIssue` with metadata, list available transitions, statuses, components, priorities. Generate `jira-field-mapping.md` and `tracker-status-mapping.md` with real field IDs, schemas, and option catalogs.
-   - For `knowledge`: read space metadata, discover page hierarchy. Generate `confluence-config.md` with real space key, root page ID, and TECH resolution table.
-5. **Fallback mode** (MCP unavailable): Read the governing contract for each file (`readme-tracker-field-mapping.md`, `readme-knowledge-publishing-config.md`, `readme-tracker-status-mapping.md`) and generate a skeleton file with contractual placeholders that the user must fill manually.
-6. **Write files**: Write generated files to `aias-config/providers/<provider_id>/` (e.g., `aias-config/providers/atlassian/`).
-7. **Update config**: Update `resource_files` and `*_source` paths in the corresponding `*-config.md` to point to the newly created files.
-8. **Report**: Show the user which files were generated and their locations.
+   - For `knowledge`: read space metadata, discover page hierarchy. Generate `confluence-config.md` with real space key, root page ID, and TECH resolution table. Then fire the TOC Injection gate.
+5. **TOC Injection gate** (knowledge providers only): determine whether to include the `## Table of Contents` section. See gate definition below.
+6. **Fallback mode** (MCP unavailable): Read the governing contract for each file (`readme-tracker-field-mapping.md`, `readme-knowledge-publishing-config.md`, `readme-tracker-status-mapping.md`) and generate a skeleton file with contractual placeholders that the user must fill manually. For knowledge providers, fire the TOC Injection gate on the skeleton as well.
+7. **Write files**: Write generated files to `aias-config/providers/<provider_id>/` (e.g., `aias-config/providers/atlassian/`).
+8. **Update config**: Update `resource_files` and `*_source` paths in the corresponding `*-config.md` to point to the newly created files.
+9. **Report**: Show the user which files were generated and their locations.
+
+#### Gate: TOC Injection
+
+**Type:** Decision
+**Fires:** During `configure-providers`, after generating base knowledge publishing config (steps 4 or 6).
+**Skippable:** No.
+
+**Context output:**
+"The knowledge publishing contract supports an optional Table of Contents section. When present, a provider-native TOC macro is injected into every artifact page after publish."
+
+**AskQuestion:**
+- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
+- **Prompt:** "Include Table of Contents injection in publishing config?"
+- **Options:**
+  - `include_toc`: "Yes — inject TOC macro after each artifact publish"
+  - `skip_toc`: "No — publish without TOC"
+- **allow_multiple:** false
+
+**On response:**
+- `include_toc` → Generate the `## Table of Contents` section per `readme-knowledge-publishing-config.md` § Table of Contents, and wire `injectTocIfMissing` into the `## Rules` section.
+- `skip_toc` → Omit `## Table of Contents` section entirely. Do NOT include `injectTocIfMissing` references in Rules.
+
+**Anti-bypass:** Inherits Gate Invocation Protocol. No additional rules.
 
 No templates directory is created. The contracts are the single source of truth for file structure.
 
 ---
 
-## 9. `health` — Legacy Migration Assistance
+## 9. `health` — Migration and Repair Assistance
 
-When the AI agent executes `/aias health` and the CLI output contains `[WARN]` entries with "Legacy" or "Deprecated" in the check name or detail:
+When the AI agent executes `/aias health` and the CLI output contains `[WARN]` or `[FAIL]` entries with "Legacy", "Deprecated", or "Sections" in the check name or detail:
 
-1. Parse the health output for all legacy and deprecation warnings.
-2. For each detected scenario, present an interactive gate and offer migration/cleanup:
+1. Parse the health output for all actionable warnings and failures.
+2. For each detected scenario, present an interactive gate and offer migration/cleanup/repair:
 
 ### Scenario A — Provider directory migration (`aias-providers/` → `aias-config/providers/`)
 
@@ -351,6 +375,35 @@ Triggered when `[FAIL] Shortcut integrity` appears in health output.
 2. Offer to execute: `python3 aias/.canonical/generation/aias_cli.py generate --shortcuts`
 3. If the generator exits with code 1 (G6/G7 post-flight errors persist after regeneration), inform the user that deeper issues exist — likely a mismatch between the stack-profile bindings and canonical templates that requires manual review.
 4. If the generator exits with code 0, report success and suggest re-running `/aias health` to verify.
+
+### Scenario F — Missing contract sections in referenced files
+
+Triggered when `[FAIL] Sections (<type>)` or `[WARN] Sections (<type>)` appears in health output.
+
+1. Parse the health output for all section validation failures and warnings.
+2. For each affected referenced file, read the governing contract to understand the required section structure.
+3. Read the existing referenced file to understand current content.
+4. Fire the Section Repair gate:
+
+**AskQuestion:**
+- **Runtime compatibility:** If `AskQuestion` is unavailable, use the Text Gate Protocol from `readme-commands.md` with the same prompt, option ids, labels, and `allow_multiple` semantics.
+- **Prompt:** "`<file>` is missing N mandatory section(s): `<list>`. Repair by adding the missing sections per the governing contract?"
+- **Options:**
+  - `repair`: "Add missing sections (preserves existing content)"
+  - `skip`: "Skip — I will fix manually"
+- **allow_multiple:** false
+
+**Anti-bypass:** Inherits Gate Invocation Protocol. No additional rules.
+
+5. If `repair`:
+   - Read the governing contract for the exact section schema.
+   - Generate the missing section(s) with contractual placeholders.
+   - Insert at the correct position per the contract's mandatory order.
+   - Do NOT modify or reorder existing sections.
+   - Report what was added and suggest re-running `/aias health` to verify.
+6. If `skip`: proceed without repair.
+
+For `[WARN]` inconsistencies (e.g., TOC cross-reference without `## Table of Contents`): present the inconsistency and offer to either add the missing optional section or remove the dangling reference, per user choice.
 
 ---
 
